@@ -5,14 +5,14 @@ import java.util.ArrayList;
 /**
  * Created by Martin Eberle aka WillShakesBeer on 23.11.2021.
  */
-public class Spielfeld {
+public class Board {
     int laenge;
     int breite;
     ArrayList<Obstacle> obstacles;
     ArrayList<Robot> robots;
 
 
-    public Spielfeld(int laenge, int breite , ArrayList<Obstacle> obstacles , ArrayList<Robot> robots){
+    public Board(int laenge, int breite , ArrayList<Obstacle> obstacles , ArrayList<Robot> robots){
         this.laenge = laenge;
         this.breite = breite;
         this.obstacles = obstacles;

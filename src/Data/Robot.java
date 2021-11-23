@@ -1,3 +1,5 @@
+package Data;
+
 public class Robot {
     Data.Coord coord;
     Data.Color color;

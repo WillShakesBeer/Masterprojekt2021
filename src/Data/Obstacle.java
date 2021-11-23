@@ -1,3 +1,4 @@
+package Data;
 
 public class Obstacle {
     Data.Coord coord;

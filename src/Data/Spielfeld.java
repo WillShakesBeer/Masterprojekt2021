@@ -1,3 +1,7 @@
+package Data;
+
+import java.util.ArrayList;
+
 /**
  * Created by Martin Eberle aka WillShakesBeer on 23.11.2021.
  */

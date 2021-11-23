@@ -5,9 +5,11 @@ package Data;
  */
 public class VictoryPoint {
     Data.Coord coord;
+    Color color;
 
-    public VictoryPoint(Data.Coord coord , ) {
+    public VictoryPoint(Data.Coord coord , Color color) {
         this.coord=coord;
+        this.color=color;
 
     }
 

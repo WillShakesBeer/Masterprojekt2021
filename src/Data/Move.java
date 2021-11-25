@@ -14,4 +14,28 @@ public class Move {
         this.prevPos=prevPos;
         this.nextPos=nextPos;
     }
+
+    public Color getColor() {
+        return color;
+    }
+
+    public void setColor(Color color) {
+        this.color = color;
+    }
+
+    public Coord getPrevPos() {
+        return prevPos;
+    }
+
+    public void setPrevPos(Coord prevPos) {
+        this.prevPos = prevPos;
+    }
+
+    public Coord getNextPos() {
+        return nextPos;
+    }
+
+    public void setNextPos(Coord nextPos) {
+        this.nextPos = nextPos;
+    }
 }

@@ -5,6 +5,7 @@ import Data.Enums.Color;
 import Data.Enums.Direction;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 // Controls the order of events in the Game
 
@@ -16,20 +17,24 @@ public class Game {
 
     //starts a new Game
     public Game(){
-        //Standard board parameters for testing
+        //Standard board parameters
         ArrayList<Obstacle> obstacleList = new ArrayList<Obstacle>();
         ArrayList<Robot> robotList = new ArrayList<Robot>();
+        ArrayList<VictorySpawn> victorySpawns = new ArrayList<VictorySpawn>();
+        VictoryPoint victoryPoint = new VictoryPoint(new Coord(4,4),Color.RED);
         robotList.add(new Robot(new Coord(0,0), Color.RED));
         robotList.add(new Robot(new Coord(0,16),Color.BLUE));
         robotList.add(new Robot(new Coord(16,0),Color.YELLOW));
         robotList.add(new Robot(new Coord(16,16),Color.GREEN));
-        Data.Board board = new Board(16,16,obstacleList,robotList);
-        state = new Gamestate(board,0);
 
+        Data.Board board = new Board(16,16,obstacleList,robotList,victorySpawns,victoryPoint);
+        state = new Gamestate(board,0);
     }
+
 
     //Moves Robot, returns 0 if movement successful
     //returns -1 if already facing an obstacle
+    //return 1 if robot has collected the victorypoint
     public int moveRobot(Color color, Direction dir){
         int result =0;
         Robot currRobot = this.state.getBoard().getRobot(color);
@@ -41,8 +46,38 @@ public class Game {
             Move move = new Move(color,currpos,newPos);
             this.state.addMove(move);
             currRobot.setCoord(newPos);
+            if(newPos.equals(this.state.getBoard().getVictorypoint().getCoord())
+                    && color.equals(this.state.getBoard().getVictorypoint().getColor())) {
+                this.state.setScore(this.state.getScore()+1);
+                this.createNewVictoryPoint();
+                this.state.setMoveList(new ArrayList<Move>());
+                return 1;
+            }
         }
         return result;
+    }
+
+    //Reverts the effect of the last move in Board.moveList
+    //Also deletes the move from the list
+    //returns 0 if successful
+    //returns -1 if moveList is empty
+    public int revertMove(){
+        if(!this.state.getMoveList().isEmpty()){
+            Move lastMove = this.state.moveList.get(this.state.getMoveList().size()-1);
+            this.state.getBoard().getRobot(lastMove.getColor()).setCoord(lastMove.getPrevPos());
+            this.state.getMoveList().remove(this.state.getMoveList().size()-1);
+            return 0;
+        }
+
+        return -1;
+    }
+
+    public void createNewVictoryPoint(){
+        Random rand = new Random();
+        int newIndex= rand.nextInt(this.state.getBoard().getVictorySpawns().size());
+        VictorySpawn spawn = this.state.getBoard().getVictorySpawns().get(newIndex);
+        VictoryPoint nextVic = new VictoryPoint(spawn.getCoord(),spawn.getColor());
+        this.state.board.setVictorypoint(nextVic);
     }
 
     //returns a possibly new Position after an executed movement

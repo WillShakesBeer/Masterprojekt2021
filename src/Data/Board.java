@@ -11,11 +11,16 @@ public class Board {
     int laenge;
     int breite;
 
+    ArrayList<VictorySpawn> victorySpawns;
+    VictoryPoint victoryPoint;
+
     ArrayList<Obstacle> obstacles;
     ArrayList<Robot> robots;
 
 
-    public Board(int laenge, int breite , ArrayList<Obstacle> obstacles , ArrayList<Robot> robots){
+    public Board(int laenge, int breite , ArrayList<Obstacle> obstacles ,
+                 ArrayList<Robot> robots, ArrayList<VictorySpawn> victorySpawns, VictoryPoint victoryPoint){
+        this.victorySpawns=victorySpawns;
         this.laenge = laenge;
         this.breite = breite;
         this.obstacles = obstacles;
@@ -50,13 +55,6 @@ public class Board {
         }
         return verticals;
     }
-
-    //ads obstacle to list of existing ones
-    public void addObstacle (Obstacle newObstacle){
-        obstacles.add(newObstacle);
-    }
-
-
 
     //getter
     public int getLaenge() {
@@ -93,4 +91,19 @@ public class Board {
         this.robots = robots;
     }
 
+    public VictoryPoint getVictorypoint() {
+        return victoryPoint;
+    }
+
+    public void setVictorypoint(VictoryPoint victorypoint) {
+        this.victoryPoint = victoryPoint;
+    }
+
+    public ArrayList<VictorySpawn> getVictorySpawns() {
+        return victorySpawns;
+    }
+
+    public void setVictorySpawns(ArrayList<VictorySpawn> victorySpawns) {
+        this.victorySpawns = victorySpawns;
+    }
 }

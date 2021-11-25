@@ -17,19 +17,10 @@ import java.util.ArrayList;
  * Created by Martin Eberle aka WillShakesBeer on 23.11.2021.
  */
 public class RunDis {
+
     public static void main (String[] args){
 
-        ArrayList<Robot> robotList = new ArrayList<Robot>();
-
-        robotList.add(new Data.Robot(new Coord(0,0), Data.Enums.Color.RED));
-        robotList.add(new Data.Robot(new Coord(0,15), Data.Enums.Color.BLUE));
-        robotList.add(new Data.Robot(new Coord(15,0), Data.Enums.Color.YELLOW));
-        robotList.add(new Robot(new Coord(15,15), Color.GREEN));
-
-        //obstacle list null for error reasons
-        Game game = new Game(robotList,null,null);
-        Display display = new Display(game);
-
+        Game game = startDefaultGame();
 
 
         final StringBuilder wordSearch = new StringBuilder();
@@ -45,7 +36,7 @@ public class RunDis {
 
 
 
-    public void startDefaultGame(){
+    public static game startDefaultGame(){
         ArrayList<Robot> robotList = new ArrayList<Robot>();
 
         robotList.add(new Data.Robot(new Coord(0,0), Data.Enums.Color.RED));

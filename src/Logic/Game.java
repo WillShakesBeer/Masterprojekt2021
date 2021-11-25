@@ -17,12 +17,13 @@ public class Game {
     ArrayList<Robot> robotList;
 
     //starts a new Game
-    public Game(ArrayList<Robot> robotList,ArrayList<Obstacle> obstacleList, VictoryPoint victoryPoint,
+    public Game(ArrayList<Robot> robotList,ArrayList<Obstacle> obstacleList,
                 ArrayList<VictorySpawn> victorySpawns){
         //Standard board parameters for testing
         this.obstacleList = obstacleList;
         this.robotList = robotList;
-        Data.Board board = new Board(16,16,obstacleList,robotList,victorySpawns,victoryPoint);
+        VictoryPoint newVic = createNewVictoryPoint();
+        Data.Board board = new Board(16,16,obstacleList,robotList,victorySpawns,newVic);
         state = new Gamestate(board,0);
 
     }
@@ -44,7 +45,8 @@ public class Game {
             if(newPos.equals(this.state.getBoard().getVictorypoint().getCoord())
                     && color.equals(this.state.getBoard().getVictorypoint().getColor())) {
                 this.state.setScore(this.state.getScore()+1);
-                this.createNewVictoryPoint();
+                VictoryPoint newVic = createNewVictoryPoint();
+                this.state.getBoard().setVictorypoint(newVic);
                 this.state.setMoveList(new ArrayList<Move>());
                 return 1;
             }
@@ -67,12 +69,12 @@ public class Game {
         return -1;
     }
 
-    public void createNewVictoryPoint(){
+    public VictoryPoint createNewVictoryPoint(){
         Random rand = new Random();
         int newIndex= rand.nextInt(this.state.getBoard().getVictorySpawns().size());
         VictorySpawn spawn = this.state.getBoard().getVictorySpawns().get(newIndex);
         VictoryPoint nextVic = new VictoryPoint(spawn.getCoord(),spawn.getColor());
-        this.state.board.setVictorypoint(nextVic);
+        return nextVic;
     }
 
     //returns a possibly new Position after an executed movement

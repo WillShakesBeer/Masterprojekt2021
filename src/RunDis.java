@@ -1,6 +1,8 @@
 import Data.Coord;
 import Data.Enums.Color;
+import Data.Obstacle;
 import Data.Robot;
+import Data.VictorySpawn;
 import Logic.Game;
 import View.Display;
 
@@ -23,7 +25,7 @@ public class RunDis {
         robotList.add(new Robot(new Coord(15,15), Color.GREEN));
 
         //obstacle list null for error reasons
-        Game game = new Game(robotList,null,null,null);
+        Game game = new Game(robotList,null,null);
         Display display = new Display(game);
 
 
@@ -40,7 +42,15 @@ public class RunDis {
     }
 
     public void startDefaultGame(){
+        ArrayList<Robot> robotList = new ArrayList<Robot>();
 
+        robotList.add(new Data.Robot(new Coord(0,0), Data.Enums.Color.RED));
+        robotList.add(new Data.Robot(new Coord(0,15), Data.Enums.Color.BLUE));
+        robotList.add(new Data.Robot(new Coord(15,0), Data.Enums.Color.YELLOW));
+        robotList.add(new Robot(new Coord(15,15), Color.GREEN));
+
+        ArrayList<Obstacle> obstacleList = new ArrayList<Obstacle>();
+        ArrayList<VictorySpawn> victorySpawns = new ArrayList<VictorySpawn>();
     }
 
 

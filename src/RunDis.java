@@ -59,7 +59,12 @@ public class RunDis {
         obstacleList.add(new Obstacle(new Coord(9,0),new Coord(10,0), ObsType.HORIZONTAL));
         obstacleList.add(new Obstacle(new Coord(5,1),new Coord(6,1), ObsType.HORIZONTAL));
         obstacleList.add(new Obstacle(new Coord(12,2),new Coord(13,2), ObsType.HORIZONTAL));
-        obstacleList.add(new Obstacle(new Coord(0,0),new Coord(0,0), ObsType.HORIZONTAL));
+        obstacleList.add(new Obstacle(new Coord(4,3),new Coord(5,3), ObsType.HORIZONTAL));
+        obstacleList.add(new Obstacle(new Coord(11,3),new Coord(0,3), ObsType.HORIZONTAL));
+        obstacleList.add(new Obstacle(new Coord(0,3),new Coord(0,3), ObsType.HORIZONTAL));
+        obstacleList.add(new Obstacle(new Coord(0,3),new Coord(0,3), ObsType.HORIZONTAL));
+        obstacleList.add(new Obstacle(new Coord(0,3),new Coord(0,3), ObsType.HORIZONTAL));
+        obstacleList.add(new Obstacle(new Coord(0,3),new Coord(0,3), ObsType.HORIZONTAL));
 
         ArrayList<VictorySpawn> victorySpawns = new ArrayList<VictorySpawn>();
         victorySpawns.add(new VictorySpawn(new Coord(4,3),Color.RED));
@@ -77,6 +82,8 @@ public class RunDis {
         victorySpawns.add(new VictorySpawn(new Coord(11,5),Color.GREEN));
 
         Config config = new Config(robotList,obstacleList,victorySpawns,0,15);
+
+        return config;
     }
 
 

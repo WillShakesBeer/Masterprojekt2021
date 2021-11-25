@@ -8,8 +8,8 @@ import java.util.ArrayList;
  * Created by Martin Eberle aka WillShakesBeer on 23.11.2021.
  */
 public class Board {
-    int laenge;
-    int breite;
+    int length;
+    int height;
 
     ArrayList<VictorySpawn> victorySpawns;
     VictoryPoint victoryPoint;
@@ -21,8 +21,8 @@ public class Board {
     public Board(int laenge, int breite , ArrayList<Obstacle> obstacles ,
                  ArrayList<Robot> robots, ArrayList<VictorySpawn> victorySpawns, VictoryPoint victoryPoint){
         this.victorySpawns=victorySpawns;
-        this.laenge = laenge;
-        this.breite = breite;
+        this.length = length;
+        this.height = height;
         this.obstacles = obstacles;
         this.robots = robots;
     }
@@ -57,22 +57,22 @@ public class Board {
     }
 
     //getter
-    public int getLaenge() {
-        return laenge;
+    public int getLength() {
+        return length;
     }
 
-    public int getBreite() {
-        return breite;
+    public int getHeight() {
+        return height;
     }
 
 
     //setter
-    public void setLaenge(int laenge) {
-        this.laenge = laenge;
+    public void setLength(int length) {
+        this.length = length;
     }
 
-    public void setBreite(int breite) {
-        this.breite = breite;
+    public void setHeight(int height) {
+        this.height = height;
     }
 
     public ArrayList<Obstacle> getObstacles() {

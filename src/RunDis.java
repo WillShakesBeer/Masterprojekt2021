@@ -60,9 +60,20 @@ public class RunDis {
         obstacleList.add(new Obstacle(new Coord(5,1),new Coord(6,1), ObsType.HORIZONTAL));
         obstacleList.add(new Obstacle(new Coord(12,2),new Coord(13,2), ObsType.HORIZONTAL));
         obstacleList.add(new Obstacle(new Coord(4,3),new Coord(5,3), ObsType.HORIZONTAL));
-        obstacleList.add(new Obstacle(new Coord(11,3),new Coord(0,3), ObsType.HORIZONTAL));
-        obstacleList.add(new Obstacle(new Coord(0,3),new Coord(0,3), ObsType.HORIZONTAL));
-        obstacleList.add(new Obstacle(new Coord(0,3),new Coord(0,3), ObsType.HORIZONTAL));
+        obstacleList.add(new Obstacle(new Coord(11,3),new Coord(12,3), ObsType.HORIZONTAL));
+        obstacleList.add(new Obstacle(new Coord(12,4),new Coord(13,4), ObsType.HORIZONTAL));
+        obstacleList.add(new Obstacle(new Coord(1,5),new Coord(2,5), ObsType.HORIZONTAL));
+        obstacleList.add(new Obstacle(new Coord(10,5),new Coord(11,5), ObsType.HORIZONTAL));
+        obstacleList.add(new Obstacle(new Coord(4,6),new Coord(5,6), ObsType.HORIZONTAL));
+        obstacleList.add(new Obstacle(new Coord(2,7),new Coord(3,7), ObsType.HORIZONTAL));
+        obstacleList.add(new Obstacle(new Coord(6,7),new Coord(7,7), ObsType.HORIZONTAL));
+        obstacleList.add(new Obstacle(new Coord(8,7),new Coord(9,7), ObsType.HORIZONTAL));
+        obstacleList.add(new Obstacle(new Coord(6,8),new Coord(7,8), ObsType.HORIZONTAL));
+        obstacleList.add(new Obstacle(new Coord(8,8),new Coord(9,8), ObsType.HORIZONTAL));
+        obstacleList.add(new Obstacle(new Coord(3,9),new Coord(4,9), ObsType.HORIZONTAL));
+        obstacleList.add(new Obstacle(new Coord(11,9),new Coord(12,9), ObsType.HORIZONTAL));
+        obstacleList.add(new Obstacle(new Coord(4,10),new Coord(5,10), ObsType.HORIZONTAL));
+        obstacleList.add(new Obstacle(new Coord(9,11),new Coord(0,11), ObsType.HORIZONTAL));
         obstacleList.add(new Obstacle(new Coord(0,3),new Coord(0,3), ObsType.HORIZONTAL));
         obstacleList.add(new Obstacle(new Coord(0,3),new Coord(0,3), ObsType.HORIZONTAL));
 

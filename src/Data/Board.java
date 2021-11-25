@@ -51,6 +51,13 @@ public class Board {
         return verticals;
     }
 
+    //ads obstacle to list of existing ones
+    public void addObstacle (Obstacle newObstacle){
+        obstacles.add(newObstacle);
+    }
+
+
+
     //getter
     public int getLaenge() {
         return laenge;

@@ -16,7 +16,7 @@ public class Game {
 
     //starts a new Game
     public Game(){
-        //Standard board parameters
+        //Standard board parameters for testing
         ArrayList<Obstacle> obstacleList = new ArrayList<Obstacle>();
         ArrayList<Robot> robotList = new ArrayList<Robot>();
         robotList.add(new Robot(new Coord(0,0), Color.RED));
@@ -25,6 +25,7 @@ public class Game {
         robotList.add(new Robot(new Coord(16,16),Color.GREEN));
         Data.Board board = new Board(16,16,obstacleList,robotList);
         state = new Gamestate(board,0);
+
     }
 
     //Moves Robot, returns 0 if movement successful

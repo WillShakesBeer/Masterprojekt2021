@@ -7,7 +7,6 @@ import java.util.ArrayList;
 
 public class Display {
     Game game;
-
     int viewHeight;
     int viewLength;
     char[][] view;
@@ -17,17 +16,18 @@ public class Display {
     }
 
     public char[][] displayGame(){
-      viewHeight = game.getState().getBoard().getHeight();
-      viewLength = game.getState().getBoard().getLength();
-      view = new char[viewHeight][viewLength];
 
-      //intitalizes the board for the first time
-      drawBoard(view);
+        viewHeight = game.getState().getBoard().getHeight();
+        viewLength = game.getState().getBoard().getLength();
+        view = new char[viewHeight][viewLength];
 
-      //draw robots adds robots onto the board
-      drawRobots(view);
+        //intitalizes the board for the first time
+        drawBoard(view);
 
-      return view;
+        //draw robots adds robots onto the board
+        drawRobots(view);
+
+        return view;
     }
 
     public void drawBoard (char[][] view){

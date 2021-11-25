@@ -7,6 +7,4 @@ public class Move {
         this.prevBoard=prevBoard;
         this.nextBoard=nextBoard;
     }
-
-
 }

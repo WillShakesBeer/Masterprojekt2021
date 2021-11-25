@@ -1,13 +1,9 @@
-import Data.Coord;
+import Data.*;
 import Data.Enums.Color;
-import Data.Obstacle;
-import Data.Robot;
-import Data.VictorySpawn;
 import Logic.Game;
+import Logic.Gamestate;
 import View.Display;
 
-import javax.swing.*;
-import java.awt.*;
 import java.util.ArrayList;
 
 
@@ -17,22 +13,13 @@ import java.util.ArrayList;
 public class RunDis {
     public static void main (String[] args){
 
-        ArrayList<Robot> robotList = new ArrayList<Robot>();
 
-        robotList.add(new Data.Robot(new Coord(0,0), Data.Enums.Color.RED));
-        robotList.add(new Data.Robot(new Coord(0,15), Data.Enums.Color.BLUE));
-        robotList.add(new Data.Robot(new Coord(15,0), Data.Enums.Color.YELLOW));
-        robotList.add(new Robot(new Coord(15,15), Color.GREEN));
-
-        //obstacle list null for error reasons
-        Game game = new Game(robotList,null,null);
-        Display display = new Display(game);
 
 
 
         final StringBuilder wordSearch = new StringBuilder();
-        for (int i = 0; i < game.getState().getBoard().getHeight(); i++){
-            for (int j = 0; j < game.getState().getBoard().getLength(); j++){
+        for (int i = 0; i < display.getGame().getState().getBoard().getHeight(); i++){
+            for (int j = 0; j < display.getGame().getState().getBoard().getLength(); j++){
                 wordSearch.append(display.displayGame()[i][j]).append('\t');
             }
             wordSearch.append('\n');
@@ -40,6 +27,8 @@ public class RunDis {
         wordSearch.toString();
         System.out.println(wordSearch);
     }
+
+
 
     public void startDefaultGame(){
         ArrayList<Robot> robotList = new ArrayList<Robot>();
@@ -52,7 +41,6 @@ public class RunDis {
         ArrayList<Obstacle> obstacleList = new ArrayList<Obstacle>();
         ArrayList<VictorySpawn> victorySpawns = new ArrayList<VictorySpawn>();
     }
-
 
 
 

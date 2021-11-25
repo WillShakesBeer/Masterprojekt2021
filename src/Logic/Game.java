@@ -3,6 +3,7 @@ package Logic;
 import Data.*;
 import Data.Enums.Color;
 import Data.Enums.Direction;
+import Data.GameConfig.Config;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -15,15 +16,15 @@ public class Game {
     Gamestate state;
     ArrayList<Obstacle> obstacleList;
     ArrayList<Robot> robotList;
+    Board board;
 
     //starts a new Game
-    public Game(ArrayList<Robot> robotList,ArrayList<Obstacle> obstacleList,
-                ArrayList<VictorySpawn> victorySpawns){
-        //Standard board parameters for testing
-        this.obstacleList = obstacleList;
-        this.robotList = robotList;
+    public Game(Config config){
+
+        this.obstacleList = config.getObstacleList();
+        this.robotList = config.getRobotList();
         VictoryPoint newVic = createNewVictoryPoint();
-        Data.Board board = new Board(16,16,obstacleList,robotList,victorySpawns,newVic);
+        this.board = config.getBoard();
         state = new Gamestate(board,0);
 
     }

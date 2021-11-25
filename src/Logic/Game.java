@@ -37,12 +37,14 @@ public class Game {
         if(currpos.equals(newPos)){
            result = -1;
         }else {
-            //oldBoard=this.state.getBoard()
+            Move move = new Move(color,currpos,newPos);
+            this.state.addMove(move);
             currRobot.setCoord(newPos);
         }
         return result;
     }
 
+    //returns a possibly new Position after an executed movement
     public Coord checkMovement(Coord pos, Direction dir, Board board){
         Coord newPos=pos;
         Boolean stoped = false;
@@ -67,6 +69,7 @@ public class Game {
         return pos;
     }
 
+    //checks if a position is reachable from a specific direction
     public boolean checkPos(Coord pos, Board board, Direction dir){
         boolean result = true;
         ArrayList<Obstacle> obstacles=null;

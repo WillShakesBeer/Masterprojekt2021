@@ -18,6 +18,9 @@ public class Gamestate {
         this.score=score;
     }
 
+    public void addMove(Move move){
+        this.moveList.add(move);
+    }
 
     public ArrayList<Move> getMoveList() {
         return moveList;

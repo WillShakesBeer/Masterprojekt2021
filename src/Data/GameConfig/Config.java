@@ -66,4 +66,6 @@ public class Config {
     public void setVictorySpawns(ArrayList<VictorySpawn> victorySpawns) {
         this.victorySpawns = victorySpawns;
     }
+
+
 }

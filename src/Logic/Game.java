@@ -17,7 +17,8 @@ public class Game {
     ArrayList<Robot> robotList;
 
     //starts a new Game
-    public Game(){
+    public Game(ArrayList<Robot> robotList,ArrayList<Obstacle> obstacleList, VictoryPoint victoryPoint,
+                ArrayList<VictorySpawn> victorySpawns){
         //Standard board parameters for testing
         this.obstacleList = obstacleList;
         this.robotList = robotList;

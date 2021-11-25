@@ -23,7 +23,7 @@ public class RunDis {
         robotList.add(new Robot(new Coord(15,15), Color.GREEN));
 
         //obstacle list null for error reasons
-        Game game = new Game(robotList,null);
+        Game game = new Game(robotList,null,null,null);
         Display display = new Display(game);
 
 
@@ -38,6 +38,12 @@ public class RunDis {
         wordSearch.toString();
         System.out.println(wordSearch);
     }
+
+    public void startDefaultGame(){
+
+    }
+
+
 
 
 }

@@ -67,6 +67,25 @@ public class RunDis {
         obstacleList.add(new Obstacle(new Coord(9,11),new Coord(10,11), ObsType.HORIZONTAL));
         obstacleList.add(new Obstacle(new Coord(0,12),new Coord(1,12), ObsType.HORIZONTAL));
         obstacleList.add(new Obstacle(new Coord(14,12),new Coord(15,12), ObsType.HORIZONTAL));
+        obstacleList.add(new Obstacle(new Coord(4,14),new Coord(5,14), ObsType.HORIZONTAL));
+        obstacleList.add(new Obstacle(new Coord(10,14),new Coord(11,14), ObsType.HORIZONTAL));
+        obstacleList.add(new Obstacle(new Coord(1,15),new Coord(2,15), ObsType.HORIZONTAL));
+        obstacleList.add(new Obstacle(new Coord(8,15),new Coord(9,15), ObsType.HORIZONTAL));
+        obstacleList.add(new Obstacle(new Coord(0,2),new Coord(0,2), ObsType.VERTICAL));
+        obstacleList.add(new Obstacle(new Coord(0,9),new Coord(0,10), ObsType.VERTICAL));
+        obstacleList.add(new Obstacle(new Coord(1,4),new Coord(1,5), ObsType.VERTICAL));
+        obstacleList.add(new Obstacle(new Coord(1,11),new Coord(1,12), ObsType.VERTICAL));
+        obstacleList.add(new Obstacle(new Coord(8,15),new Coord(9,15), ObsType.VERTICAL));
+        obstacleList.add(new Obstacle(new Coord(8,15),new Coord(9,15), ObsType.VERTICAL));
+        obstacleList.add(new Obstacle(new Coord(8,15),new Coord(9,15), ObsType.VERTICAL));
+        obstacleList.add(new Obstacle(new Coord(8,15),new Coord(9,15), ObsType.VERTICAL));
+        obstacleList.add(new Obstacle(new Coord(8,15),new Coord(9,15), ObsType.VERTICAL));
+        obstacleList.add(new Obstacle(new Coord(8,15),new Coord(9,15), ObsType.VERTICAL));
+        obstacleList.add(new Obstacle(new Coord(8,15),new Coord(9,15), ObsType.VERTICAL));
+        obstacleList.add(new Obstacle(new Coord(8,15),new Coord(9,15), ObsType.VERTICAL));
+        obstacleList.add(new Obstacle(new Coord(8,15),new Coord(9,15), ObsType.VERTICAL));
+        obstacleList.add(new Obstacle(new Coord(8,15),new Coord(9,15), ObsType.VERTICAL));
+        obstacleList.add(new Obstacle(new Coord(8,15),new Coord(9,15), ObsType.VERTICAL));
 
         ArrayList<VictorySpawn> victorySpawns = new ArrayList<VictorySpawn>();
         victorySpawns.add(new VictorySpawn(new Coord(4,3),Color.RED));

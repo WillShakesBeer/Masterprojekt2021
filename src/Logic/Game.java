@@ -14,14 +14,11 @@ public class Game {
 
     // Gamestate keeps track of the temporary data during a Game
     Gamestate state;
-    ArrayList<Obstacle> obstacleList;
-    ArrayList<Robot> robotList;
+    Config config;
 
     //starts a new Game
     public Game(Config config){
-
-        this.obstacleList = config.getObstacleList();
-        this.robotList = config.getRobotList();
+        this.config=config;
         VictoryPoint newVic = createNewVictoryPoint();
         Board board = new Board(config.getLength(),config.getHeight(),config.getObstacleList(),config.getRobotList()
         ,config.getVictorySpawns(),newVic);
@@ -72,8 +69,8 @@ public class Game {
 
     public VictoryPoint createNewVictoryPoint(){
         Random rand = new Random();
-        int newIndex= rand.nextInt(this.state.getBoard().getVictorySpawns().size());
-        VictorySpawn spawn = this.state.getBoard().getVictorySpawns().get(newIndex);
+        int newIndex= rand.nextInt(this.getConfig().getVictorySpawns().size());
+        VictorySpawn spawn = this.getConfig().getVictorySpawns().get(newIndex);
         VictoryPoint nextVic = new VictoryPoint(spawn.getCoord(),spawn.getColor());
         return nextVic;
     }
@@ -147,20 +144,11 @@ public class Game {
         this.state = state;
     }
 
-
-    public ArrayList<Obstacle> getObstacleList() {
-        return obstacleList;
+    public Config getConfig() {
+        return config;
     }
 
-    public void setObstacleList(ArrayList<Obstacle> obstacleList) {
-        this.obstacleList = obstacleList;
-    }
-
-    public ArrayList<Robot> getRobotList() {
-        return robotList;
-    }
-
-    public void setRobotList(ArrayList<Robot> robotList) {
-        this.robotList = robotList;
+    public void setConfig(Config config) {
+        this.config = config;
     }
 }

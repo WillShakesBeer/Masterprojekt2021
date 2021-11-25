@@ -1,15 +1,17 @@
 package Data;
 
 
+import Data.Enums.ObsType;
+
 public class Obstacle {
     //An obstacle is defined by the two adjacent positions
     //The type describes if the adjacent positions are horizontal or vertical to each other
     //For horizontal obstacles coord1 is the left one and coord2 is the right one
     //For vertical obstacles coord1 is the lower one and coord2 is the upper one
-    Data.ObsType type;
+    ObsType type;
     Data.Coord coord1;
     Data.Coord coord2;
-    public Obstacle(Data.Coord coord1, Data.Coord coord2, Data.ObsType type){
+    public Obstacle(Data.Coord coord1, Data.Coord coord2, ObsType type){
         this.coord1=coord1;
         this.coord2=coord2;
         this.type=type;

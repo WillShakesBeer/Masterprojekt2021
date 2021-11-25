@@ -1,5 +1,7 @@
 package Data;
 
+import Data.Enums.Color;
+
 /**
  * Created by Martin Eberle aka WillShakesBeer on 23.11.2021.
  */

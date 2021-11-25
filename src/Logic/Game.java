@@ -1,9 +1,10 @@
 package Logic;
 
 import Data.*;
+import Data.Enums.Color;
+import Data.Enums.Direction;
 
 import java.util.ArrayList;
-import java.util.function.BinaryOperator;
 
 // Controls the order of events in the Game
 
@@ -18,7 +19,7 @@ public class Game {
         //Standard board parameters
         ArrayList<Obstacle> obstacleList = new ArrayList<Obstacle>();
         ArrayList<Robot> robotList = new ArrayList<Robot>();
-        robotList.add(new Robot(new Coord(0,0),Color.RED));
+        robotList.add(new Robot(new Coord(0,0), Color.RED));
         robotList.add(new Robot(new Coord(0,16),Color.BLUE));
         robotList.add(new Robot(new Coord(16,0),Color.YELLOW));
         robotList.add(new Robot(new Coord(16,16),Color.GREEN));

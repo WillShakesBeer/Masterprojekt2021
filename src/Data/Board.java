@@ -1,4 +1,7 @@
 package Data;
+import Data.Enums.Color;
+import Data.Enums.ObsType;
+
 import java.util.ArrayList;
 
 /**

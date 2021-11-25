@@ -164,4 +164,12 @@ public class Game {
     public void setRobotList(ArrayList<Robot> robotList) {
         this.robotList = robotList;
     }
+
+    public Board getBoard() {
+        return board;
+    }
+
+    public void setBoard(Board board) {
+        this.board = board;
+    }
 }

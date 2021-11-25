@@ -1,8 +1,43 @@
+import Data.Coord;
+import Data.Enums.Color;
+import Data.Robot;
+import Logic.Game;
+import View.Display;
+
+import javax.swing.*;
+import java.awt.*;
+import java.util.ArrayList;
+
+
 /**
  * Created by Martin Eberle aka WillShakesBeer on 23.11.2021.
  */
 public class RunDis {
     public static void main (String[] args){
-        System.out.println("Hello beautifulp World");
+
+        ArrayList<Robot> robotList = new ArrayList<Robot>();
+
+        robotList.add(new Data.Robot(new Coord(0,0), Data.Enums.Color.RED));
+        robotList.add(new Data.Robot(new Coord(0,15), Data.Enums.Color.BLUE));
+        robotList.add(new Data.Robot(new Coord(15,0), Data.Enums.Color.YELLOW));
+        robotList.add(new Robot(new Coord(15,15), Color.GREEN));
+
+        //obstacle list null for error reasons
+        Game game = new Game(robotList,null);
+        Display display = new Display(game);
+
+
+
+        final StringBuilder wordSearch = new StringBuilder();
+        for (int i = 0; i < game.getState().getBoard().getHeight(); i++){
+            for (int j = 0; j < game.getState().getBoard().getLength(); j++){
+                wordSearch.append(display.displayGame()[i][j]).append('\t');
+            }
+            wordSearch.append('\n');
+        }
+        wordSearch.toString();
+        System.out.println(wordSearch);
     }
+
+
 }

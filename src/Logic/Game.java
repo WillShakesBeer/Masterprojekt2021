@@ -12,17 +12,14 @@ public class Game {
 
     // Gamestate keeps track of the temporary data during a Game
     Gamestate state;
-
+    ArrayList<Obstacle> obstacleList;
+    ArrayList<Robot> robotList;
 
     //starts a new Game
-    public Game(){
+    public Game(ArrayList<Robot> robotList , ArrayList<Obstacle> obstacleList){
         //Standard board parameters for testing
-        ArrayList<Obstacle> obstacleList = new ArrayList<Obstacle>();
-        ArrayList<Robot> robotList = new ArrayList<Robot>();
-        robotList.add(new Robot(new Coord(0,0), Color.RED));
-        robotList.add(new Robot(new Coord(0,16),Color.BLUE));
-        robotList.add(new Robot(new Coord(16,0),Color.YELLOW));
-        robotList.add(new Robot(new Coord(16,16),Color.GREEN));
+        this.obstacleList = obstacleList;
+        this.robotList = robotList;
         Data.Board board = new Board(16,16,obstacleList,robotList);
         state = new Gamestate(board,0);
 
@@ -106,4 +103,28 @@ public class Game {
         return result;
     }
 
+    public Gamestate getState() {
+        return state;
+    }
+
+    public void setState(Gamestate state) {
+        this.state = state;
+    }
+
+
+    public ArrayList<Obstacle> getObstacleList() {
+        return obstacleList;
+    }
+
+    public void setObstacleList(ArrayList<Obstacle> obstacleList) {
+        this.obstacleList = obstacleList;
+    }
+
+    public ArrayList<Robot> getRobotList() {
+        return robotList;
+    }
+
+    public void setRobotList(ArrayList<Robot> robotList) {
+        this.robotList = robotList;
+    }
 }

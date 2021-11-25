@@ -24,7 +24,6 @@ public class RunDis {
         Game game = new Game(startDefaultGame());
         Display display = new Display(game);
 
-
         final StringBuilder wordSearch = new StringBuilder();
         for (int i = 0; i < game.getBoard().getHeight(); i++){
             for (int j = 0; j < game.getBoard().getLength(); j++){
@@ -39,8 +38,10 @@ public class RunDis {
 
 
     public static Config startDefaultGame(){
-        ArrayList<Robot> robotList = new ArrayList<Robot>();
+        int lenth = 7;
+        int height = 16;
 
+        ArrayList<Robot> robotList = new ArrayList<Robot>();
         robotList.add(new Data.Robot(new Coord(0,0), Data.Enums.Color.RED));
         robotList.add(new Data.Robot(new Coord(0,15), Data.Enums.Color.BLUE));
         robotList.add(new Data.Robot(new Coord(15,0), Data.Enums.Color.YELLOW));
@@ -84,7 +85,7 @@ public class RunDis {
         victorySpawns.add(new VictorySpawn(new Coord(5,6),Color.GREEN));
         victorySpawns.add(new VictorySpawn(new Coord(11,5),Color.GREEN));
 
-        Config config = new Config(robotList,obstacleList,victorySpawns,0,15);
+        Config config = new Config(robotList,obstacleList,victorySpawns,lenth,height);
         return config;
     }
 

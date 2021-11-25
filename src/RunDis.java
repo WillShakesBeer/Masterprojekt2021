@@ -1,5 +1,6 @@
 import Data.Coord;
 import Data.Enums.Color;
+import Data.Enums.ObsType;
 import Data.Obstacle;
 import Data.Robot;
 import Data.VictorySpawn;
@@ -50,7 +51,28 @@ public class RunDis {
         robotList.add(new Robot(new Coord(15,15), Color.GREEN));
 
         ArrayList<Obstacle> obstacleList = new ArrayList<Obstacle>();
+        obstacleList.add(new Obstacle(new Coord(0,0),new Coord(3,4), ObsType.HORIZONTAL));
+        obstacleList.add(new Obstacle(new Coord(0,0),new Coord(0,0), ObsType.HORIZONTAL));
+        obstacleList.add(new Obstacle(new Coord(0,0),new Coord(0,0), ObsType.HORIZONTAL));
+        obstacleList.add(new Obstacle(new Coord(0,0),new Coord(0,0), ObsType.HORIZONTAL));
+        obstacleList.add(new Obstacle(new Coord(0,0),new Coord(0,0), ObsType.HORIZONTAL));
+
         ArrayList<VictorySpawn> victorySpawns = new ArrayList<VictorySpawn>();
+        victorySpawns.add(new VictorySpawn(new Coord(4,3),Color.RED));
+        victorySpawns.add(new VictorySpawn(new Coord(13,4),Color.RED));
+        victorySpawns.add(new VictorySpawn(new Coord(1,12),Color.RED));
+        victorySpawns.add(new VictorySpawn(new Coord(11,14),Color.RED));
+        victorySpawns.add(new VictorySpawn(new Coord(1,5),Color.BLUE));
+        victorySpawns.add(new VictorySpawn(new Coord(3,9),Color.BLUE));
+        victorySpawns.add(new VictorySpawn(new Coord(10,3),Color.BLUE));
+        victorySpawns.add(new VictorySpawn(new Coord(5,10),Color.YELLOW));
+        victorySpawns.add(new VictorySpawn(new Coord(12,2),Color.YELLOW));
+        victorySpawns.add(new VictorySpawn(new Coord(12,9),Color.YELLOW));
+        victorySpawns.add(new VictorySpawn(new Coord(4,14),Color.GREEN));
+        victorySpawns.add(new VictorySpawn(new Coord(5,6),Color.GREEN));
+        victorySpawns.add(new VictorySpawn(new Coord(11,5),Color.GREEN));
+
+
     }
 
 

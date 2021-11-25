@@ -22,7 +22,7 @@ public class RunDis {
     public static void main (String[] args){
         Game game = new Game(DefaultGame());
         Display display = new Display(game);
-
+        System.out.println(display.getGame().getState().getBoard());
         final StringBuilder wordSearch = new StringBuilder();
         for (int i = 0; i < game.getState().getBoard().getHeight(); i++){
             for (int j = 0; j < game.getState().getBoard().getLength(); j++){

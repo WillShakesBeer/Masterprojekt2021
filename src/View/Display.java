@@ -40,7 +40,7 @@ public class Display {
     }
 
     public void drawRobots (char[][] view){
-        ArrayList<Robot> robots = game.getRobotList();
+        ArrayList<Robot> robots = game.getState().getBoard().getRobots();
         for(Robot robot : robots){
             view [robot.getCoord().getX()][robot.getCoord().getY()] = 'R';
         }

@@ -18,7 +18,7 @@ public class Board {
     ArrayList<Robot> robots;
 
 
-    public Board(int laenge, int breite , ArrayList<Obstacle> obstacles ,
+    public Board(int length, int height , ArrayList<Obstacle> obstacles ,
                  ArrayList<Robot> robots, ArrayList<VictorySpawn> victorySpawns, VictoryPoint victoryPoint){
         this.victorySpawns=victorySpawns;
         this.length = length;
@@ -105,5 +105,13 @@ public class Board {
 
     public void setVictorySpawns(ArrayList<VictorySpawn> victorySpawns) {
         this.victorySpawns = victorySpawns;
+    }
+
+    public VictoryPoint getVictoryPoint() {
+        return victoryPoint;
+    }
+
+    public void setVictoryPoint(VictoryPoint victoryPoint) {
+        this.victoryPoint = victoryPoint;
     }
 }

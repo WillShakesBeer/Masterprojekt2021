@@ -16,7 +16,6 @@ public class Game {
     Gamestate state;
     ArrayList<Obstacle> obstacleList;
     ArrayList<Robot> robotList;
-    Board board;
 
     //starts a new Game
     public Game(Config config){
@@ -24,7 +23,7 @@ public class Game {
         this.obstacleList = config.getObstacleList();
         this.robotList = config.getRobotList();
         VictoryPoint newVic = createNewVictoryPoint();
-        this.board = new Board(config.getLength(),config.getHeight(),config.getObstacleList(),config.getRobotList()
+        Board board = new Board(config.getLength(),config.getHeight(),config.getObstacleList(),config.getRobotList()
         ,config.getVictorySpawns(),newVic);
         state = new Gamestate(board,0);
 

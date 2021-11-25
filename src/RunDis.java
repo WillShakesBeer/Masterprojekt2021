@@ -20,11 +20,7 @@ import java.util.ArrayList;
 public class RunDis {
 
     public static void main (String[] args){
-
-        ArrayList<Robot> robotList = new ArrayList<Robot>();
-
-        //obstacle list null for error reasons
-        Game game = new Game(robotList,null,null);
+        Game game = new Game(DefaultGame());
         Display display = new Display(game);
 
         final StringBuilder wordSearch = new StringBuilder();
@@ -41,6 +37,8 @@ public class RunDis {
 
 
     public static Config DefaultGame(){
+        int length = 16;
+        int height = 16;
         ArrayList<Robot> robotList = new ArrayList<Robot>();
         robotList.add(new Data.Robot(new Coord(0,0), Data.Enums.Color.RED));
         robotList.add(new Data.Robot(new Coord(0,15), Data.Enums.Color.BLUE));
@@ -85,7 +83,7 @@ public class RunDis {
         victorySpawns.add(new VictorySpawn(new Coord(5,6),Color.GREEN));
         victorySpawns.add(new VictorySpawn(new Coord(11,5),Color.GREEN));
 
-        Config config = new Config(robotList,obstacleList,victorySpawns,lenth,height);
+        Config config = new Config(robotList,obstacleList,victorySpawns,length,height);
         return config;
     }
 

@@ -24,7 +24,8 @@ public class Game {
         this.obstacleList = config.getObstacleList();
         this.robotList = config.getRobotList();
         VictoryPoint newVic = createNewVictoryPoint();
-        this.board = config.getBoard();
+        this.board = new Board(config.getLength(),config.getHeight(),config.getObstacleList(),config.getRobotList()
+        ,config.getVictorySpawns(),newVic);
         state = new Gamestate(board,0);
 
     }

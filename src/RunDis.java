@@ -1,6 +1,7 @@
 import Data.*;
 import Data.Enums.Color;
 import Data.Enums.ObsType;
+import Data.GameConfig.Config;
 import Data.Obstacle;
 import Data.Robot;
 import Data.VictorySpawn;
@@ -17,10 +18,19 @@ import java.util.ArrayList;
  * Created by Martin Eberle aka WillShakesBeer on 23.11.2021.
  */
 public class RunDis {
-
     public static void main (String[] args){
 
-        Game game = startDefaultGame();
+        ArrayList<Robot> robotList = new ArrayList<Robot>();
+
+        robotList.add(new Data.Robot(new Coord(0,0), Data.Enums.Color.RED));
+        robotList.add(new Data.Robot(new Coord(0,15), Data.Enums.Color.BLUE));
+        robotList.add(new Data.Robot(new Coord(15,0), Data.Enums.Color.YELLOW));
+        robotList.add(new Robot(new Coord(15,15), Color.GREEN));
+
+        //obstacle list null for error reasons
+        Game game = new Game(robotList,null,null);
+        Display display = new Display(game);
+
 
 
         final StringBuilder wordSearch = new StringBuilder();
@@ -36,7 +46,7 @@ public class RunDis {
 
 
 
-    public static game startDefaultGame(){
+    public static Config DefaultGame(){
         ArrayList<Robot> robotList = new ArrayList<Robot>();
 
         robotList.add(new Data.Robot(new Coord(0,0), Data.Enums.Color.RED));
@@ -45,10 +55,10 @@ public class RunDis {
         robotList.add(new Robot(new Coord(15,15), Color.GREEN));
 
         ArrayList<Obstacle> obstacleList = new ArrayList<Obstacle>();
-        obstacleList.add(new Obstacle(new Coord(0,0),new Coord(3,4), ObsType.HORIZONTAL));
-        obstacleList.add(new Obstacle(new Coord(0,0),new Coord(0,0), ObsType.HORIZONTAL));
-        obstacleList.add(new Obstacle(new Coord(0,0),new Coord(0,0), ObsType.HORIZONTAL));
-        obstacleList.add(new Obstacle(new Coord(0,0),new Coord(0,0), ObsType.HORIZONTAL));
+        obstacleList.add(new Obstacle(new Coord(3,0),new Coord(4,0), ObsType.HORIZONTAL));
+        obstacleList.add(new Obstacle(new Coord(9,0),new Coord(10,0), ObsType.HORIZONTAL));
+        obstacleList.add(new Obstacle(new Coord(5,1),new Coord(6,1), ObsType.HORIZONTAL));
+        obstacleList.add(new Obstacle(new Coord(12,2),new Coord(13,2), ObsType.HORIZONTAL));
         obstacleList.add(new Obstacle(new Coord(0,0),new Coord(0,0), ObsType.HORIZONTAL));
 
         ArrayList<VictorySpawn> victorySpawns = new ArrayList<VictorySpawn>();
@@ -66,7 +76,7 @@ public class RunDis {
         victorySpawns.add(new VictorySpawn(new Coord(5,6),Color.GREEN));
         victorySpawns.add(new VictorySpawn(new Coord(11,5),Color.GREEN));
 
-
+        Config config = new Config(robotList,obstacleList,victorySpawns,0,15);
     }
 
 

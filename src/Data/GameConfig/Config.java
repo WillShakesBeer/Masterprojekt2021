@@ -12,25 +12,19 @@ import java.util.ArrayList;
  * Created by Martin Eberle aka WillShakesBeer on 25.11.2021.
  */
 public class Config {
-    Gamestate state;
     ArrayList<Obstacle> obstacleList;
     ArrayList<Robot> robotList;
-    Board board;
+    ArrayList<VictorySpawn> victorySpawns;
+    int length;
+    int height;
 
     public Config(ArrayList<Robot> robotList, ArrayList<Obstacle> obstacleList,
-                  ArrayList<VictorySpawn> victorySpawns, Board board) {
+                  ArrayList<VictorySpawn> victorySpawns, int length,int height) {
+        this.victorySpawns = victorySpawns;
         this.obstacleList = obstacleList;
         this.robotList = robotList;
-        this.board = board;
-        state = new Gamestate(board,0);
-    }
-
-    public Gamestate getState() {
-        return state;
-    }
-
-    public void setState(Gamestate state) {
-        this.state = state;
+        this.length=length;
+        this.height=height;
     }
 
     public ArrayList<Obstacle> getObstacleList() {
@@ -49,11 +43,27 @@ public class Config {
         this.robotList = robotList;
     }
 
-    public Board getBoard() {
-        return board;
+    public int getLength() {
+        return length;
     }
 
-    public void setBoard(Board board) {
-        this.board = board;
+    public void setLength(int length) {
+        this.length = length;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
+    }
+
+    public ArrayList<VictorySpawn> getVictorySpawns() {
+        return victorySpawns;
+    }
+
+    public void setVictorySpawns(ArrayList<VictorySpawn> victorySpawns) {
+        this.victorySpawns = victorySpawns;
     }
 }

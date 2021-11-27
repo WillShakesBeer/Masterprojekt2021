@@ -1,5 +1,6 @@
 import Data.*;
 import Data.Enums.Color;
+import Data.Enums.Direction;
 import Data.Enums.ObsType;
 import Data.GameConfig.Config;
 import Data.Obstacle;
@@ -12,6 +13,7 @@ import View.Display;
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 
 /**
@@ -19,14 +21,21 @@ import java.util.ArrayList;
  */
 public class RunDis {
 
+
     public static void main (String[] args){
         Game game = new Game(DefaultGame());
+        game.moveRobot(Color.RED, Direction.RIGHT);
+        updateVisuals(game);
+
+    }
+
+
+    public static void updateVisuals(Game game){
         Display display = new Display(game);
-        System.out.println(display.getGame().getState().getBoard());
         final StringBuilder wordSearch = new StringBuilder();
         for (int i = 0; i < game.getState().getBoard().getHeight(); i++){
             for (int j = 0; j < game.getState().getBoard().getLength(); j++){
-                wordSearch.append(display.displayGame()[i][j]).append('\t');
+                wordSearch.append(display.updateGame()[i][j]).append('\t');
             }
             wordSearch.append('\n');
         }

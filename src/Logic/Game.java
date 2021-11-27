@@ -16,6 +16,7 @@ public class Game {
     Gamestate state;
     Config config;
 
+
     //starts a new Game
     public Game(Config config){
         this.config=config;
@@ -80,18 +81,18 @@ public class Game {
         Coord newPos=pos;
         Boolean stoped = false;
         while (!stoped){
-           switch (dir){
+            switch (dir){
                case UP:
-                   newPos.setY((newPos.getY())+1);
+                   newPos.setY(newPos.getY()+1);
                    break;
                case DOWN:
-                   newPos.setY((newPos.getY())-1);
+                   newPos.setY(newPos.getY()-1);
                    break;
                case LEFT:
-                   newPos.setX((newPos.getX())-1);
+                   newPos.setX(newPos.getX()-1);
                    break;
                case RIGHT:
-                   newPos.setX((newPos.getX())+1);
+                   newPos.setX(newPos.getX()+1);
                    break;
            }
            stoped=checkPos(newPos,board,dir);
@@ -121,6 +122,7 @@ public class Game {
         for(Obstacle obstacle:obstacles){
             switch (dir){
                 case UP: case RIGHT:
+                    // System.out.println(pos.equals(obstacle.getCoord2()) +" " + pos.getX()+ " " +obstacle.getCoord2().getX()+ "       " + pos.getY()+ " " +obstacle.getCoord2().getY());
                     if(pos.equals(obstacle.getCoord2())){
                         result=false;
                     }

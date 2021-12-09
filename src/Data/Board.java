@@ -25,6 +25,7 @@ public class Board {
         this.height = height;
         this.obstacles = obstacles;
         this.robots = robots;
+        this.victoryPoint=victoryPoint;
     }
 
     public Robot getRobot(Color color){

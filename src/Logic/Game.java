@@ -33,12 +33,12 @@ public class Game {
     public int moveRobot(Color color, Direction dir){
         int result =0;
         Robot currRobot = this.state.getBoard().getRobot(color);
-        Coord currpos = currRobot.getCoord();
-        Coord newPos = checkMovement(currpos,dir,this.state.getBoard());
-        if(currpos.equals(newPos)){
+        Coord startPos= currRobot.getCoord().clone();
+        Coord newPos = checkMovement(startPos.clone(),dir,this.state.getBoard());
+        if(startPos.equals(newPos)){
            result = -1;
         }else {
-            Move move = new Move(color,currpos,newPos);
+            Move move = new Move(color,startPos,newPos);
             this.state.addMove(move);
             currRobot.setCoord(newPos);
             if(newPos.equals(this.state.getBoard().getVictorypoint().getCoord())
@@ -78,7 +78,7 @@ public class Game {
 
     //returns a possibly new Position after an executed movement
     public Coord checkMovement(Coord pos, Direction dir, Board board){
-        Coord newPos=pos;
+        Coord newPos=new Coord(pos.getX(),pos.getY());
         Boolean stoped = false;
         while (!stoped){
             switch (dir){
@@ -95,8 +95,11 @@ public class Game {
                    newPos.setX(newPos.getX()+1);
                    break;
            }
-           stoped=checkPos(newPos,board,dir);
-           pos=newPos;
+           stoped=!checkPos(newPos,board,dir);
+           if(!stoped){
+               pos.setX(newPos.getX());
+               pos.setY(newPos.getY());
+           }
         }
         return pos;
     }
@@ -104,12 +107,15 @@ public class Game {
     //checks if a position is reachable from a specific direction
     public boolean checkPos(Coord pos, Board board, Direction dir){
         boolean result = true;
-        ArrayList<Obstacle> obstacles=null;
+        ArrayList<Obstacle> obstacles= board.getObstacles();
         ArrayList<Robot> robots = board.getRobots();
         for(Robot robot :robots){
             if(robot.getCoord().equals(pos)){
                 result=false;
             }
+        }
+        if(pos.getX()<0 || pos.getX()>board.getLength() || pos.getY()<0 || pos.getY()>board.getHeight()){
+            result=false;
         }
         switch (dir){
             case UP: case DOWN:

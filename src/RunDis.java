@@ -24,7 +24,7 @@ public class RunDis {
 
     public static void main (String[] args){
         Game game = new Game(DefaultGame());
-        game.moveRobot(Color.RED, Direction.RIGHT);
+        System.out.println(game.moveRobot(Color.RED, Direction.LEFT));
         updateVisuals(game);
 
     }

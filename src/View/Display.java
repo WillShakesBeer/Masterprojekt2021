@@ -11,15 +11,21 @@ import Logic.Game;
 import java.util.ArrayList;
 
 public class Display {
+
+    //The Game that is displayed
     Game game;
+
+    //@Maddin whats the difference to Board.height and Board.length?
     int viewHeight;
     int viewLength;
+    //The Output String
     String[][] view;
 
     public Display(Game game){
         this.game = game;
     }
 
+    //updates Visual if the game.GameState has changed
     public String[][] updateGame(){
 
         viewHeight = game.getState().getBoard().getHeight();

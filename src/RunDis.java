@@ -25,22 +25,27 @@ public class RunDis {
     public static void main (String[] args){
         Game game = new Game(DefaultGame());
         game.moveRobot(Color.RED, Direction.RIGHT);
+        game.moveRobot(Color.RED, Direction.UP);
         updateVisuals(game);
+
+
+
+
     }
 
 
     public static void updateVisuals(Game game){
         Display display = new Display(game);
-        final StringBuilder wordSearch = new StringBuilder();
-        for (int i = 0; i < game.getState().getBoard().getHeight(); i++){
+        String[][] updatedGame = display.updateGame();
+
+        for (int i = game.getState().getBoard().getHeight()-1; i >=0; i--){
             for (int j = 0; j < game.getState().getBoard().getLength(); j++){
-                wordSearch.append(display.updateGame()[i][j]).append('\t');
+                System.out.print(updatedGame[j][i] + '\t' );
             }
-            wordSearch.append('\n');
+            System.out.println();
         }
-        wordSearch.toString();
-        System.out.println(wordSearch);
     }
+
 
 
 

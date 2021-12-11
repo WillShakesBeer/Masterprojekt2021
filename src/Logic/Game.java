@@ -128,7 +128,7 @@ public class Game {
         for(Obstacle obstacle:obstacles){
             switch (dir){
                 case UP: case RIGHT:
-                    // System.out.println(pos.equals(obstacle.getCoord2()) +" " + pos.getX()+ " " +obstacle.getCoord2().getX()+ "       " + pos.getY()+ " " +obstacle.getCoord2().getY());
+                    //System.out.println(pos.equals(obstacle.getCoord2()) +" " + pos.getX()+ " " +obstacle.getCoord2().getX()+ "       " + pos.getY()+ " " +obstacle.getCoord2().getY());
                     if(pos.equals(obstacle.getCoord2())){
                         result=false;
                     }

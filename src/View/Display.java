@@ -4,7 +4,6 @@ import Data.Enums.Color;
 import Data.Enums.ObsType;
 import Data.Obstacle;
 import Data.Robot;
-import Data.VictoryPoint;
 import Data.VictorySpawn;
 import Logic.Game;
 
@@ -16,8 +15,8 @@ public class Display {
     Game game;
 
     //@Maddin whats the difference to Board.height and Board.length?
-    int viewHeight;
-    int viewLength;
+    int height;
+    int length;
     //The Output String
     String[][] view;
 
@@ -28,21 +27,21 @@ public class Display {
     //updates Visual if the game.GameState has changed
     public String[][] updateGame(){
 
-        viewHeight = game.getState().getBoard().getHeight();
-        viewLength = game.getState().getBoard().getLength();
-        view = new String[viewHeight][viewLength];
+        height = game.getState().getBoard().getHeight();
+        length = game.getState().getBoard().getLength();
+        view = new String[height][length];
 
         //intitalizes the board for the first time
         drawBoard(view);
 
-        //draw robots adds robots onto the board
-        drawRobots(view);
-
-        //darw vivory points
+        //draw victory points
         drawVictoryPoints(view);
 
-        //darw obstacles
+        //draw obstacles
         drawObstacles(view);
+
+        //draw robots adds robots onto the board
+        drawRobots(view);
 
         return view;
     }
@@ -52,38 +51,13 @@ public class Display {
 
     public void drawBoard (String[][] view){
 
-        for (int i=0; i<viewHeight ; i++){
-            for (int j=0; j<viewLength ; j++){
+        for (int i = 0; i< height; i++){
+            for (int j = 0; j< length; j++){
                 view[i][j] = "■";
             }
         }
 
     }
-
-    public void drawRobots (String[][] view){
-        ArrayList<Robot> robots = game.getState().getBoard().getRobots();
-        for(Robot robot : robots){
-            Color color = robot.getColor();
-            // if E is printed a robot is missing its color type""
-            String colorString = "E";
-            switch (color){
-                case RED:
-                    colorString = "R";
-                    break;
-                case GREEN:
-                    colorString = "G";
-                    break;
-                case BLUE:
-                    colorString = "B";
-                    break;
-                case YELLOW:
-                    colorString = "Y";
-                    break;
-            }
-            view[robot.getCoord().getX()][robot.getCoord().getY()] = colorString;
-        }
-    }
-
 
     public void drawVictoryPoints (String[][] view){
         ArrayList<VictorySpawn> victorySpawns = game.getState().getBoard().getVictorySpawns();
@@ -120,16 +94,50 @@ public class Display {
 
             switch (type) {
                 case VERTICAL:
-                    obsString = "_";
+                    obsString = "‾";
                     break;
                 case HORIZONTAL:
-                    obsString = "|";
+                    obsString = " |";
                     break;
 
             }
             view[obstacle.getCoord1().getX()][obstacle.getCoord1().getY()] = obsString;
         }
 
+    }
+
+
+
+    public void drawRobots (String[][] view){
+        ArrayList<Robot> robots = game.getState().getBoard().getRobots();
+
+        for(Robot robot : robots){
+            Color color = robot.getColor();
+            // if E is printed a robot is missing its color type""
+            String colorString = "E";
+            switch (color){
+                case RED:
+                    colorString = "R";
+                    break;
+                case GREEN:
+                    colorString = "G";
+                    break;
+                case BLUE:
+                    colorString = "B";
+                    break;
+                case YELLOW:
+                    colorString = "Y";
+                    break;
+            }
+
+            String field = view[robot.getCoord().getX()][robot.getCoord().getY()];
+            if (field.equals("■")){
+                view[robot.getCoord().getX()][robot.getCoord().getY()] = colorString;
+            }else {
+                view[robot.getCoord().getX()][robot.getCoord().getY()] = colorString + field;
+            }
+
+        }
     }
 
 

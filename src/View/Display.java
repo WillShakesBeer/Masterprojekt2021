@@ -1,16 +1,25 @@
 package View;
 
+import Data.*;
 import Data.Enums.Color;
+import Data.Enums.Direction;
 import Data.Enums.ObsType;
-import Data.Obstacle;
-import Data.Robot;
-import Data.VictorySpawn;
 import Logic.Game;
 
 import java.util.ArrayList;
+import java.util.Scanner;
+
 
 public class Display {
-
+    public static final String ANSI_RESET = "\u001B[0m";
+    public static final String ANSI_BLACK = "\u001B[30m";
+    public static final String ANSI_RED = "\u001B[31m";
+    public static final String ANSI_GREEN = "\u001B[32m";
+    public static final String ANSI_YELLOW = "\u001B[33m";
+    public static final String ANSI_BLUE = "\u001B[34m";
+    public static final String ANSI_PURPLE = "\u001B[35m";
+    public static final String ANSI_CYAN = "\u001B[36m";
+    public static final String ANSI_WHITE = "\u001B[37m";
     //The Game that is displayed
     Game game;
 
@@ -24,6 +33,53 @@ public class Display {
         this.game = game;
     }
 
+    //gets MoveCommand from user
+    //returns newMoveCommand(null,null) for invalid input
+    public MoveCommand getMove(){
+        MoveCommand mCmd=null;
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Enter Color (r=red,g=green,b=blue,y=yellow)");
+        String colorStr = sc.nextLine();
+        Color color=null;
+        switch (colorStr){
+            case "r":
+                color=Color.RED;
+                break;
+            case "g":
+                color=Color.GREEN;
+                break;
+            case "b":
+                color=Color.BLUE;
+                break;
+            case "y":
+                color=Color.YELLOW;
+                break;
+            default:
+                System.out.println("Cant identify Color");
+        }
+        System.out.println("Enter Direction (u=up,r=right,l=left,d=down)");
+        String dirStr = sc.nextLine();
+        Direction dir=null;
+        switch (dirStr){
+            case "u":
+                dir = Direction.UP;
+                break;
+            case "r":
+                dir = Direction.RIGHT;
+                break;
+            case "l":
+                dir = Direction.LEFT;
+                break;
+            case "d":
+                dir = Direction.DOWN;
+                break;
+            default:
+                System.out.println("Cant identify Direction");
+        }
+        mCmd = new MoveCommand(color,dir);
+        return mCmd;
+    }
+
     //updates Visual if the game.GameState has changed
     public String[][] updateGame(){
 
@@ -31,11 +87,15 @@ public class Display {
         length = game.getState().getBoard().getLength();
         view = new String[height][length];
 
+
         //intitalizes the board for the first time
         drawBoard(view);
 
         //draw victory points
-        drawVictoryPoints(view);
+        drawVictorySpawn(view);
+
+        //draw the current victory point
+        drawVictoryPoint(view);
 
         //draw obstacles
         drawObstacles(view);
@@ -45,7 +105,6 @@ public class Display {
 
         return view;
     }
-
 
 
 
@@ -59,25 +118,47 @@ public class Display {
 
     }
 
-    public void drawVictoryPoints (String[][] view){
+    //replaces a victoryspawn with the current VictoryPoint
+    public void drawVictoryPoint(String[][] view){
+        VictoryPoint vp = game.getState().getBoard().getVictoryPoint();
+        Color color= vp.getColor();
+        String colorString = "E";
+        switch (color) {
+            case RED:
+                colorString = ANSI_RED + "X" + ANSI_RESET;
+                break;
+            case GREEN:
+                colorString = ANSI_GREEN + "X" + ANSI_RESET;
+                break;
+            case BLUE:
+                colorString = ANSI_BLUE + "X" + ANSI_RESET;
+                break;
+            case YELLOW:
+                colorString = ANSI_YELLOW + "X" + ANSI_RESET;
+                break;
+        }
+        view[vp.getCoord().getX()][vp.getCoord().getY()] = colorString;
+
+    }
+
+    public void drawVictorySpawn(String[][] view){
         ArrayList<VictorySpawn> victorySpawns = game.getState().getBoard().getVictorySpawns();
          for (VictorySpawn victorySpawn : victorySpawns) {
              Color color = victorySpawn.getColor();
              // if E is printed a VP is missing its color type
              String colorString = "E";
-
              switch (color) {
                  case RED:
-                     colorString = "r";
+                     colorString = ANSI_RED + "O" + ANSI_RESET;
                      break;
                  case GREEN:
-                     colorString = "g";
+                     colorString = ANSI_GREEN + "O" + ANSI_RESET;
                      break;
                  case BLUE:
-                     colorString = "b";
+                     colorString = ANSI_BLUE + "O" + ANSI_RESET;
                      break;
                  case YELLOW:
-                     colorString = "y";
+                     colorString = ANSI_YELLOW + "O" + ANSI_RESET;
                      break;
              }
              view[victorySpawn.getCoord().getX()][victorySpawn.getCoord().getY()] = colorString;
@@ -121,7 +202,7 @@ public class Display {
 
 
 
-    public void drawRobots (String[][] view){
+    public void drawRobots(String[][] view){
         ArrayList<Robot> robots = game.getState().getBoard().getRobots();
 
         for(Robot robot : robots){
@@ -130,16 +211,16 @@ public class Display {
             String colorString = "E";
             switch (color){
                 case RED:
-                    colorString = "R";
+                    colorString = ANSI_RED+"R"+ANSI_RESET;
                     break;
                 case GREEN:
-                    colorString = "G";
+                    colorString = ANSI_GREEN+"G"+ANSI_RESET;
                     break;
                 case BLUE:
-                    colorString = "B";
+                    colorString = ANSI_BLUE+"B"+ANSI_RESET;
                     break;
                 case YELLOW:
-                    colorString = "Y";
+                    colorString = ANSI_YELLOW+"Y"+ANSI_RESET;
                     break;
             }
 

@@ -21,6 +21,7 @@ public class Game {
     public Game(Config config){
         this.config=config;
         VictoryPoint newVic = createNewVictoryPoint();
+        //VictoryPoint newVic = new VictoryPoint(new Coord(0,2),Color.RED);
         Board board = new Board(config.getLength(),config.getHeight(),config.getObstacleList(),config.getRobotList()
         ,config.getVictorySpawns(),newVic);
         state = new Gamestate(board,0);
@@ -30,7 +31,9 @@ public class Game {
     //Moves Robot, returns 0 if movement successful
     //returns -1 if already facing an obstacle
     //return 1 if robot has collected the victorypoint
-    public int moveRobot(Color color, Direction dir){
+    public int moveRobot(MoveCommand cmd){
+        Color color = cmd.getColor();
+        Direction dir = cmd.getDir();
         int result =0;
         Robot currRobot = this.state.getBoard().getRobot(color);
         Coord startPos= currRobot.getCoord().clone();
@@ -41,11 +44,11 @@ public class Game {
             Move move = new Move(color,startPos,newPos);
             this.state.addMove(move);
             currRobot.setCoord(newPos);
-            if(newPos.equals(this.state.getBoard().getVictorypoint().getCoord())
-                    && color.equals(this.state.getBoard().getVictorypoint().getColor())) {
+            if(newPos.equals(this.state.getBoard().getVictoryPoint().getCoord())
+                    && color.equals(this.state.getBoard().getVictoryPoint().getColor())) {
                 this.state.setScore(this.state.getScore()+1);
                 VictoryPoint newVic = createNewVictoryPoint();
-                this.state.getBoard().setVictorypoint(newVic);
+                this.state.getBoard().setVictoryPoint(newVic);
                 this.state.setMoveList(new ArrayList<Move>());
                 return 1;
             }

@@ -92,14 +92,6 @@ public class Board {
         this.robots = robots;
     }
 
-    public VictoryPoint getVictorypoint() {
-        return victoryPoint;
-    }
-
-    public void setVictorypoint(VictoryPoint victorypoint) {
-        this.victoryPoint = victoryPoint;
-    }
-
     public ArrayList<VictorySpawn> getVictorySpawns() {
         return victorySpawns;
     }

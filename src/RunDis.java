@@ -24,15 +24,24 @@ public class RunDis {
 
     public static void main (String[] args){
         Game game = new Game(DefaultGame());
-        game.moveRobot(Color.BLUE, Direction.RIGHT);
-        game.moveRobot(Color.RED, Direction.RIGHT);
-        game.moveRobot(Color.RED, Direction.UP);
-        updateVisuals(game);
+        Display display = new Display(game);
+        /*game.moveRobot(new MoveCommand(Color.RED, Direction.RIGHT));
+        game.moveRobot(new MoveCommand(Color.RED, Direction.UP));
+        //updateVisuals(display);
+        display.getMove();*/
+
+        updateVisuals(display);
+        while (true){
+            MoveCommand mCmd=display.getMove();
+            game.moveRobot(mCmd);
+            updateVisuals(display);
+        }
+
     }
 
 
-    public static void updateVisuals(Game game){
-        Display display = new Display(game);
+    public static void updateVisuals(Display display){
+        Game game =display.getGame();
         String[][] updatedGame = display.updateGame();
 
         for (int i = game.getState().getBoard().getHeight()-1; i >=0; i--){
@@ -81,7 +90,7 @@ public class RunDis {
         obstacleList.add(new Obstacle(new Coord(10,14),new Coord(11,14), ObsType.HORIZONTAL));
         obstacleList.add(new Obstacle(new Coord(1,15),new Coord(2,15), ObsType.HORIZONTAL));
         obstacleList.add(new Obstacle(new Coord(8,15),new Coord(9,15), ObsType.HORIZONTAL));
-        obstacleList.add(new Obstacle(new Coord(0,2),new Coord(0,2), ObsType.VERTICAL));
+        obstacleList.add(new Obstacle(new Coord(0,2),new Coord(0,3), ObsType.VERTICAL));
         obstacleList.add(new Obstacle(new Coord(0,9),new Coord(0,10), ObsType.VERTICAL));
         obstacleList.add(new Obstacle(new Coord(1,4),new Coord(1,5), ObsType.VERTICAL));
         obstacleList.add(new Obstacle(new Coord(1,11),new Coord(1,12), ObsType.VERTICAL));

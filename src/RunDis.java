@@ -128,8 +128,4 @@ public class RunDis {
         Config config = new Config(robotList,obstacleList,victorySpawns,length,height);
         return config;
     }
-
-
-
-
 }

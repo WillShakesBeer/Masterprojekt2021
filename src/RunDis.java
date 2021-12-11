@@ -24,13 +24,10 @@ public class RunDis {
 
     public static void main (String[] args){
         Game game = new Game(DefaultGame());
+        game.moveRobot(Color.BLUE, Direction.RIGHT);
         game.moveRobot(Color.RED, Direction.RIGHT);
         game.moveRobot(Color.RED, Direction.UP);
         updateVisuals(game);
-
-
-
-
     }
 
 

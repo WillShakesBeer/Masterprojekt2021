@@ -14,9 +14,9 @@ public class Display {
     //The Game that is displayed
     Game game;
 
-    //@Maddin whats the difference to Board.height and Board.length?
     int height;
     int length;
+
     //The Output String
     String[][] view;
 
@@ -92,6 +92,7 @@ public class Display {
             // if E is printed an Obs is missing its  type
             String obsString = "E";
 
+
             switch (type) {
                 case VERTICAL:
                     obsString = "‾";
@@ -99,9 +100,21 @@ public class Display {
                 case HORIZONTAL:
                     obsString = " |";
                     break;
+            }
 
+            String existingField = view[obstacle.getCoord1().getX()][obstacle.getCoord1().getY()];
+            switch (existingField) {
+                case "■":
+                    break;
+                case " |":
+                    obsString = "‾|";
+                    break;
+                case "‾":
+                    obsString = "‾|";
+                    break;
             }
             view[obstacle.getCoord1().getX()][obstacle.getCoord1().getY()] = obsString;
+
         }
 
     }

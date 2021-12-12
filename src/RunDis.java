@@ -7,7 +7,6 @@ import Data.Robot;
 import Data.VictorySpawn;
 import Logic.Game;
 import View.Display;
-import java.awt.*;
 import java.util.ArrayList;
 
 import javafx.application.Application;
@@ -15,11 +14,14 @@ import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Group;
 import javafx.scene.Scene;
+import javafx.scene.layout.GridPane;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.stage.Screen;
+
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
@@ -80,40 +82,35 @@ public class RunDis extends Application {
     //lass mal kleine Size nehmen zum debuggen
     //Idk men lass doch einfach starten wie ne normale FX App siehe Rundis.start(Stage)
     private static void initAndShowGUI() {
+        // This method is invoked on the EDT thread
         JFrame frame = new JFrame("Ricochet Robots");
         final JFXPanel fxPanel = new JFXPanel();
         frame.add(fxPanel);
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        frame.setSize(screenSize.width,screenSize.height);
+        frame.setSize( (int)(Screen.getPrimary().getBounds().getWidth()) , (int)(Screen.getPrimary().getBounds().getHeight()) );
         frame.setVisible(true);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        Stage stage = new Stage();
-        stage.show();
+
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
-                initFX(stage);
+                initFX(fxPanel);
             }
         });
     }
 
-    private static void initFX(Stage stage) {
+    private static void initFX(JFXPanel fxPanel) {
         // This method is invoked on the JavaFX thread
         Scene scene = createScene();
-        stage.setScene(scene);
+        fxPanel.setScene(scene);
     }
 
     private static Scene createScene() {
         Group  root  =  new  Group();
         Scene  scene  =  new  Scene(root, Color.ALICEBLUE);
-        Text  text  =  new  Text();
+        GridPane gridpane = new GridPane();
 
-        text.setX(40);
-        text.setY(100);
-        text.setFont(new Font(25));
-        text.setText("Welcome JavaFX!");
 
-        root.getChildren().add(text);
+
 
         return (scene);
     }

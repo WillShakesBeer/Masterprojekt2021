@@ -7,15 +7,15 @@ import Data.Robot;
 import Data.VictorySpawn;
 import Logic.Game;
 import View.Display;
-import java.awt.*;
 import java.util.ArrayList;
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Group;
 import javafx.scene.Scene;
+import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.text.Text;
+import javafx.stage.Screen;
+
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
@@ -44,8 +44,7 @@ public class RunDis {
         JFrame frame = new JFrame("Ricochet Robots");
         final JFXPanel fxPanel = new JFXPanel();
         frame.add(fxPanel);
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        frame.setSize(screenSize.width, screenSize.height);
+        frame.setSize( (int)(Screen.getPrimary().getBounds().getWidth()) , (int)(Screen.getPrimary().getBounds().getHeight()) );
         frame.setVisible(true);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -66,14 +65,10 @@ public class RunDis {
     private static Scene createScene() {
         Group  root  =  new  Group();
         Scene  scene  =  new  Scene(root, Color.ALICEBLUE);
-        Text  text  =  new  Text();
+        GridPane gridpane = new GridPane();
 
-        text.setX(40);
-        text.setY(100);
-        text.setFont(new Font(25));
-        text.setText("Welcome JavaFX!");
 
-        root.getChildren().add(text);
+
 
         return (scene);
     }

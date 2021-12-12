@@ -1,17 +1,17 @@
 package Data;
 
-import Data.Enums.Color;
+import Data.Enums.Colors;
 
 /**
  * Created by Martin Eberle aka WillShakesBeer on 23.11.2021.
  */
 public class VictoryPoint {
     Data.Coord coord;
-    Color color;
+    Colors colors;
 
-    public VictoryPoint(Data.Coord coord , Color color) {
+    public VictoryPoint(Data.Coord coord , Colors colors) {
         this.coord=coord;
-        this.color=color;
+        this.colors = colors;
 
     }
 
@@ -23,11 +23,11 @@ public class VictoryPoint {
         this.coord = coord;
     }
 
-    public Color getColor() {
-        return color;
+    public Colors getColor() {
+        return colors;
     }
 
-    public void setColor(Color color) {
-        this.color = color;
+    public void setColor(Colors colors) {
+        this.colors = colors;
     }
 }

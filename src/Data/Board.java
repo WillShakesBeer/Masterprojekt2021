@@ -1,5 +1,5 @@
 package Data;
-import Data.Enums.Color;
+import Data.Enums.Colors;
 import Data.Enums.ObsType;
 
 import java.util.ArrayList;
@@ -28,9 +28,9 @@ public class Board {
         this.victoryPoint=victoryPoint;
     }
 
-    public Robot getRobot(Color color){
+    public Robot getRobot(Colors colors){
        for(Robot robot : robots){
-           if(robot.getColor().equals(color)){
+           if(robot.getColor().equals(colors)){
                return robot;
            }
        }

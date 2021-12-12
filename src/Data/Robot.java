@@ -1,14 +1,14 @@
 package Data;
 
-import Data.Enums.Color;
+import Data.Enums.Colors;
 
 public class Robot {
     Data.Coord coord;
-    Color color;
+    Colors colors;
 
-    public Robot(Data.Coord coord, Color color){
+    public Robot(Data.Coord coord, Colors colors){
        this.coord = coord;
-       this.color = color;
+       this.colors = colors;
     }
 
     public Coord getCoord() {
@@ -19,12 +19,12 @@ public class Robot {
         this.coord = coord;
     }
 
-    public Color getColor() {
-        return color;
+    public Colors getColor() {
+        return colors;
     }
 
-    public void setColor(Color color) {
-        this.color = color;
+    public void setColor(Colors colors) {
+        this.colors = colors;
     }
 
 

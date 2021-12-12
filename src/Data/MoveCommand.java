@@ -1,27 +1,27 @@
 package Data;
 
-import Data.Enums.Color;
+import Data.Enums.Colors;
 import Data.Enums.Direction;
 
 
 //Used for Userinput
 //MoveCommand can be input in Game.moveRobot and may not result in a sucessful Move
 public class MoveCommand {
-    Color color;
+    Colors colors;
     Direction dir;
 
 
-    public MoveCommand(Color color, Direction dir){
-        this.color = color;
+    public MoveCommand(Colors colors, Direction dir){
+        this.colors = colors;
         this.dir = dir;
     }
 
-    public Color getColor() {
-        return color;
+    public Colors getColor() {
+        return colors;
     }
 
-    public void setColor(Color color) {
-        this.color = color;
+    public void setColor(Colors colors) {
+        this.colors = colors;
     }
 
     public Direction getDir() {

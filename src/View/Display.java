@@ -1,7 +1,7 @@
 package View;
 
 import Data.*;
-import Data.Enums.Color;
+import Data.Enums.Colors;
 import Data.Enums.Direction;
 import Data.Enums.ObsType;
 import Logic.Game;
@@ -40,19 +40,19 @@ public class Display {
         Scanner sc = new Scanner(System.in);
         System.out.println("Enter Color (r=red,g=green,b=blue,y=yellow)");
         String colorStr = sc.nextLine();
-        Color color=null;
+        Colors colors =null;
         switch (colorStr){
             case "r":
-                color=Color.RED;
+                colors = Colors.RED;
                 break;
             case "g":
-                color=Color.GREEN;
+                colors = Colors.GREEN;
                 break;
             case "b":
-                color=Color.BLUE;
+                colors = Colors.BLUE;
                 break;
             case "y":
-                color=Color.YELLOW;
+                colors = Colors.YELLOW;
                 break;
             default:
                 System.out.println("Cant identify Color");
@@ -76,7 +76,7 @@ public class Display {
             default:
                 System.out.println("Cant identify Direction");
         }
-        mCmd = new MoveCommand(color,dir);
+        mCmd = new MoveCommand(colors,dir);
         return mCmd;
     }
 
@@ -121,9 +121,9 @@ public class Display {
     //replaces a victoryspawn with the current VictoryPoint
     public void drawVictoryPoint(String[][] view){
         VictoryPoint vp = game.getState().getBoard().getVictoryPoint();
-        Color color= vp.getColor();
+        Colors colors = vp.getColor();
         String colorString = "E";
-        switch (color) {
+        switch (colors) {
             case RED:
                 colorString = ANSI_RED + "X" + ANSI_RESET;
                 break;
@@ -144,10 +144,10 @@ public class Display {
     public void drawVictorySpawn(String[][] view){
         ArrayList<VictorySpawn> victorySpawns = game.getState().getBoard().getVictorySpawns();
          for (VictorySpawn victorySpawn : victorySpawns) {
-             Color color = victorySpawn.getColor();
+             Colors colors = victorySpawn.getColor();
              // if E is printed a VP is missing its color type
              String colorString = "E";
-             switch (color) {
+             switch (colors) {
                  case RED:
                      colorString = ANSI_RED + "O" + ANSI_RESET;
                      break;
@@ -206,10 +206,10 @@ public class Display {
         ArrayList<Robot> robots = game.getState().getBoard().getRobots();
 
         for(Robot robot : robots){
-            Color color = robot.getColor();
+            Colors colors = robot.getColor();
             // if E is printed a robot is missing its color type""
             String colorString = "E";
-            switch (color){
+            switch (colors){
                 case RED:
                     colorString = ANSI_RED+"R"+ANSI_RESET;
                     break;

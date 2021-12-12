@@ -1,19 +1,23 @@
 import Data.*;
-import Data.Enums.Color;
-import Data.Enums.Direction;
+import Data.Enums.Colors;
 import Data.Enums.ObsType;
 import Data.GameConfig.Config;
 import Data.Obstacle;
 import Data.Robot;
 import Data.VictorySpawn;
 import Logic.Game;
-import Logic.Gamestate;
 import View.Display;
-
-import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.Arrays;
+import javafx.application.Platform;
+import javafx.embed.swing.JFXPanel;
+import javafx.scene.Group;
+import javafx.scene.Scene;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
+import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 
 
 /**
@@ -23,7 +27,62 @@ public class RunDis {
 
 
     public static void main (String[] args){
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                initAndShowGUI();
+            }
+        });
+
+
         Game game = new Game(DefaultGame());
+        updateVisuals(game);
+    }
+
+    private static void initAndShowGUI() {
+        // This method is invoked on the EDT thread
+        JFrame frame = new JFrame("Ricochet Robots");
+        final JFXPanel fxPanel = new JFXPanel();
+        frame.add(fxPanel);
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        frame.setSize(screenSize.width, screenSize.height);
+        frame.setVisible(true);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                initFX(fxPanel);
+            }
+        });
+    }
+
+    private static void initFX(JFXPanel fxPanel) {
+        // This method is invoked on the JavaFX thread
+        Scene scene = createScene();
+        fxPanel.setScene(scene);
+    }
+
+    private static Scene createScene() {
+        Group  root  =  new  Group();
+        Scene  scene  =  new  Scene(root, Color.ALICEBLUE);
+        Text  text  =  new  Text();
+
+        text.setX(40);
+        text.setY(100);
+        text.setFont(new Font(25));
+        text.setText("Welcome JavaFX!");
+
+        root.getChildren().add(text);
+
+        return (scene);
+    }
+
+
+
+
+
+    public static void updateVisuals(Game game){
         Display display = new Display(game);
         /*game.moveRobot(new MoveCommand(Color.RED, Direction.RIGHT));
         game.moveRobot(new MoveCommand(Color.RED, Direction.UP));
@@ -59,10 +118,10 @@ public class RunDis {
         int length = 16;
         int height = 16;
         ArrayList<Robot> robotList = new ArrayList<Robot>();
-        robotList.add(new Data.Robot(new Coord(0,0), Data.Enums.Color.RED));
-        robotList.add(new Data.Robot(new Coord(0,15), Data.Enums.Color.BLUE));
-        robotList.add(new Data.Robot(new Coord(15,0), Data.Enums.Color.YELLOW));
-        robotList.add(new Robot(new Coord(15,15), Color.GREEN));
+        robotList.add(new Data.Robot(new Coord(0,0), Colors.RED));
+        robotList.add(new Data.Robot(new Coord(0,15), Colors.BLUE));
+        robotList.add(new Data.Robot(new Coord(15,0), Colors.YELLOW));
+        robotList.add(new Robot(new Coord(15,15), Colors.GREEN));
 
         ArrayList<Obstacle> obstacleList = new ArrayList<Obstacle>();
         obstacleList.add(new Obstacle(new Coord(3,0),new Coord(4,0), ObsType.HORIZONTAL));
@@ -90,7 +149,7 @@ public class RunDis {
         obstacleList.add(new Obstacle(new Coord(10,14),new Coord(11,14), ObsType.HORIZONTAL));
         obstacleList.add(new Obstacle(new Coord(1,15),new Coord(2,15), ObsType.HORIZONTAL));
         obstacleList.add(new Obstacle(new Coord(8,15),new Coord(9,15), ObsType.HORIZONTAL));
-        obstacleList.add(new Obstacle(new Coord(0,2),new Coord(0,3), ObsType.VERTICAL));
+        obstacleList.add(new Obstacle(new Coord(0,2),new Coord(0,2), ObsType.VERTICAL));
         obstacleList.add(new Obstacle(new Coord(0,9),new Coord(0,10), ObsType.VERTICAL));
         obstacleList.add(new Obstacle(new Coord(1,4),new Coord(1,5), ObsType.VERTICAL));
         obstacleList.add(new Obstacle(new Coord(1,11),new Coord(1,12), ObsType.VERTICAL));
@@ -117,21 +176,25 @@ public class RunDis {
         obstacleList.add(new Obstacle(new Coord(15,13),new Coord(15,14), ObsType.VERTICAL));
 
         ArrayList<VictorySpawn> victorySpawns = new ArrayList<VictorySpawn>();
-        victorySpawns.add(new VictorySpawn(new Coord(4,3),Color.RED));
-        victorySpawns.add(new VictorySpawn(new Coord(13,4),Color.RED));
-        victorySpawns.add(new VictorySpawn(new Coord(1,12),Color.RED));
-        victorySpawns.add(new VictorySpawn(new Coord(11,14),Color.RED));
-        victorySpawns.add(new VictorySpawn(new Coord(1,5),Color.BLUE));
-        victorySpawns.add(new VictorySpawn(new Coord(3,9),Color.BLUE));
-        victorySpawns.add(new VictorySpawn(new Coord(10,3),Color.BLUE));
-        victorySpawns.add(new VictorySpawn(new Coord(5,10),Color.YELLOW));
-        victorySpawns.add(new VictorySpawn(new Coord(12,2),Color.YELLOW));
-        victorySpawns.add(new VictorySpawn(new Coord(12,9),Color.YELLOW));
-        victorySpawns.add(new VictorySpawn(new Coord(4,14),Color.GREEN));
-        victorySpawns.add(new VictorySpawn(new Coord(5,6),Color.GREEN));
-        victorySpawns.add(new VictorySpawn(new Coord(11,5),Color.GREEN));
+        victorySpawns.add(new VictorySpawn(new Coord(4,3), Colors.RED));
+        victorySpawns.add(new VictorySpawn(new Coord(13,4), Colors.RED));
+        victorySpawns.add(new VictorySpawn(new Coord(1,12), Colors.RED));
+        victorySpawns.add(new VictorySpawn(new Coord(11,14), Colors.RED));
+        victorySpawns.add(new VictorySpawn(new Coord(1,5), Colors.BLUE));
+        victorySpawns.add(new VictorySpawn(new Coord(3,9), Colors.BLUE));
+        victorySpawns.add(new VictorySpawn(new Coord(10,3), Colors.BLUE));
+        victorySpawns.add(new VictorySpawn(new Coord(5,10), Colors.YELLOW));
+        victorySpawns.add(new VictorySpawn(new Coord(12,2), Colors.YELLOW));
+        victorySpawns.add(new VictorySpawn(new Coord(12,9), Colors.YELLOW));
+        victorySpawns.add(new VictorySpawn(new Coord(4,14), Colors.GREEN));
+        victorySpawns.add(new VictorySpawn(new Coord(5,6), Colors.GREEN));
+        victorySpawns.add(new VictorySpawn(new Coord(11,5), Colors.GREEN));
 
         Config config = new Config(robotList,obstacleList,victorySpawns,length,height);
         return config;
     }
+
+
+
+
 }

@@ -1,22 +1,22 @@
 package Data;
 
-import Data.Enums.Color;
+import Data.Enums.Colors;
 
 public class VictorySpawn {
-    Color color;
+    Colors colors;
     Coord coord;
 
-    public VictorySpawn(Coord coord, Color color){
-        this.color = color;
+    public VictorySpawn(Coord coord, Colors colors){
+        this.colors = colors;
         this.coord = coord;
     }
 
-    public Color getColor() {
-        return color;
+    public Colors getColor() {
+        return colors;
     }
 
-    public void setColor(Color color) {
-        this.color = color;
+    public void setColor(Colors colors) {
+        this.colors = colors;
     }
 
     public Coord getCoord() {

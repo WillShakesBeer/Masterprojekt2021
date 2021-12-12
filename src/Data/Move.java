@@ -4,23 +4,23 @@ import Data.Enums.*;
 
 public class Move {
     //color of the moved Robot
-    Color color;
+    Colors colors;
     //pos of the Robot before movement
     Coord prevPos;
     //pos of the Robot after movement
     Coord nextPos;
-    public Move(Color color, Coord prevPos, Coord nextPos){
-        this.color=color;
+    public Move(Colors colors, Coord prevPos, Coord nextPos){
+        this.colors = colors;
         this.prevPos=prevPos;
         this.nextPos=nextPos;
     }
 
-    public Color getColor() {
-        return color;
+    public Colors getColor() {
+        return colors;
     }
 
-    public void setColor(Color color) {
-        this.color = color;
+    public void setColor(Colors colors) {
+        this.colors = colors;
     }
 
     public Coord getPrevPos() {

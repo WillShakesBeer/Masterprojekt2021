@@ -1,7 +1,7 @@
 package Logic;
 
 import Data.*;
-import Data.Enums.Color;
+import Data.Enums.Colors;
 import Data.Enums.Direction;
 import Data.GameConfig.Config;
 
@@ -32,20 +32,20 @@ public class Game {
     //returns -1 if already facing an obstacle
     //return 1 if robot has collected the victorypoint
     public int moveRobot(MoveCommand cmd){
-        Color color = cmd.getColor();
+        Colors colors = cmd.getColor();
         Direction dir = cmd.getDir();
         int result =0;
-        Robot currRobot = this.state.getBoard().getRobot(color);
+        Robot currRobot = this.state.getBoard().getRobot(colors);
         Coord startPos= currRobot.getCoord().clone();
         Coord newPos = checkMovement(startPos.clone(),dir,this.state.getBoard());
         if(startPos.equals(newPos)){
            result = -1;
         }else {
-            Move move = new Move(color,startPos,newPos);
+            Move move = new Move(colors,startPos,newPos);
             this.state.addMove(move);
             currRobot.setCoord(newPos);
             if(newPos.equals(this.state.getBoard().getVictoryPoint().getCoord())
-                    && color.equals(this.state.getBoard().getVictoryPoint().getColor())) {
+                    && colors.equals(this.state.getBoard().getVictoryPoint().getColor())) {
                 this.state.setScore(this.state.getScore()+1);
                 VictoryPoint newVic = createNewVictoryPoint();
                 this.state.getBoard().setVictoryPoint(newVic);

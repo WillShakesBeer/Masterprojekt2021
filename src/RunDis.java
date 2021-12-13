@@ -1,40 +1,41 @@
 import Data.*;
 import Data.Enums.Colors;
+import Data.Enums.Direction;
 import Data.Enums.ObsType;
 import Data.GameConfig.Config;
 import Data.Obstacle;
 import Data.Robot;
 import Data.VictorySpawn;
 import Logic.Game;
-import View.Display;
+
 import java.util.ArrayList;
 
 import javafx.application.Application;
-import javafx.application.Platform;
-import javafx.embed.swing.JFXPanel;
-import javafx.scene.Group;
+import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.layout.GridPane;
+import javafx.scene.control.Button;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ToggleGroup;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.stage.Screen;
-
-import javafx.scene.text.Font;
-import javafx.scene.text.Text;
+import javafx.scene.layout.*;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
-
-import javax.swing.JFrame;
-import javax.swing.SwingUtilities;
+import javafx.geometry.Insets;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 
 
 /**
  * Created by Martin Eberle aka WillShakesBeer on 23.11.2021.
  */
 public class RunDis extends Application {
+
+    public static Colors selectedColor;
+    public static Direction selectedDirection;
+
 
 
     public static void main (String[] args){
@@ -44,87 +45,222 @@ public class RunDis extends Application {
             public void run() {
                 initAndShowGUI();
             }
-        });*/
+        });
+        Game game = new Game(DefaultGame());
+        */
 
         launch();
-        Game game = new Game(DefaultGame());
+
         //updateVisuals(game);
     }
 
     public void start(Stage primaryStage){
         primaryStage.setTitle("Ricochet Robots");
-
+        primaryStage.setResizable(false);
         //Starting with Input UI
         //Color Selection with Radio Buttons
         //Direction with Buttons
 
+        Game game = new Game(DefaultGame());
+
+        GridPane boardGrid = new GridPane();
+        boardGrid.setHgap(0);
+        boardGrid.setVgap(0);
+
+        boardGrid.setPadding(new Insets(10, 10, 0, 10));
+
+        Image floorSprite = new Image("file:Ressources/SpriteFloor.jpg");
+
+
+
+        //draw empty board
+        for (int i =0 ; i < game.getConfig().getHeight() ;i++){
+            for (int j =0 ; j < game.getConfig().getLength() ;j++){
+                boardGrid.add(new ImageView(floorSprite), i , j );
+            }
+        }
+        //draw VPs
+        ArrayList<VictorySpawn> victorySpawns = game.getState().getBoard().getVictorySpawns();
+        for (VictorySpawn victorySpawn : victorySpawns) {
+            Colors colors = victorySpawn.getColor();
+            Image newVP = null;
+            switch (colors) {
+                 case RED:
+                    newVP =  new Image("file:Ressources/VRed.png");
+                    break;
+                case GREEN:
+                    newVP = new Image("file:Ressources/VGreen.png");
+                    break;
+                case BLUE:
+                    newVP = new Image("file:Ressources/VBlue.png");
+                    break;
+                case YELLOW:
+                    newVP = new Image("file:Ressources/VYellow.png");
+                    break;
+            }
+            boardGrid.add(new ImageView(newVP), victorySpawn.getCoord().getX()  , victorySpawn.getCoord().getY() );
+        }
+
+
+        //draw Walls
+        ArrayList<Obstacle> obstacles = game.getState().getBoard().getObstacles();
+        for (Obstacle obstacle : obstacles) {
+            ObsType type = obstacle.getType();
+            // if E is printed an Obs is missing its  type
+            Image newObs =null;
+            switch (type) {
+                case VERTICAL:
+                    newObs = new Image("file:Ressources/SpriteWallVertical.png");
+                    break;
+                case HORIZONTAL:
+                    newObs = new Image("file:Ressources/SpriteWallHorizontal.png");
+                    break;
+            }
+
+            boardGrid.add(new ImageView(newObs), obstacle.getCoord1().getX()  , obstacle.getCoord1().getY() );
+        }
+
+
+        //draw Robots
+        ArrayList<Robot> robots = game.getState().getBoard().getRobots();
+        for(Robot robot : robots){
+            Colors colors = robot.getColor();
+            Image newRobot =null;
+            switch (colors){
+                case RED:
+                    newRobot= new Image("file:Ressources/RobotRed.png" );
+                    break;
+                case GREEN:
+                    newRobot= new Image("file:Ressources/RobotGreen.png");
+                    break;
+                case BLUE:
+                    newRobot= new Image("file:Ressources/RobotBlue.png");
+                    break;
+                case YELLOW:
+                    newRobot= new Image("file:Ressources/RobotYellow.png");
+                    break;
+            }
+            boardGrid.add(new ImageView(newRobot), robot.getCoord().getX(), robot.getCoord().getY() );
+        }
+
+
+
         RadioButton red = new RadioButton("Red");
+        red.setOnAction(new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent e) {
+                selectedColor = Colors.RED;
+                System.out.println("Selected: " + selectedColor);
+            }
+        });
         RadioButton green = new RadioButton("Green");
+        green.setOnAction(new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent e) {
+                selectedColor = Colors.GREEN;
+                System.out.println("Selected: " + selectedColor);
+            }
+        });
         RadioButton blue = new RadioButton("Blue");
+        blue.setOnAction(new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent e) {
+                selectedColor = Colors.BLUE;
+                System.out.println("Selected: " + selectedColor);
+            }
+        });
         RadioButton yellow = new RadioButton("yellow");
+        yellow.setOnAction(new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent e) {
+                selectedColor = Colors.YELLOW;
+                System.out.println("Selected: " + selectedColor);
+            }
+        });
+        red.setSelected(true);
+        ToggleGroup radioGroupColor = new ToggleGroup();
 
-        VBox vbox = new VBox(red,green,blue,yellow);
 
-        ToggleGroup radioGroup = new ToggleGroup();
+        red.setToggleGroup(radioGroupColor);
+        green.setToggleGroup(radioGroupColor);
+        blue.setToggleGroup(radioGroupColor);
+        yellow.setToggleGroup(radioGroupColor);
 
-        red.setToggleGroup(radioGroup);
-        green.setToggleGroup(radioGroup);
-        blue.setToggleGroup(radioGroup);
-        yellow.setToggleGroup(radioGroup);
+        HBox hBoxColor = new HBox(red,green,blue,yellow);
+        hBoxColor.setPadding(new Insets(0, 0, 0, 0));
 
-        Scene scene = new Scene(vbox,600,400);
+
+        int childrenLength =
+                (game.getConfig().getHeight()*game.getConfig().getLength() ) + //h*l +
+                        game.getState().getBoard().getObstacles().size() -1 +     // all walls
+                        game.getState().getBoard().getVictorySpawns().size() -1;  // all VPs
+
+
+        Button left = new Button("left");
+        left.setOnAction(new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent e) {
+                selectedDirection = Direction.LEFT;
+                System.out.println("Selected: " + selectedColor + " " +  selectedDirection);
+                MoveCommand mCmd = new MoveCommand(selectedColor, selectedDirection);
+                game.moveRobot(mCmd);
+
+            }
+        });
+        Button up = new Button("up");
+        up.setOnAction(new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent e) {
+                selectedDirection = Direction.UP;
+                System.out.println("Selected: " + selectedColor + " " +  selectedDirection);
+                MoveCommand mCmd = new MoveCommand(selectedColor, selectedDirection);
+                game.moveRobot(mCmd);
+            }
+        });
+        Button right = new Button("right");
+        right.setOnAction(new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent e) {
+                selectedDirection = Direction.RIGHT;
+                System.out.println("Selected: " + selectedColor + " " +  selectedDirection);
+                MoveCommand mCmd = new MoveCommand(selectedColor, selectedDirection);
+                game.moveRobot(mCmd);
+
+            }
+        });
+        Button down = new Button("down");
+        down.setOnAction(new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent e) {
+                selectedDirection = Direction.DOWN;
+                System.out.println("Selected: " + selectedColor + " " +  selectedDirection);
+                MoveCommand mCmd = new MoveCommand(selectedColor, selectedDirection);
+                game.moveRobot(mCmd);
+            }
+        });
+
+        HBox hBoxDirection = new HBox(left,up,right,down);
+        hBoxDirection.setPadding(new Insets(10, 0, 0, 0));
+
+        HBox hBoxAllButtons = new HBox(hBoxColor,hBoxDirection);
+        hBoxAllButtons.setSpacing(50);
+        hBoxAllButtons.setAlignment(Pos.BASELINE_CENTER);
+
+        VBox vBoxAll = new VBox(boardGrid,hBoxAllButtons);
+
+
+        //Scene scene = new Scene(vbox,(int)(Screen.getPrimary().getBounds().getWidth()),(int)(Screen.getPrimary().getBounds().getHeight()));
+        Scene scene = new Scene(vBoxAll,810,850);
         primaryStage.setScene(scene);
 
         primaryStage.show();
-    }
-
-    //JFrame = dirty Swing shit ?!
-    //lass mal kleine Size nehmen zum debuggen
-    //Idk men lass doch einfach starten wie ne normale FX App siehe Rundis.start(Stage)
-    private static void initAndShowGUI() {
-        // This method is invoked on the EDT thread
-        JFrame frame = new JFrame("Ricochet Robots");
-        final JFXPanel fxPanel = new JFXPanel();
-        frame.add(fxPanel);
-        frame.setSize( (int)(Screen.getPrimary().getBounds().getWidth()) , (int)(Screen.getPrimary().getBounds().getHeight()) );
-        frame.setVisible(true);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                initFX(fxPanel);
-            }
-        });
-    }
-
-    private static void initFX(JFXPanel fxPanel) {
-        // This method is invoked on the JavaFX thread
-        Scene scene = createScene();
-        fxPanel.setScene(scene);
-    }
-
-    private static Scene createScene() {
-        Group  root  =  new  Group();
-        Scene  scene  =  new  Scene(root, Color.ALICEBLUE);
-        GridPane gridpane = new GridPane();
 
 
 
 
-        return (scene);
     }
 
 
-
-
+    /*
     //deprecated
     public static void updateVisuals(Game game){
         Display display = new Display(game);
-        /*game.moveRobot(new MoveCommand(Color.RED, Direction.RIGHT));
+        game.moveRobot(new MoveCommand(Color.RED, Direction.RIGHT));
         game.moveRobot(new MoveCommand(Color.RED, Direction.UP));
         //updateVisuals(display);
-        display.getMove();*/
+        display.getMove();
 
         updateVisuals(display);
         while (true){
@@ -135,7 +271,7 @@ public class RunDis extends Application {
 
     }
 
-    //deprecated
+
     public static void updateVisuals(Display display){
         Game game =display.getGame();
         String[][] updatedGame = display.updateGame();
@@ -147,6 +283,7 @@ public class RunDis extends Application {
             System.out.println();
         }
     }
+    */
 
 
 

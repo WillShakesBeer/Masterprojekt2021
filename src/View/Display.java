@@ -33,6 +33,7 @@ public class Display {
         this.game = game;
     }
 
+
     //gets MoveCommand from user
     //returns newMoveCommand(null,null) for invalid input
     public MoveCommand getMove(){

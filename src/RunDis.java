@@ -1,4 +1,5 @@
 import Data.*;
+import View.*;
 import Data.Enums.Colors;
 import Data.Enums.Direction;
 import Data.Enums.ObsType;
@@ -9,7 +10,6 @@ import Data.VictorySpawn;
 import Logic.Game;
 
 import java.util.ArrayList;
-
 import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -33,232 +33,37 @@ import javafx.event.EventHandler;
  */
 public class RunDis extends Application {
 
-    public static Colors selectedColor;
-    public static Direction selectedDirection;
 
 
 
     public static void main (String[] args){
-        //idk men SwingUtilities?
-        /*SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                initAndShowGUI();
-            }
-        });
+        /*
         Game game = new Game(DefaultGame());
+        updateVisuals(game);
         */
 
-        launch();
 
-        //updateVisuals(game);
+        launch();
     }
 
     public void start(Stage primaryStage){
-        primaryStage.setTitle("Ricochet Robots");
-        primaryStage.setResizable(false);
-        //Starting with Input UI
-        //Color Selection with Radio Buttons
-        //Direction with Buttons
-
         Game game = new Game(DefaultGame());
-
-        GridPane boardGrid = new GridPane();
-        boardGrid.setHgap(0);
-        boardGrid.setVgap(0);
-
-        boardGrid.setPadding(new Insets(10, 10, 0, 10));
-
-        Image floorSprite = new Image("file:Ressources/SpriteFloor.jpg");
-
-
-
-        //draw empty board
-        for (int i =0 ; i < game.getConfig().getHeight() ;i++){
-            for (int j =0 ; j < game.getConfig().getLength() ;j++){
-                boardGrid.add(new ImageView(floorSprite), i , j );
-            }
-        }
-        //draw VPs
-        ArrayList<VictorySpawn> victorySpawns = game.getState().getBoard().getVictorySpawns();
-        for (VictorySpawn victorySpawn : victorySpawns) {
-            Colors colors = victorySpawn.getColor();
-            Image newVP = null;
-            switch (colors) {
-                 case RED:
-                    newVP =  new Image("file:Ressources/VRed.png");
-                    break;
-                case GREEN:
-                    newVP = new Image("file:Ressources/VGreen.png");
-                    break;
-                case BLUE:
-                    newVP = new Image("file:Ressources/VBlue.png");
-                    break;
-                case YELLOW:
-                    newVP = new Image("file:Ressources/VYellow.png");
-                    break;
-            }
-            boardGrid.add(new ImageView(newVP), victorySpawn.getCoord().getX()  , victorySpawn.getCoord().getY() );
-        }
-
-
-        //draw Walls
-        ArrayList<Obstacle> obstacles = game.getState().getBoard().getObstacles();
-        for (Obstacle obstacle : obstacles) {
-            ObsType type = obstacle.getType();
-            // if E is printed an Obs is missing its  type
-            Image newObs =null;
-            switch (type) {
-                case VERTICAL:
-                    newObs = new Image("file:Ressources/SpriteWallVertical.png");
-                    break;
-                case HORIZONTAL:
-                    newObs = new Image("file:Ressources/SpriteWallHorizontal.png");
-                    break;
-            }
-
-            boardGrid.add(new ImageView(newObs), obstacle.getCoord1().getX()  , obstacle.getCoord1().getY() );
-        }
-
-
-        //draw Robots
-        ArrayList<Robot> robots = game.getState().getBoard().getRobots();
-        for(Robot robot : robots){
-            Colors colors = robot.getColor();
-            Image newRobot =null;
-            switch (colors){
-                case RED:
-                    newRobot= new Image("file:Ressources/RobotRed.png" );
-                    break;
-                case GREEN:
-                    newRobot= new Image("file:Ressources/RobotGreen.png");
-                    break;
-                case BLUE:
-                    newRobot= new Image("file:Ressources/RobotBlue.png");
-                    break;
-                case YELLOW:
-                    newRobot= new Image("file:Ressources/RobotYellow.png");
-                    break;
-            }
-            boardGrid.add(new ImageView(newRobot), robot.getCoord().getX(), robot.getCoord().getY() );
-        }
-
-
-
-        RadioButton red = new RadioButton("Red");
-        red.setOnAction(new EventHandler<ActionEvent>() {
-            @Override public void handle(ActionEvent e) {
-                selectedColor = Colors.RED;
-                System.out.println("Selected: " + selectedColor);
-            }
-        });
-        RadioButton green = new RadioButton("Green");
-        green.setOnAction(new EventHandler<ActionEvent>() {
-            @Override public void handle(ActionEvent e) {
-                selectedColor = Colors.GREEN;
-                System.out.println("Selected: " + selectedColor);
-            }
-        });
-        RadioButton blue = new RadioButton("Blue");
-        blue.setOnAction(new EventHandler<ActionEvent>() {
-            @Override public void handle(ActionEvent e) {
-                selectedColor = Colors.BLUE;
-                System.out.println("Selected: " + selectedColor);
-            }
-        });
-        RadioButton yellow = new RadioButton("yellow");
-        yellow.setOnAction(new EventHandler<ActionEvent>() {
-            @Override public void handle(ActionEvent e) {
-                selectedColor = Colors.YELLOW;
-                System.out.println("Selected: " + selectedColor);
-            }
-        });
-        red.setSelected(true);
-        ToggleGroup radioGroupColor = new ToggleGroup();
-
-
-        red.setToggleGroup(radioGroupColor);
-        green.setToggleGroup(radioGroupColor);
-        blue.setToggleGroup(radioGroupColor);
-        yellow.setToggleGroup(radioGroupColor);
-
-        HBox hBoxColor = new HBox(red,green,blue,yellow);
-        hBoxColor.setPadding(new Insets(0, 0, 0, 0));
-
-
-        int childrenLength =
-                (game.getConfig().getHeight()*game.getConfig().getLength() ) + //h*l +
-                        game.getState().getBoard().getObstacles().size() -1 +     // all walls
-                        game.getState().getBoard().getVictorySpawns().size() -1;  // all VPs
-
-
-        Button left = new Button("left");
-        left.setOnAction(new EventHandler<ActionEvent>() {
-            @Override public void handle(ActionEvent e) {
-                selectedDirection = Direction.LEFT;
-                System.out.println("Selected: " + selectedColor + " " +  selectedDirection);
-                MoveCommand mCmd = new MoveCommand(selectedColor, selectedDirection);
-                game.moveRobot(mCmd);
-
-            }
-        });
-        Button up = new Button("up");
-        up.setOnAction(new EventHandler<ActionEvent>() {
-            @Override public void handle(ActionEvent e) {
-                selectedDirection = Direction.UP;
-                System.out.println("Selected: " + selectedColor + " " +  selectedDirection);
-                MoveCommand mCmd = new MoveCommand(selectedColor, selectedDirection);
-                game.moveRobot(mCmd);
-            }
-        });
-        Button right = new Button("right");
-        right.setOnAction(new EventHandler<ActionEvent>() {
-            @Override public void handle(ActionEvent e) {
-                selectedDirection = Direction.RIGHT;
-                System.out.println("Selected: " + selectedColor + " " +  selectedDirection);
-                MoveCommand mCmd = new MoveCommand(selectedColor, selectedDirection);
-                game.moveRobot(mCmd);
-
-            }
-        });
-        Button down = new Button("down");
-        down.setOnAction(new EventHandler<ActionEvent>() {
-            @Override public void handle(ActionEvent e) {
-                selectedDirection = Direction.DOWN;
-                System.out.println("Selected: " + selectedColor + " " +  selectedDirection);
-                MoveCommand mCmd = new MoveCommand(selectedColor, selectedDirection);
-                game.moveRobot(mCmd);
-            }
-        });
-
-        HBox hBoxDirection = new HBox(left,up,right,down);
-        hBoxDirection.setPadding(new Insets(10, 0, 0, 0));
-
-        HBox hBoxAllButtons = new HBox(hBoxColor,hBoxDirection);
-        hBoxAllButtons.setSpacing(50);
-        hBoxAllButtons.setAlignment(Pos.BASELINE_CENTER);
-
-        VBox vBoxAll = new VBox(boardGrid,hBoxAllButtons);
-
-
-        //Scene scene = new Scene(vbox,(int)(Screen.getPrimary().getBounds().getWidth()),(int)(Screen.getPrimary().getBounds().getHeight()));
-        Scene scene = new Scene(vBoxAll,810,850);
-        primaryStage.setScene(scene);
-
-        primaryStage.show();
-
-
-
-
+        DisplayFx displayFx = new DisplayFx();
+        displayFx.diplayVisuals(primaryStage,game);
     }
 
 
-    /*
+
+
+
+
+
+
     //deprecated
     public static void updateVisuals(Game game){
         Display display = new Display(game);
-        game.moveRobot(new MoveCommand(Color.RED, Direction.RIGHT));
-        game.moveRobot(new MoveCommand(Color.RED, Direction.UP));
+        game.moveRobot(new MoveCommand(Colors.RED, Direction.RIGHT));
+        game.moveRobot(new MoveCommand(Colors.RED, Direction.UP));
         //updateVisuals(display);
         display.getMove();
 
@@ -270,8 +75,6 @@ public class RunDis extends Application {
         }
 
     }
-
-
     public static void updateVisuals(Display display){
         Game game =display.getGame();
         String[][] updatedGame = display.updateGame();
@@ -283,14 +86,14 @@ public class RunDis extends Application {
             System.out.println();
         }
     }
-    */
+
 
 
 
 
     public static Config DefaultGame(){
-        int length = 16;
-        int height = 16;
+        int length = 15;
+        int height = 15;
         ArrayList<Robot> robotList = new ArrayList<Robot>();
         robotList.add(new Data.Robot(new Coord(0,0), Colors.RED));
         robotList.add(new Data.Robot(new Coord(0,15), Colors.BLUE));
@@ -323,7 +126,7 @@ public class RunDis extends Application {
         obstacleList.add(new Obstacle(new Coord(10,14),new Coord(11,14), ObsType.HORIZONTAL));
         obstacleList.add(new Obstacle(new Coord(1,15),new Coord(2,15), ObsType.HORIZONTAL));
         obstacleList.add(new Obstacle(new Coord(8,15),new Coord(9,15), ObsType.HORIZONTAL));
-        obstacleList.add(new Obstacle(new Coord(0,2),new Coord(0,2), ObsType.VERTICAL));
+        obstacleList.add(new Obstacle(new Coord(0,2),new Coord(0,3), ObsType.VERTICAL));
         obstacleList.add(new Obstacle(new Coord(0,9),new Coord(0,10), ObsType.VERTICAL));
         obstacleList.add(new Obstacle(new Coord(1,4),new Coord(1,5), ObsType.VERTICAL));
         obstacleList.add(new Obstacle(new Coord(1,11),new Coord(1,12), ObsType.VERTICAL));

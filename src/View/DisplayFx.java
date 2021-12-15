@@ -218,19 +218,32 @@ public class DisplayFx {
         }
     }
     public HBox drawButtons(Game game, GridPane boardGrid){
+
+        Button revertLastMoveButton = drawRevertButton(game , boardGrid);
+
         HBox hBoxColor = drawColorButtons(game,boardGrid);
         HBox hBoxDirection = drawDirectionButtons(game,boardGrid);
 
         moveScore.setText("Moves: "+game.getState().getMoveList().size() );
 
-        HBox hBoxAllButtons = new HBox(hBoxColor, hBoxDirection , moveScore);
+        HBox hBoxAllButtons = new HBox(revertLastMoveButton , hBoxColor, hBoxDirection , moveScore);
         hBoxAllButtons.setSpacing(50);
         hBoxAllButtons.setAlignment(Pos.BASELINE_CENTER);
 
         return hBoxAllButtons;
     }
 
-
+    public Button drawRevertButton (Game game , GridPane boardGrid){
+        Button revertLastMoveButton = new Button("Revert Last Move");
+        revertLastMoveButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent e) {
+                game.revertMove();
+                redrawRobots(game , boardGrid);
+            }
+        });
+        return revertLastMoveButton;
+    }
 
     public HBox drawColorButtons(Game game, GridPane boardGrid){
         red.setOnAction(new EventHandler<ActionEvent>() {

@@ -11,13 +11,17 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import java.util.ArrayList;
 
@@ -41,6 +45,7 @@ public class DisplayFx {
     private Colors selectedColor;
     private Direction selectedDirection;
 
+    private Label moveScore = new Label ("Moves: ");
 
     public DisplayFx (){
 
@@ -77,7 +82,7 @@ public class DisplayFx {
         //generateButtons
         HBox hBoxAllButtons = drawButtons(game,boardGrid);
 
-        //fullBoard with Buttons
+        //fullBoard with Buttons + move score
         VBox vBoxAll = new VBox(boardGrid, hBoxAllButtons);
 
 
@@ -100,23 +105,41 @@ public class DisplayFx {
         ArrayList<VictorySpawn> victorySpawns = game.getState().getBoard().getVictorySpawns();
         for (VictorySpawn victorySpawn : victorySpawns) {
             Colors colors = victorySpawn.getColor();
-            Image newVP = null;
+            Image newVPSpawn = null;
             switch (colors) {
                 case RED:
-                    newVP = new Image("file:Ressources/VRed.png");
+                    newVPSpawn = new Image("file:Ressources/VRedSpawn.png");
                     break;
                 case GREEN:
-                    newVP = new Image("file:Ressources/VGreen.png");
+                    newVPSpawn = new Image("file:Ressources/VGreenSpawn.png");
                     break;
                 case BLUE:
-                    newVP = new Image("file:Ressources/VBlue.png");
+                    newVPSpawn = new Image("file:Ressources/VBlueSpawn.png");
                     break;
                 case YELLOW:
-                    newVP = new Image("file:Ressources/VYellow.png");
+                    newVPSpawn = new Image("file:Ressources/VYellowSpawn.png");
                     break;
             }
-            boardGrid.add(new ImageView(newVP), victorySpawn.getCoord().getX(), victorySpawn.getCoord().getY());
+            boardGrid.add(new ImageView(newVPSpawn), victorySpawn.getCoord().getX(), victorySpawn.getCoord().getY());
         }
+
+        Colors colors = game.getState().getBoard().getVictoryPoint().getColor();
+        Image newVP = null;
+        switch (colors) {
+            case RED:
+                newVP = new Image("file:Ressources/VRed.png");
+                break;
+            case GREEN:
+                newVP = new Image("file:Ressources/VGreen.png");
+                break;
+            case BLUE:
+                newVP = new Image("file:Ressources/VBlue.png");
+                break;
+            case YELLOW:
+                newVP = new Image("file:Ressources/VYellow.png");
+                break;
+        }
+        boardGrid.add(new ImageView(newVP), game.getState().getBoard().getVictoryPoint().getCoord().getX(), game.getState().getBoard().getVictoryPoint().getCoord().getY());
     }
 
     public void drawObstacles(Game game, GridPane boardGrid){
@@ -163,7 +186,9 @@ public class DisplayFx {
         HBox hBoxColor = drawColorButtons(game,boardGrid);
         HBox hBoxDirection = drawDirectionButtons(game,boardGrid);
 
-        HBox hBoxAllButtons = new HBox(hBoxColor, hBoxDirection);
+        moveScore.setText("Moves: "+game.getState().getMoveList().size() );
+
+        HBox hBoxAllButtons = new HBox(hBoxColor, hBoxDirection , moveScore);
         hBoxAllButtons.setSpacing(50);
         hBoxAllButtons.setAlignment(Pos.BASELINE_CENTER);
 
@@ -190,6 +215,7 @@ public class DisplayFx {
             }
         });
 
+
         RadioButton blue = new RadioButton("Blue ");
         blue.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -199,6 +225,7 @@ public class DisplayFx {
             }
         });
 
+
         RadioButton yellow = new RadioButton("Yellow ");
         yellow.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -207,6 +234,7 @@ public class DisplayFx {
                 System.out.println("Selected: " + selectedColor);
             }
         });
+
 
         selectedColor = Colors.RED;
         red.setSelected(true);
@@ -232,6 +260,9 @@ public class DisplayFx {
                 moveRobot(selectedDirection , selectedColor , game , boardGrid);
             }
         });
+
+
+
         Button up = new Button("↑");
         up.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -250,6 +281,7 @@ public class DisplayFx {
 
             }
         });
+
         Button down = new Button("↓");
         down.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -276,8 +308,10 @@ public class DisplayFx {
 
     public void redrawRobots(Game game, GridPane boardGrid){
         int distanceToRobots = (game.getConfig().getHeight()+1) * (game.getConfig().getLength()+1) //all fields
-                + game.getConfig().getVictorySpawns().size()                                       //all vp
+                + game.getConfig().getVictorySpawns().size()                                       //all vp spawns
+                + 1                                                                                //the vp
                 + game.getConfig().getObstacleList().size();                                       //all obs
+
 
         //we delete all robots and draw them new (less hazzle than to identify which Robot moved this turn)
         boardGrid.getChildren().remove(distanceToRobots);
@@ -285,7 +319,9 @@ public class DisplayFx {
         boardGrid.getChildren().remove(distanceToRobots);
         boardGrid.getChildren().remove(distanceToRobots);
         drawRobots(game,boardGrid);
+        moveScore.setText("Moves: "+game.getState().getMoveList().size() );
     }
+
 
 
 }

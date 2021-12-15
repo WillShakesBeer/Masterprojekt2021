@@ -19,13 +19,10 @@ import javafx.stage.Stage;
  */
 public class RunDis extends Application {
 
-
-
-
     public static void main (String[] args){
         /*
         @Linus
-        The Robots can now be moved with W A S D
+        The Robots can now be moved with W A S D,
         and the colors can be selected with 1 2 3 4
         Backspace reverts the last move
          */

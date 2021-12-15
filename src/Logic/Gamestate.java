@@ -45,4 +45,6 @@ public class Gamestate {
     public void setBoard(Board board) {
         this.board = board;
     }
+
+
 }

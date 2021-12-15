@@ -117,6 +117,7 @@ public class Game {
                 result=false;
             }
         }
+
         if(pos.getX()<0 || pos.getX()>board.getLength() || pos.getY()<0 || pos.getY()>board.getHeight()){
             result=false;
         }

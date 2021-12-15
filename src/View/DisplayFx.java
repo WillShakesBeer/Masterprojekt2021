@@ -10,10 +10,7 @@ import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.RadioButton;
-import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
@@ -57,16 +54,22 @@ public class DisplayFx {
 
     private Button revertLastMoveButton = new Button("Revert Last Move");
 
+    private Label score = new Label("Score: 0");
     private Label moveScore = new Label ("Moves: ");
     private Label movelist = new Label("Made moves: ");
     private ArrayList<String> moveListlist = new ArrayList<>();
+    private ScrollPane movelistScrollPane;
 
+
+    private Game game;
+    private GridPane boardGrid;
 
     public DisplayFx (){
 
     }
 
     public void diplayVisuals(Stage primaryStage , Game game) {
+
         primaryStage.setTitle("Ricochet Robots");
         primaryStage.setResizable(false);
         //Starting with Input UI
@@ -75,35 +78,37 @@ public class DisplayFx {
 
         System.out.println("Spielfeld: " + game.getConfig().getLength() + " x " + game.getConfig().getHeight() );
 
-        GridPane boardGrid = new GridPane();
+        this.game = game;
+        boardGrid = new GridPane();
         boardGrid.setHgap(0);
         boardGrid.setVgap(0);
         boardGrid.setPadding(new Insets(10, 10, 0, 10));
 
         //draw empty board
-        drawEmptyBoard(game, boardGrid);
-
-        //draw VPs
-        drawVP(game, boardGrid);
+        drawEmptyBoard();
 
         //draw Walls
-        drawObstacles(game,boardGrid);
+        drawObstacles();
+
+        //draw VPs
+        drawVP();
 
         //draw Robots
-        drawRobots(game,boardGrid);
+        drawRobots();
 
         //Grid and listofMoves
-        movelist.setPadding(new Insets(10, 10, 0,0 ));
-        HBox gridAndMoveList = new HBox(boardGrid , movelist);
+
+        movelistScrollPane = drawListOfMoves();
+        HBox gridAndMoveList = new HBox(boardGrid , movelistScrollPane);
 
         //generateButtons
-        HBox hBoxAllButtons = drawButtons(game,boardGrid);
+        HBox hBoxAllButtons = drawButtons();
 
         //fullBoard with Buttons + move score
         VBox vBoxAll = new VBox(gridAndMoveList, hBoxAllButtons);
 
         //Scene scene = new Scene(vbox,(int)(Screen.getPrimary().getBounds().getWidth()),(int)(Screen.getPrimary().getBounds().getHeight()));
-        Scene scene = new Scene(vBoxAll, 920, 900);
+        Scene scene = new Scene(vBoxAll, 950, 900);
 
         generateKeyhandlers(scene);
 
@@ -111,6 +116,7 @@ public class DisplayFx {
 
         primaryStage.show();
     }
+
     public void generateKeyhandlers (Scene scene){
         scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
@@ -132,7 +138,7 @@ public class DisplayFx {
     }
 
 
-    public void drawEmptyBoard(Game game , GridPane boardGrid){
+    public void drawEmptyBoard(){
         for (int i = 0; i <= game.getConfig().getHeight(); i++) {
             for (int j = 0; j <= game.getConfig().getLength(); j++) {
                 Random random = new Random();
@@ -149,7 +155,7 @@ public class DisplayFx {
         }
     }
 
-    public void drawVP(Game game, GridPane boardGrid){
+    public void drawVP(){
         ArrayList<VictorySpawn> victorySpawns = game.getState().getBoard().getVictorySpawns();
         for (VictorySpawn victorySpawn : victorySpawns) {
             Colors colors = victorySpawn.getColor();
@@ -190,7 +196,7 @@ public class DisplayFx {
         boardGrid.add(new ImageView(newVP), game.getState().getBoard().getVictoryPoint().getCoord().getX(), game.getState().getBoard().getVictoryPoint().getCoord().getY());
     }
 
-    public void drawObstacles(Game game, GridPane boardGrid){
+    public void drawObstacles(){
         ArrayList<Obstacle> obstacles = game.getState().getBoard().getObstacles();
         for (Obstacle obstacle : obstacles) {
             ObsType type = obstacle.getType();
@@ -208,7 +214,7 @@ public class DisplayFx {
             boardGrid.add(new ImageView(newObs), obstacle.getCoord1().getX(), obstacle.getCoord1().getY());
         }
     }
-    public void drawRobots(Game game, GridPane boardGrid){
+    public void drawRobots(){
         ArrayList<Robot> robots = game.getState().getBoard().getRobots();
         for (Robot robot : robots) {
             Colors colors = robot.getColor();
@@ -230,40 +236,54 @@ public class DisplayFx {
             boardGrid.add(new ImageView(newRobot), robot.getCoord().getX(), robot.getCoord().getY());
         }
     }
-    public HBox drawButtons(Game game, GridPane boardGrid){
 
-        Button revertLastMoveButton = drawRevertButton(game , boardGrid);
+    public ScrollPane drawListOfMoves (){
+        ScrollPane movelistScrollPane = new ScrollPane();
+        movelist.setPadding(new Insets(5, 0, 0,0 ));
+        movelistScrollPane.setContent(movelist);
+        movelistScrollPane.setPrefViewportHeight(game.getConfig().getHeight()*50);
+        movelistScrollPane.setPrefViewportWidth(120);
+        //so we stay at the bottom
+        movelistScrollPane.setVvalue(movelistScrollPane.getVmax());
 
-        HBox hBoxColor = drawColorButtons(game,boardGrid);
-        HBox hBoxDirection = drawDirectionButtons(game,boardGrid);
+        return movelistScrollPane;
+    }
+
+
+    public HBox drawButtons(){
+
+        Button revertLastMoveButton = drawRevertButton();
+
+        HBox hBoxColor = drawColorButtons();
+        HBox hBoxDirection = drawDirectionButtons();
 
         moveScore.setText("Moves: "+game.getState().getMoveList().size() );
 
-        HBox hBoxAllButtons = new HBox(revertLastMoveButton , hBoxColor, hBoxDirection , moveScore);
+        HBox hBoxAllButtons = new HBox(score, revertLastMoveButton , hBoxColor, hBoxDirection , moveScore);
         hBoxAllButtons.setSpacing(50);
         hBoxAllButtons.setAlignment(Pos.BASELINE_CENTER);
 
         return hBoxAllButtons;
     }
 
-    public Button drawRevertButton (Game game , GridPane boardGrid){
+    public Button drawRevertButton (){
         revertLastMoveButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
                 game.revertMove();
-                redrawRobots(game , boardGrid);
+                redrawRobots();
                 if (moveListlist.size() > 0){
                     moveListlist.remove(moveListlist.size()-1);
                 }
-                redrawMovelist(game,boardGrid);
-                redrawRobots(game,boardGrid);
+                redrawMovelist();
+                redrawRobots();
             }
         });
 
         return revertLastMoveButton;
     }
 
-    public HBox drawColorButtons(Game game, GridPane boardGrid){
+    public HBox drawColorButtons(){
         red.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
@@ -314,12 +334,12 @@ public class DisplayFx {
 
 
 
-    public HBox drawDirectionButtons(Game game, GridPane boardGrid){
+    public HBox drawDirectionButtons(){
         left.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
                 selectedDirection = Direction.LEFT;
-                moveRobot(selectedDirection , selectedColor , game , boardGrid);
+                moveRobot(selectedDirection , selectedColor );
             }
         });
 
@@ -327,7 +347,7 @@ public class DisplayFx {
             @Override
             public void handle(ActionEvent e) {
                 selectedDirection = Direction.UP;
-                moveRobot(selectedDirection , selectedColor , game , boardGrid);
+                moveRobot(selectedDirection , selectedColor );
 
             }
         });
@@ -336,7 +356,7 @@ public class DisplayFx {
             @Override
             public void handle(ActionEvent e) {
                 selectedDirection = Direction.DOWN;
-                moveRobot(selectedDirection , selectedColor , game , boardGrid);
+                moveRobot(selectedDirection , selectedColor );
 
             }
         });
@@ -345,7 +365,7 @@ public class DisplayFx {
             @Override
             public void handle(ActionEvent e) {
                 selectedDirection = Direction.RIGHT;
-                moveRobot(selectedDirection , selectedColor , game , boardGrid);
+                moveRobot(selectedDirection , selectedColor );
 
             }
         });
@@ -357,42 +377,44 @@ public class DisplayFx {
 
     }
 
-    public void moveRobot(Direction selectedDirection, Colors selectedColor, Game game, GridPane boardGrid){
+    public void moveRobot(Direction selectedDirection, Colors selectedColor){
         System.out.println("Selected: " + selectedColor + " " + selectedDirection);
         MoveCommand mCmd = new MoveCommand(selectedColor, selectedDirection);
-        fillMovelist(game,boardGrid);
+        fillMovelist();
         game.moveRobot(mCmd);
-        redrawRobots (game, boardGrid);
+        redrawRobots ();
+        score.setText("Score: " + game.getState().getScore());
 
     }
 
-    public void redrawRobots(Game game, GridPane boardGrid){
-        int distanceToRobots = (game.getConfig().getHeight()+1) * (game.getConfig().getLength()+1) //all fields
-                + game.getConfig().getVictorySpawns().size()                                       //all vp spawns
-                + 1                                                                                //the vp
-                + game.getConfig().getObstacleList().size();                                       //all obs
+    public void redrawRobots(){
+        int distanceToVps = (game.getConfig().getHeight()+1) * (game.getConfig().getLength()+1) //all fields
+                + game.getConfig().getObstacleList().size() ;                                      //all obs
 
-
-        //we delete all robots and redraw them new (less hazzle than to identify which Robot moved this turn)
-        boardGrid.getChildren().remove(distanceToRobots);
-        boardGrid.getChildren().remove(distanceToRobots);
-        boardGrid.getChildren().remove(distanceToRobots);
-        boardGrid.getChildren().remove(distanceToRobots);
-        drawRobots(game,boardGrid);
+        //we delete all robots and VPs redraw them new (less hazzle than to identify which Robot moved this turn)
+        for (int i = 0 ; i <= (game.getState().getBoard().getRobots().size() + game.getState().getBoard().getVictorySpawns().size()  ); i++){
+            boardGrid.getChildren().remove(distanceToVps);
+        }
+        drawRobots();
+        drawVP();
         moveScore.setText("Moves: "+game.getState().getMoveList().size() );
+
     }
 
-    public void fillMovelist(Game game, GridPane boardGrid){
+    public void fillMovelist(){
         moveListlist.add('\n' + selectedColor.toString() + "  "+ "\t" + selectedDirection.toString() );
-        redrawMovelist(game,boardGrid);
+        redrawMovelist();
     }
 
-    public void redrawMovelist (Game game, GridPane boardGrid){
+    public void redrawMovelist (){
         String movelistString = "Made moves: ";
         for (String move : moveListlist){
             movelistString = movelistString + move;
         }
         movelist.setText(movelistString);
+        //scrolls to the bottom
+        movelistScrollPane.setVvalue(movelistScrollPane.getVmax());
+
     }
 
 }

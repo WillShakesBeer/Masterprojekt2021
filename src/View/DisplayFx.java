@@ -45,6 +45,17 @@ public class DisplayFx {
     private Colors selectedColor;
     private Direction selectedDirection;
 
+
+    private RadioButton red = new RadioButton("Red ");
+    private RadioButton green = new RadioButton("Green ");
+    private RadioButton blue = new RadioButton("Blue ");
+    private RadioButton yellow = new RadioButton("Yellow ");
+
+    private Button left = new Button("←");
+    private Button up = new Button("↑");
+    private Button down = new Button("↓");
+    private Button right = new Button("→");
+
     private Label moveScore = new Label ("Moves: ");
 
     public DisplayFx (){
@@ -88,10 +99,34 @@ public class DisplayFx {
 
         //Scene scene = new Scene(vbox,(int)(Screen.getPrimary().getBounds().getWidth()),(int)(Screen.getPrimary().getBounds().getHeight()));
         Scene scene = new Scene(vBoxAll, 820, 900);
+
+        generateKeyhandlers(scene);
+
+
         primaryStage.setScene(scene);
+
 
         primaryStage.show();
     }
+    public void generateKeyhandlers (Scene scene){
+        scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent event) {
+                switch (event.getCode()) {
+                    case W: up.fire(); break;
+                    case A: left.fire(); break;
+                    case S: down.fire(); break;
+                    case D: right.fire(); break;
+                    case DIGIT1: red.fire(); break;
+                    case DIGIT2: green.fire(); break;
+                    case DIGIT3: blue.fire(); break;
+                    case DIGIT4: yellow.fire(); break;
+                }
+            }
+        });
+
+    }
+
 
     public void drawEmptyBoard(Game game , GridPane boardGrid){
         for (int i = 0; i <= game.getConfig().getHeight(); i++) {
@@ -195,9 +230,9 @@ public class DisplayFx {
         return hBoxAllButtons;
     }
 
-    public HBox drawColorButtons(Game game, GridPane boardGrid){
 
-        RadioButton red = new RadioButton("Red ");
+
+    public HBox drawColorButtons(Game game, GridPane boardGrid){
         red.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
@@ -206,7 +241,7 @@ public class DisplayFx {
             }
         });
 
-        RadioButton green = new RadioButton("Green ");
+
         green.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
@@ -215,8 +250,6 @@ public class DisplayFx {
             }
         });
 
-
-        RadioButton blue = new RadioButton("Blue ");
         blue.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
@@ -225,8 +258,6 @@ public class DisplayFx {
             }
         });
 
-
-        RadioButton yellow = new RadioButton("Yellow ");
         yellow.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
@@ -250,9 +281,9 @@ public class DisplayFx {
         return hBoxColor;
     }
 
-    public HBox drawDirectionButtons(Game game, GridPane boardGrid){
 
-        Button left = new Button("←");
+
+    public HBox drawDirectionButtons(Game game, GridPane boardGrid){
         left.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
@@ -261,9 +292,6 @@ public class DisplayFx {
             }
         });
 
-
-
-        Button up = new Button("↑");
         up.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
@@ -272,21 +300,20 @@ public class DisplayFx {
 
             }
         });
-        Button right = new Button("→");
-        right.setOnAction(new EventHandler<ActionEvent>() {
+
+        down.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
-                selectedDirection = Direction.RIGHT;
+                selectedDirection = Direction.DOWN;
                 moveRobot(selectedDirection , selectedColor , game , boardGrid);
 
             }
         });
 
-        Button down = new Button("↓");
-        down.setOnAction(new EventHandler<ActionEvent>() {
+        right.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
-                selectedDirection = Direction.DOWN;
+                selectedDirection = Direction.RIGHT;
                 moveRobot(selectedDirection , selectedColor , game , boardGrid);
 
             }

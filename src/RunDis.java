@@ -38,11 +38,10 @@ public class RunDis extends Application {
 
     public static void main (String[] args){
         /*
-        Game game = new Game(DefaultGame());
-        updateVisuals(game);
-        */
-
-
+        @Linus
+        The Robots can now be moved with W A S D
+        and the colors can be selected with 1 2 3 4
+         */
         launch();
     }
 
@@ -51,43 +50,6 @@ public class RunDis extends Application {
         DisplayFx displayFx = new DisplayFx();
         displayFx.diplayVisuals(primaryStage,game);
     }
-
-
-
-
-
-
-
-
-    //deprecated
-    public static void updateVisuals(Game game){
-        Display display = new Display(game);
-        game.moveRobot(new MoveCommand(Colors.RED, Direction.RIGHT));
-        game.moveRobot(new MoveCommand(Colors.RED, Direction.UP));
-        //updateVisuals(display);
-        display.getMove();
-
-        updateVisuals(display);
-        while (true){
-            MoveCommand mCmd=display.getMove();
-            game.moveRobot(mCmd);
-            updateVisuals(display);
-        }
-
-    }
-    public static void updateVisuals(Display display){
-        Game game =display.getGame();
-        String[][] updatedGame = display.updateGame();
-
-        for (int i = game.getState().getBoard().getHeight()-1; i >=0; i--){
-            for (int j = 0; j < game.getState().getBoard().getLength(); j++){
-                System.out.print(updatedGame[j][i] + '\t' );
-            }
-            System.out.println();
-        }
-    }
-
-
 
 
 

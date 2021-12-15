@@ -56,6 +56,8 @@ public class DisplayFx {
     private Button down = new Button("↓");
     private Button right = new Button("→");
 
+    private Button revertLastMoveButton = new Button("Revert Last Move");
+
     private Label moveScore = new Label ("Moves: ");
 
     public DisplayFx (){
@@ -121,6 +123,7 @@ public class DisplayFx {
                     case DIGIT2: green.fire(); break;
                     case DIGIT3: blue.fire(); break;
                     case DIGIT4: yellow.fire(); break;
+                    case BACK_SPACE: revertLastMoveButton.fire(); break;
                 }
             }
         });
@@ -234,7 +237,6 @@ public class DisplayFx {
     }
 
     public Button drawRevertButton (Game game , GridPane boardGrid){
-        Button revertLastMoveButton = new Button("Revert Last Move");
         revertLastMoveButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {

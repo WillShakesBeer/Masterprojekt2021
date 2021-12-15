@@ -24,6 +24,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import java.util.ArrayList;
+import java.util.Random;
 
 /**
  * Created by Martin Eberle aka WillShakesBeer on 14.12.2021.
@@ -31,20 +32,18 @@ import java.util.ArrayList;
 
 public class DisplayFx {
 
-    public static final String ANSI_RESET = "\u001B[0m";
-    public static final String ANSI_BLACK = "\u001B[30m";
-    public static final String ANSI_RED = "\u001B[31m";
-    public static final String ANSI_GREEN = "\u001B[32m";
-    public static final String ANSI_YELLOW = "\u001B[33m";
-    public static final String ANSI_BLUE = "\u001B[34m";
-    public static final String ANSI_PURPLE = "\u001B[35m";
-    public static final String ANSI_CYAN = "\u001B[36m";
-    public static final String ANSI_WHITE = "\u001B[37m";
-
+    private final String ANSI_RESET = "\u001B[0m";
+    private final String ANSI_BLACK = "\u001B[30m";
+    private final String ANSI_RED = "\u001B[31m";
+    private final String ANSI_GREEN = "\u001B[32m";
+    private final String ANSI_YELLOW = "\u001B[33m";
+    private final String ANSI_BLUE = "\u001B[34m";
+    private final String ANSI_PURPLE = "\u001B[35m";
+    private final String ANSI_CYAN = "\u001B[36m";
+    private final String ANSI_WHITE = "\u001B[37m";
 
     private Colors selectedColor;
     private Direction selectedDirection;
-
 
     private RadioButton red = new RadioButton("Red ");
     private RadioButton green = new RadioButton("Green ");
@@ -59,6 +58,9 @@ public class DisplayFx {
     private Button revertLastMoveButton = new Button("Revert Last Move");
 
     private Label moveScore = new Label ("Moves: ");
+    private Label movelist = new Label("Made moves: ");
+    private ArrayList<String> moveListlist = new ArrayList<>();
+
 
     public DisplayFx (){
 
@@ -66,13 +68,12 @@ public class DisplayFx {
 
     public void diplayVisuals(Stage primaryStage , Game game) {
         primaryStage.setTitle("Ricochet Robots");
-        primaryStage.setResizable(true);
+        primaryStage.setResizable(false);
         //Starting with Input UI
         //Color Selection with Radio Buttons
         //Direction with Buttons
 
         System.out.println("Spielfeld: " + game.getConfig().getLength() + " x " + game.getConfig().getHeight() );
-
 
         GridPane boardGrid = new GridPane();
         boardGrid.setHgap(0);
@@ -88,25 +89,25 @@ public class DisplayFx {
         //draw Walls
         drawObstacles(game,boardGrid);
 
-
         //draw Robots
         drawRobots(game,boardGrid);
+
+        //Grid and listofMoves
+        movelist.setPadding(new Insets(10, 10, 0,0 ));
+        HBox gridAndMoveList = new HBox(boardGrid , movelist);
 
         //generateButtons
         HBox hBoxAllButtons = drawButtons(game,boardGrid);
 
         //fullBoard with Buttons + move score
-        VBox vBoxAll = new VBox(boardGrid, hBoxAllButtons);
-
+        VBox vBoxAll = new VBox(gridAndMoveList, hBoxAllButtons);
 
         //Scene scene = new Scene(vbox,(int)(Screen.getPrimary().getBounds().getWidth()),(int)(Screen.getPrimary().getBounds().getHeight()));
-        Scene scene = new Scene(vBoxAll, 820, 900);
+        Scene scene = new Scene(vBoxAll, 920, 900);
 
         generateKeyhandlers(scene);
 
-
         primaryStage.setScene(scene);
-
 
         primaryStage.show();
     }
@@ -134,7 +135,16 @@ public class DisplayFx {
     public void drawEmptyBoard(Game game , GridPane boardGrid){
         for (int i = 0; i <= game.getConfig().getHeight(); i++) {
             for (int j = 0; j <= game.getConfig().getLength(); j++) {
-                boardGrid.add(new ImageView(new Image("file:Ressources/SpriteFloor.jpg" )), i, j);
+                Random random = new Random();
+                int randomNumber =random.nextInt(3);
+                if (randomNumber == 0){
+                    boardGrid.add(new ImageView(new Image("file:Ressources/SpriteFloor.jpg" )), i, j);
+                }if (randomNumber == 1){
+                    boardGrid.add(new ImageView(new Image("file:Ressources/SpriteFloor2.jpg" )), i, j);
+                }if (randomNumber == 2){
+                    boardGrid.add(new ImageView(new Image("file:Ressources/SpriteFloor3.jpg" )), i, j);
+                }
+
             }
         }
     }
@@ -242,8 +252,14 @@ public class DisplayFx {
             public void handle(ActionEvent e) {
                 game.revertMove();
                 redrawRobots(game , boardGrid);
+                if (moveListlist.size() > 0){
+                    moveListlist.remove(moveListlist.size()-1);
+                }
+                redrawMovelist(game,boardGrid);
+                redrawRobots(game,boardGrid);
             }
         });
+
         return revertLastMoveButton;
     }
 
@@ -344,8 +360,10 @@ public class DisplayFx {
     public void moveRobot(Direction selectedDirection, Colors selectedColor, Game game, GridPane boardGrid){
         System.out.println("Selected: " + selectedColor + " " + selectedDirection);
         MoveCommand mCmd = new MoveCommand(selectedColor, selectedDirection);
+        fillMovelist(game,boardGrid);
         game.moveRobot(mCmd);
         redrawRobots (game, boardGrid);
+
     }
 
     public void redrawRobots(Game game, GridPane boardGrid){
@@ -355,7 +373,7 @@ public class DisplayFx {
                 + game.getConfig().getObstacleList().size();                                       //all obs
 
 
-        //we delete all robots and draw them new (less hazzle than to identify which Robot moved this turn)
+        //we delete all robots and redraw them new (less hazzle than to identify which Robot moved this turn)
         boardGrid.getChildren().remove(distanceToRobots);
         boardGrid.getChildren().remove(distanceToRobots);
         boardGrid.getChildren().remove(distanceToRobots);
@@ -364,7 +382,18 @@ public class DisplayFx {
         moveScore.setText("Moves: "+game.getState().getMoveList().size() );
     }
 
+    public void fillMovelist(Game game, GridPane boardGrid){
+        moveListlist.add('\n' + selectedColor.toString() + "  "+ "\t" + selectedDirection.toString() );
+        redrawMovelist(game,boardGrid);
+    }
 
+    public void redrawMovelist (Game game, GridPane boardGrid){
+        String movelistString = "Made moves: ";
+        for (String move : moveListlist){
+            movelistString = movelistString + move;
+        }
+        movelist.setText(movelistString);
+    }
 
 }
 

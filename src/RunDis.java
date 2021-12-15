@@ -1,7 +1,6 @@
 import Data.*;
 import View.*;
 import Data.Enums.Colors;
-import Data.Enums.Direction;
 import Data.Enums.ObsType;
 import Data.GameConfig.Config;
 import Data.Obstacle;
@@ -11,21 +10,8 @@ import Logic.Game;
 
 import java.util.ArrayList;
 import javafx.application.Application;
-import javafx.geometry.Pos;
-import javafx.scene.Node;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.RadioButton;
-import javafx.scene.control.ToggleGroup;
-import javafx.scene.layout.*;
+
 import javafx.stage.Stage;
-import javafx.geometry.Insets;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 
 
 /**
@@ -41,6 +27,7 @@ public class RunDis extends Application {
         @Linus
         The Robots can now be moved with W A S D
         and the colors can be selected with 1 2 3 4
+        Backspace reverts the last move
          */
         launch();
     }

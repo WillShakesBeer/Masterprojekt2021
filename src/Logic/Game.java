@@ -86,10 +86,10 @@ public class Game {
         while (!stoped){
             switch (dir){
                case UP:
-                   newPos.setY(newPos.getY()+1);
+                   newPos.setY(newPos.getY()-1);
                    break;
                case DOWN:
-                   newPos.setY(newPos.getY()-1);
+                   newPos.setY(newPos.getY()+1);
                    break;
                case LEFT:
                    newPos.setX(newPos.getX()-1);
@@ -117,6 +117,7 @@ public class Game {
                 result=false;
             }
         }
+
         if(pos.getX()<0 || pos.getX()>board.getLength() || pos.getY()<0 || pos.getY()>board.getHeight()){
             result=false;
         }
@@ -130,13 +131,13 @@ public class Game {
         }
         for(Obstacle obstacle:obstacles){
             switch (dir){
-                case UP: case RIGHT:
+                case DOWN: case RIGHT:
                     //System.out.println(pos.equals(obstacle.getCoord2()) +" " + pos.getX()+ " " +obstacle.getCoord2().getX()+ "       " + pos.getY()+ " " +obstacle.getCoord2().getY());
                     if(pos.equals(obstacle.getCoord2())){
                         result=false;
                     }
                     break;
-                case DOWN: case LEFT:
+                case UP: case LEFT:
                     if(pos.equals(obstacle.getCoord1())){
                         result=false;
                     }
@@ -162,4 +163,7 @@ public class Game {
     public void setConfig(Config config) {
         this.config = config;
     }
+
+
+
 }

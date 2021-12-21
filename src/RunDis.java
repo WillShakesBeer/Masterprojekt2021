@@ -1,4 +1,5 @@
 import Data.*;
+import View.*;
 import Data.Enums.Colors;
 import Data.Enums.ObsType;
 import Data.GameConfig.Config;
@@ -6,29 +7,11 @@ import Data.Obstacle;
 import Data.Robot;
 import Data.VictorySpawn;
 import Logic.Game;
-import View.Display;
+
 import java.util.ArrayList;
-
 import javafx.application.Application;
-import javafx.application.Platform;
-import javafx.embed.swing.JFXPanel;
-import javafx.scene.Group;
-import javafx.scene.Scene;
-import javafx.scene.layout.GridPane;
-import javafx.scene.control.RadioButton;
-import javafx.scene.control.ToggleGroup;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.stage.Screen;
 
-import javafx.scene.text.Font;
-import javafx.scene.text.Text;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
-
-import javax.swing.JFrame;
-import javax.swing.SwingUtilities;
 
 
 /**
@@ -36,124 +19,27 @@ import javax.swing.SwingUtilities;
  */
 public class RunDis extends Application {
 
-
     public static void main (String[] args){
-        //idk men SwingUtilities?
-        /*SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                initAndShowGUI();
-            }
-        });*/
-
+        /*
+        @Linus
+        The Robots can now be moved with W A S D,
+        and the colors can be selected with 1 2 3 4
+        Backspace reverts the last move
+         */
         launch();
-        Game game = new Game(DefaultGame());
-        //updateVisuals(game);
     }
 
     public void start(Stage primaryStage){
-        primaryStage.setTitle("Ricochet Robots");
-
-        //Starting with Input UI
-        //Color Selection with Radio Buttons
-        //Direction with Buttons
-
-        RadioButton red = new RadioButton("Red");
-        RadioButton green = new RadioButton("Green");
-        RadioButton blue = new RadioButton("Blue");
-        RadioButton yellow = new RadioButton("yellow");
-
-        VBox vbox = new VBox(red,green,blue,yellow);
-
-        ToggleGroup radioGroup = new ToggleGroup();
-
-        red.setToggleGroup(radioGroup);
-        green.setToggleGroup(radioGroup);
-        blue.setToggleGroup(radioGroup);
-        yellow.setToggleGroup(radioGroup);
-
-        Scene scene = new Scene(vbox,600,400);
-        primaryStage.setScene(scene);
-
-        primaryStage.show();
+        Game game = new Game(DefaultGame());
+        DisplayFx displayFx = new DisplayFx();
+        displayFx.diplayVisuals(primaryStage,game);
     }
-
-    //JFrame = dirty Swing shit ?!
-    //lass mal kleine Size nehmen zum debuggen
-    //Idk men lass doch einfach starten wie ne normale FX App siehe Rundis.start(Stage)
-    private static void initAndShowGUI() {
-        // This method is invoked on the EDT thread
-        JFrame frame = new JFrame("Ricochet Robots");
-        final JFXPanel fxPanel = new JFXPanel();
-        frame.add(fxPanel);
-        frame.setSize( (int)(Screen.getPrimary().getBounds().getWidth()) , (int)(Screen.getPrimary().getBounds().getHeight()) );
-        frame.setVisible(true);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                initFX(fxPanel);
-            }
-        });
-    }
-
-    private static void initFX(JFXPanel fxPanel) {
-        // This method is invoked on the JavaFX thread
-        Scene scene = createScene();
-        fxPanel.setScene(scene);
-    }
-
-    private static Scene createScene() {
-        Group  root  =  new  Group();
-        Scene  scene  =  new  Scene(root, Color.ALICEBLUE);
-        GridPane gridpane = new GridPane();
-
-
-
-
-        return (scene);
-    }
-
-
-
-
-    //deprecated
-    public static void updateVisuals(Game game){
-        Display display = new Display(game);
-        /*game.moveRobot(new MoveCommand(Color.RED, Direction.RIGHT));
-        game.moveRobot(new MoveCommand(Color.RED, Direction.UP));
-        //updateVisuals(display);
-        display.getMove();*/
-
-        updateVisuals(display);
-        while (true){
-            MoveCommand mCmd=display.getMove();
-            game.moveRobot(mCmd);
-            updateVisuals(display);
-        }
-
-    }
-
-    //deprecated
-    public static void updateVisuals(Display display){
-        Game game =display.getGame();
-        String[][] updatedGame = display.updateGame();
-
-        for (int i = game.getState().getBoard().getHeight()-1; i >=0; i--){
-            for (int j = 0; j < game.getState().getBoard().getLength(); j++){
-                System.out.print(updatedGame[j][i] + '\t' );
-            }
-            System.out.println();
-        }
-    }
-
 
 
 
     public static Config DefaultGame(){
-        int length = 16;
-        int height = 16;
+        int length = 15;
+        int height = 15;
         ArrayList<Robot> robotList = new ArrayList<Robot>();
         robotList.add(new Data.Robot(new Coord(0,0), Colors.RED));
         robotList.add(new Data.Robot(new Coord(0,15), Colors.BLUE));
@@ -186,7 +72,7 @@ public class RunDis extends Application {
         obstacleList.add(new Obstacle(new Coord(10,14),new Coord(11,14), ObsType.HORIZONTAL));
         obstacleList.add(new Obstacle(new Coord(1,15),new Coord(2,15), ObsType.HORIZONTAL));
         obstacleList.add(new Obstacle(new Coord(8,15),new Coord(9,15), ObsType.HORIZONTAL));
-        obstacleList.add(new Obstacle(new Coord(0,2),new Coord(0,2), ObsType.VERTICAL));
+        obstacleList.add(new Obstacle(new Coord(0,2),new Coord(0,3), ObsType.VERTICAL));
         obstacleList.add(new Obstacle(new Coord(0,9),new Coord(0,10), ObsType.VERTICAL));
         obstacleList.add(new Obstacle(new Coord(1,4),new Coord(1,5), ObsType.VERTICAL));
         obstacleList.add(new Obstacle(new Coord(1,11),new Coord(1,12), ObsType.VERTICAL));

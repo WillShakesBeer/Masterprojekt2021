@@ -417,6 +417,21 @@ public class DisplayFx {
 
     }
 
+    public Colors getSelectedColor() {
+        return selectedColor;
+    }
+
+    public void setSelectedColor(Colors selectedColor) {
+        this.selectedColor = selectedColor;
+    }
+
+    public Direction getSelectedDirection() {
+        return selectedDirection;
+    }
+
+    public void setSelectedDirection(Direction selectedDirection) {
+        this.selectedDirection = selectedDirection;
+    }
 }
 
 

@@ -16,6 +16,14 @@ public class MoveCommand {
         this.dir = dir;
     }
 
+    public boolean equals(MoveCommand mc){
+       if(this.colors == mc.getColor() && this.dir == mc.getDir()){
+           return true;
+       }else{
+           return false;
+       }
+    }
+
     public Colors getColor() {
         return colors;
     }

@@ -1,4 +1,5 @@
 import Data.*;
+import Logic.AI;
 import View.*;
 import Data.Enums.Colors;
 import Data.Enums.ObsType;
@@ -33,6 +34,7 @@ public class RunDis extends Application {
         Game game = new Game(DefaultGame());
         DisplayFx displayFx = new DisplayFx();
         displayFx.diplayVisuals(primaryStage,game);
+        AI ai = new AI(game,displayFx);
     }
 
 

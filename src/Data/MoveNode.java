@@ -4,19 +4,21 @@ import java.util.ArrayList;
 
 public class MoveNode {
     // Nodes for Treesearching algorithms
-    // Root node does not contain a Movecommand
+    // Root node does contain an empty MoveCommandList
+    // Every node represents a Sequence of Moves
     Boolean isRoot;
-    MoveCommand MoveCommand;
+    ArrayList<MoveCommand> moveCommands;
     ArrayList<MoveNode> childs;
 
     public MoveNode(){
         isRoot=true;
+        this.moveCommands=new ArrayList<MoveCommand>();
         childs=new ArrayList<MoveNode>();
     }
 
-    public MoveNode(MoveCommand moveCommand){
+    public MoveNode(ArrayList<MoveCommand> moveCommands){
         isRoot=false;
-        this.MoveCommand=moveCommand;
+        this.moveCommands=moveCommands;
         childs=new ArrayList<MoveNode>();
     }
 
@@ -25,27 +27,20 @@ public class MoveNode {
     }
 
     public void addChild(MoveCommand mc){
-        childs.add(new MoveNode(mc));
+        ArrayList<MoveCommand> childCommands= (ArrayList<MoveCommand>) this.moveCommands.clone();
+        childCommands.add(mc);
+        childs.add(new MoveNode(childCommands));
+    }
+    public void addChild(ArrayList<MoveCommand> mcs){
+        childs.add(new MoveNode(mcs));
     }
 
-    public void removeChild(MoveCommand mc){
-        for(MoveNode child : childs){
-           if(!child.isRoot){
-              if(child.getMoveCommand().equals(mc)){
-                  childs.remove(child);
-              }
-           }else{
-               System.out.println("Cant Remove on Node on Root");
-           }
-        }
+    public ArrayList<MoveCommand> getMoveCommands() {
+        return moveCommands;
     }
 
-    public Data.MoveCommand getMoveCommand() {
-        return MoveCommand;
-    }
-
-    public void setMoveCommand(Data.MoveCommand moveCommand) {
-        MoveCommand = moveCommand;
+    public void setMoveCommands(ArrayList<MoveCommand> moveCommands) {
+        this.moveCommands = moveCommands;
     }
 
     public Boolean getRoot() {

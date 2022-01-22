@@ -285,6 +285,17 @@ public class DisplayFx {
         return revertLastMoveButton;
     }
 
+    //same functionality as the Button but accessible for the AI
+    public void revertMove(){
+        game.revertMove();
+        redrawRobots();
+        if (moveListlist.size() > 0){
+            moveListlist.remove(moveListlist.size()-1);
+        }
+        redrawMovelist();
+        redrawRobots();
+    }
+
     public HBox drawColorButtons(){
         red.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -518,5 +529,3 @@ public class DisplayFx {
         this.crashWall = crashWall;
     }
 }
-
-

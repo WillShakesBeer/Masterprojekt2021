@@ -35,13 +35,13 @@ public class RunDis extends Application {
         DisplayFx displayFx = new DisplayFx();
         displayFx.diplayVisuals(primaryStage,game);
         AI ai = new AI(displayFx);
-        ai.doSmartStuff();
+        //ai.doSmartStuff();
     }
 
 
 
     public static Config DefaultGame(){
-        int length = 18;
+        int length = 15;
         int height = 15;
         ArrayList<Robot> robotList = new ArrayList<Robot>();
         robotList.add(new Data.Robot(new Coord(0,0), Colors.RED));

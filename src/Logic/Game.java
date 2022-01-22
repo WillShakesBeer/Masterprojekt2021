@@ -28,9 +28,17 @@ public class Game {
 
     }
 
+    //previous
     //Moves Robot, returns 0 if movement successful
     //returns -1 if already facing an obstacle
     //return 1 if robot has collected the victorypoint
+
+    //@Maddin es gibt 3 möglichkeiten
+    //jetzt brauchen wir ne extra darstellung für collected victorypoint
+
+    //actual
+    //true => if already facing an obstacle
+    //false => movement successful
     public boolean moveRobot(MoveCommand cmd){
         Colors colors = cmd.getColor();
         Direction dir = cmd.getDir();
@@ -41,6 +49,7 @@ public class Game {
         if(startPos.equals(newPos)){
            result = true;
         }else {
+            result = false;
             Move move = new Move(colors,startPos,newPos);
             this.state.addMove(move);
             currRobot.setCoord(newPos);
@@ -120,7 +129,7 @@ public class Game {
 
         if(pos.getX()<0 || pos.getX()>board.getLength() || pos.getY()<0 || pos.getY()>board.getHeight()){
             result=false;
-            System.out.println("hit wall" + board.getLength());
+            //System.out.println("hit wall" + board.getLength());
         }
         switch (dir){
             case UP: case DOWN:

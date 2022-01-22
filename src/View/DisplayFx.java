@@ -60,6 +60,8 @@ public class DisplayFx {
     private ArrayList<String> moveListlist = new ArrayList<>();
     private ScrollPane movelistScrollPane;
 
+    //to determine if a move is usefull, or the robot just runs in a wall
+    private boolean crashWall;
 
     private Game game;
     private GridPane boardGrid;
@@ -71,7 +73,7 @@ public class DisplayFx {
     public void diplayVisuals(Stage primaryStage , Game game) {
 
         primaryStage.setTitle("Ricochet Robots");
-        primaryStage.setResizable(false);
+        primaryStage.setResizable(true);
         //Starting with Input UI
         //Color Selection with Radio Buttons
         //Direction with Buttons
@@ -139,8 +141,8 @@ public class DisplayFx {
 
 
     public void drawEmptyBoard(){
-        for (int i = 0; i <= game.getConfig().getHeight(); i++) {
-            for (int j = 0; j <= game.getConfig().getLength(); j++) {
+        for (int i = 0; i <= game.getConfig().getLength(); i++) {
+            for (int j = 0; j <= game.getConfig().getHeight(); j++) {
                 Random random = new Random();
                 int randomNumber =random.nextInt(3);
                 if (randomNumber == 0){
@@ -377,14 +379,17 @@ public class DisplayFx {
 
     }
 
-    public void moveRobot(Direction selectedDirection, Colors selectedColor){
+    public boolean moveRobot(Direction selectedDirection, Colors selectedColor){
         System.out.println("Selected: " + selectedColor + " " + selectedDirection);
         MoveCommand mCmd = new MoveCommand(selectedColor, selectedDirection);
         fillMovelist();
-        game.moveRobot(mCmd);
+
+        // used to determine if the robot hit a wall  (then returns -1)
+        crashWall = game.moveRobot(mCmd);
+
         redrawRobots ();
         score.setText("Score: " + game.getState().getScore());
-
+        return crashWall;
     }
 
     public void redrawRobots(){
@@ -431,6 +436,86 @@ public class DisplayFx {
 
     public void setSelectedDirection(Direction selectedDirection) {
         this.selectedDirection = selectedDirection;
+    }
+
+    public RadioButton getRed() {
+        return red;
+    }
+
+    public void setRed(RadioButton red) {
+        this.red = red;
+    }
+
+    public RadioButton getGreen() {
+        return green;
+    }
+
+    public void setGreen(RadioButton green) {
+        this.green = green;
+    }
+
+    public RadioButton getBlue() {
+        return blue;
+    }
+
+    public void setBlue(RadioButton blue) {
+        this.blue = blue;
+    }
+
+    public RadioButton getYellow() {
+        return yellow;
+    }
+
+    public void setYellow(RadioButton yellow) {
+        this.yellow = yellow;
+    }
+
+    public Button getLeft() {
+        return left;
+    }
+
+    public void setLeft(Button left) {
+        this.left = left;
+    }
+
+    public Button getUp() {
+        return up;
+    }
+
+    public void setUp(Button up) {
+        this.up = up;
+    }
+
+    public Button getDown() {
+        return down;
+    }
+
+    public void setDown(Button down) {
+        this.down = down;
+    }
+
+    public Button getRight() {
+        return right;
+    }
+
+    public void setRight(Button right) {
+        this.right = right;
+    }
+
+    public Game getGame() {
+        return game;
+    }
+
+    public void setGame(Game game) {
+        this.game = game;
+    }
+
+    public boolean isCrashWall() {
+        return crashWall;
+    }
+
+    public void setCrashWall(boolean crashWall) {
+        this.crashWall = crashWall;
     }
 }
 

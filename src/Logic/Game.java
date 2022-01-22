@@ -31,15 +31,15 @@ public class Game {
     //Moves Robot, returns 0 if movement successful
     //returns -1 if already facing an obstacle
     //return 1 if robot has collected the victorypoint
-    public int moveRobot(MoveCommand cmd){
+    public boolean moveRobot(MoveCommand cmd){
         Colors colors = cmd.getColor();
         Direction dir = cmd.getDir();
-        int result =0;
+        boolean result = true;
         Robot currRobot = this.state.getBoard().getRobot(colors);
         Coord startPos= currRobot.getCoord().clone();
         Coord newPos = checkMovement(startPos.clone(),dir,this.state.getBoard());
         if(startPos.equals(newPos)){
-           result = -1;
+           result = true;
         }else {
             Move move = new Move(colors,startPos,newPos);
             this.state.addMove(move);
@@ -50,7 +50,7 @@ public class Game {
                 VictoryPoint newVic = createNewVictoryPoint();
                 this.state.getBoard().setVictoryPoint(newVic);
                 this.state.setMoveList(new ArrayList<Move>());
-                return 1;
+                return false;
             }
         }
         return result;
@@ -120,6 +120,7 @@ public class Game {
 
         if(pos.getX()<0 || pos.getX()>board.getLength() || pos.getY()<0 || pos.getY()>board.getHeight()){
             result=false;
+            System.out.println("hit wall" + board.getLength());
         }
         switch (dir){
             case UP: case DOWN:

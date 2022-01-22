@@ -10,15 +10,17 @@ import java.util.ArrayList;
 
 // An AI that play on a given Game object
 public class AI {
-    Game game;
-    MoveNode root;
-    DisplayFx view;
-    public AI(Game game, DisplayFx view){
-       this.game = game;
-       this.view = view;
-       root = new MoveNode();
-       buildNaiveTree(3,root);
+    private Game game;
+    private MoveNode root;
+    private DisplayFx view;
+
+    public AI(DisplayFx view){
+        this.view = view;
+        this.game = view.getGame();
+        root = new MoveNode();
+         buildNaiveTree(3,root);
     }
+
 
 
     //Naive uninformed Tree search
@@ -32,16 +34,25 @@ public class AI {
             }
         //}
         while(!curr.getChilds().isEmpty() && depthLimit>0) {
-            if (game.moveRobot(curr.getChilds().get(0).getMoveCommand()) == 0) {
+            //@Linus: hie rhab ich das geändert von 0/1/-1 auf nen boolean, da es nur 2 Zustände gibt: hittet wall/hittet keine -> a
+            //-> a  if (game.moveRobot(curr.getChilds().get(0).getMoveCommand()) == 0) {
+            if (game.moveRobot(curr.getChilds().get(0).getMoveCommand()) ) {
                 displayMove(curr.getChilds().get(0).getMoveCommand().getColor(),curr.getChilds().get(0).getMoveCommand().getDir());
                 buildNaiveTree(depthLimit-1,curr.getChilds().get(0));
             }
-            if (game.moveRobot(curr.getChilds().get(0).getMoveCommand()) == -1) {
+            //-> a  if (game.moveRobot(curr.getChilds().get(0).getMoveCommand()) == -1) {
+            if (game.moveRobot(curr.getChilds().get(0).getMoveCommand()) ) {
                 curr.getChilds().remove(0);
                 game.revertMove();
             }
         }
     }
+
+
+    //Naive uninformed Tree search
+    //Uses Depth first expansion
+
+
 
     //Dirty Hack to interact with displayfx
     //1. use game.moveRobot to get return value
@@ -52,6 +63,36 @@ public class AI {
         view.setSelectedDirection(dir);
         view.moveRobot(dir,color);
     }
+
+
+
+    /*
+    //sorts out moves that doesnt move the robot, e.g if he would hit a wall
+    public void doSmartStuff(){
+        int counter = 100;
+        while (counter<100){
+
+
+
+            counter++;
+        }
+
+    }
+
+    //checks if the move is ending up in a loop or if the robot is hitting a wall
+    public boolean isMoveSmart (){
+        boolean isSmart = true;
+
+        //checks if we hit a wall
+        view.isCrashWall();
+
+        //checks if we run a loop
+        view.getGame().getState().getMoveList();
+
+        return isSmart;
+
+    }*/
+
 
 
 }

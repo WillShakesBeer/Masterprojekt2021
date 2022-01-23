@@ -1,13 +1,12 @@
 package Logic;
 
+import Data.*;
 import Data.Enums.Colors;
 import Data.Enums.Direction;
-import Data.Move;
-import Data.MoveCommand;
-import Data.MoveNode;
 import View.DisplayFx;
 
 import java.util.ArrayList;
+import java.util.Scanner;
 
 // An AI that play on a given Game object
 public class AI {
@@ -21,28 +20,48 @@ public class AI {
         root = new MoveNode();
         ArrayList<MoveNode> toExplore = new ArrayList<MoveNode>();
         toExplore.add(root);
-        buildNaiveTree(3,toExplore);
+        //test a specific config
+        MoveNode result= buildNaiveTree(5,toExplore);
+        if (result == null) {
+            System.out.println("no result");
+        } else {
+            view.visualizeSeq(result.getMoveCommands());
+            System.out.println("Solution found");
+        }
+        //test a few Configurations
+        /*while (true) {
+            toExplore=new ArrayList<MoveNode>();
+            toExplore.add(root);
+            MoveNode result= buildNaiveTree(5,toExplore);
+            if (result == null) {
+                System.out.println("no result");
+                game.forceNewVictoryPoint();
+            } else {
+                //view.visualizeSeq(result.getMoveCommands());
+                System.out.println("Solution found");
+                game.forceNewVictoryPoint();
+            }
+        }*/
     }
 
     //@Linus: hier hab ich das geändert von 0/1/-1 auf nen boolean, da es nur 2 Zustände gibt: hittet wall/hittet keine -> a
-    //@Maddin: Lässt sich drüber streiten
+    //@Maddin: Lässt sich drüber streiten aber ich hab eh recht
 
     //reworked now uses Nodes with list of Commands
-    //todo Bugfix DepthLimitedDepthfirstSearch
-    //(some incorrect Nodes come through)
     //todo visualize
-    //Naive uninformed Tree search
     //Uses Depth limited Depth first search
     public MoveNode buildNaiveTree(int depthLimit, ArrayList<MoveNode> toExplore){
         MoveNode curr = toExplore.get(0);
         Colors color = Colors.RED;
         while(!toExplore.isEmpty()) {
             curr=toExplore.get(0);
-            if(curr.getMoveCommands().size()>=depthLimit){
+            if(curr.getMoveCommands().size()>depthLimit){
                 toExplore.remove(curr);
             }else {
-                if (isSeqSmart(curr.getMoveCommands()) || curr.getRoot()) {
-                    System.out.println("Expand further");
+                int seqCheck = isSeqSmart(curr.getMoveCommands());
+                if (seqCheck==0 || curr.getRoot()) {
+                    //System.out.println("Expand further");
+
                     for (Direction direction : Direction.values()) {
 
                         curr.addChild(new MoveCommand(color, direction));
@@ -51,50 +70,52 @@ public class AI {
                     toExplore.remove(curr);
                 }
                 //cut out usless moves
-                if (!isSeqSmart(curr.getMoveCommands())) {
-                    System.out.println("Useless Move");
+                if (seqCheck==-1) {
+                    //System.out.println("Useless Move");
                     toExplore.remove(curr);
                     if(!toExplore.isEmpty()){
                         curr = toExplore.get(0);
                     }
                 }
+                if(seqCheck==1){
+                    return curr;
+                }
             }
 
         }
-        System.out.println("No more to explore");
-        return curr;
+        return null;
     }
 
-    //Dirty Hack to interact with displayfx
-    //1. use game.moveRobot to get return value
-    //2. displayMove to repeat the moveCommand with a visualization
-    public void displayMove(Colors color,Direction dir){
-        game.revertMove();
-        view.setSelectedColor(color);
-        view.setSelectedDirection(dir);
-        view.moveRobot(dir,color);
-
-    }
 
     //checks if a Seq contains moves that end up crashing a Wall
-    //true => no crash
-    //false => crash
-    public boolean isSeqSmart(ArrayList<MoveCommand> moveCommands){
+    //0 => no crash
+    //-1 => crash
+    //1 => Point Scored
+    public int isSeqSmart(ArrayList<MoveCommand> moveCommands){
         for(int i =0;i<moveCommands.size();i++){
-           if(game.moveRobot(moveCommands.get(i))){
-               return false;
-           }
+            if(game.checkMove(moveCommands.get(i))==1){
+                game.resetGame();
+                return 1;
+            }
+            int result = game.moveRobot(moveCommands.get(i));
+            if(result==-1){
+                game.resetGame();
+                return -1;
+            }
         }
-        for(int i =0;i<moveCommands.size();i++) {
-            game.revertMove();
-        }
-        return true;
+        game.resetGame();
+        return 0;
     }
 
-    //todo
-    public void visualizeSeq(ArrayList<MoveCommand> moveCommands){
+    /*public void visualizeSeq(ArrayList<MoveCommand> moveCommands){
+        for(int i=0;i<moveCommands.size();i++){
+            MoveCommand curr = moveCommands.get(i);
+            view.setSelectedColor(curr.getColor());
+            view.setSelectedDirection(curr.getDir());
+            view.moveRobot(curr.getDir(), curr.getColor());
+        }
 
-    }
+    }*/
 
     /*
     //sorts out moves that doesnt move the robot, e.g if he would hit a wall

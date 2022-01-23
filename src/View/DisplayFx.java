@@ -62,6 +62,7 @@ public class DisplayFx {
 
     //to determine if a move is usefull, or the robot just runs in a wall
     private boolean crashWall;
+    private ArrayList<MoveCommand> visSeq=null;
 
     private Game game;
     private GridPane boardGrid;
@@ -133,9 +134,26 @@ public class DisplayFx {
                     case DIGIT3: blue.fire(); break;
                     case DIGIT4: yellow.fire(); break;
                     case BACK_SPACE: revertLastMoveButton.fire(); break;
+                    case ENTER: executeNextMove(); break;
                 }
             }
         });
+
+    }
+
+
+    public void visualizeSeq(ArrayList<MoveCommand> moveCommands){
+        this.visSeq=moveCommands;
+    }
+
+    public void executeNextMove(){
+        if(!visSeq.isEmpty()){
+            MoveCommand curr = visSeq.get(0);
+            this.setSelectedColor(curr.getColor());
+            this.setSelectedDirection(curr.getDir());
+            this.moveRobot(curr.getDir(), curr.getColor());
+            visSeq.remove(curr);
+        }
 
     }
 
@@ -396,7 +414,11 @@ public class DisplayFx {
         fillMovelist();
 
         // used to determine if the robot hit a wall  (then returns -1)
-        crashWall = game.moveRobot(mCmd);
+        if(game.moveRobot(mCmd)==-1){
+            crashWall = true;
+        }else {
+            crashWall = false;
+        }
 
         redrawRobots ();
         score.setText("Score: " + game.getState().getScore());
@@ -528,4 +550,6 @@ public class DisplayFx {
     public void setCrashWall(boolean crashWall) {
         this.crashWall = crashWall;
     }
+
+
 }

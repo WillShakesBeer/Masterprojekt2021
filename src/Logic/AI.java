@@ -12,47 +12,31 @@ import java.util.Scanner;
 public class AI {
     private Game game;
     private MoveNode root;
-    private DisplayFx view;
 
-    public AI(DisplayFx view){
-        this.view = view;
-        this.game = view.getGame();
+    public AI(Game game){
+        this.game = game;
         root = new MoveNode();
-        ArrayList<MoveNode> toExplore = new ArrayList<MoveNode>();
-        toExplore.add(root);
-        //test a specific config
-        MoveNode result= buildNaiveTree(5,toExplore);
-        if (result == null) {
-            System.out.println("no result");
-        } else {
-            view.visualizeSeq(result.getMoveCommands());
-            System.out.println("Solution found");
-        }
-        //test a few Configurations
-        /*while (true) {
-            toExplore=new ArrayList<MoveNode>();
-            toExplore.add(root);
-            MoveNode result= buildNaiveTree(5,toExplore);
-            if (result == null) {
-                System.out.println("no result");
-                game.forceNewVictoryPoint();
-            } else {
-                //view.visualizeSeq(result.getMoveCommands());
-                System.out.println("Solution found");
-                game.forceNewVictoryPoint();
-            }
-        }*/
     }
 
-    //@Linus: hier hab ich das geändert von 0/1/-1 auf nen boolean, da es nur 2 Zustände gibt: hittet wall/hittet keine -> a
-    //@Maddin: Lässt sich drüber streiten aber ich hab eh recht
+    //test TreeSearch
+    public MoveNode createSeq(){
+        ArrayList<MoveNode> toExplore = new ArrayList<MoveNode>();
+        toExplore=new ArrayList<MoveNode>();
+        toExplore.add(root);
+        MoveNode result= buildNaiveTree(5,toExplore);
+        if (result == null) {
+            return new MoveNode();
+        } else {
+            return result;
+        }
+    }
 
     //reworked now uses Nodes with list of Commands
-    //todo visualize
     //Uses Depth limited Depth first search
     public MoveNode buildNaiveTree(int depthLimit, ArrayList<MoveNode> toExplore){
         MoveNode curr = toExplore.get(0);
-        Colors color = Colors.RED;
+        Colors vicColor=game.getState().getBoard().getVictoryPoint().getColor();
+        Colors color = vicColor;
         while(!toExplore.isEmpty()) {
             curr=toExplore.get(0);
             if(curr.getMoveCommands().size()>depthLimit){

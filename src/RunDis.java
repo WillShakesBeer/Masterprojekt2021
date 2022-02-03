@@ -34,7 +34,6 @@ public class RunDis extends Application {
         Game game = new Game(DefaultGame());
         DisplayFx displayFx = new DisplayFx();
         displayFx.diplayVisuals(primaryStage,game);
-        AI ai = new AI(displayFx);
         //ai.doSmartStuff();
     }
 

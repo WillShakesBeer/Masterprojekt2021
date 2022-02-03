@@ -4,6 +4,7 @@ import Data.*;
 import Data.Enums.Colors;
 import Data.Enums.Direction;
 import Data.Enums.ObsType;
+import Logic.AI;
 import Logic.Game;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -62,17 +63,20 @@ public class DisplayFx {
 
     //to determine if a move is usefull, or the robot just runs in a wall
     private boolean crashWall;
-    private ArrayList<MoveCommand> visSeq=null;
+    private ArrayList<MoveCommand> visSeq=new ArrayList<MoveCommand>();
 
     private Game game;
     private GridPane boardGrid;
+
+    private Logic.AI ai;
+
 
     public DisplayFx (){
 
     }
 
     public void diplayVisuals(Stage primaryStage , Game game) {
-
+        this.ai = ai;
         primaryStage.setTitle("Ricochet Robots");
         primaryStage.setResizable(true);
         //Starting with Input UI
@@ -118,6 +122,8 @@ public class DisplayFx {
         primaryStage.setScene(scene);
 
         primaryStage.show();
+
+        this.ai = new AI(game);
     }
 
     public void generateKeyhandlers (Scene scene){
@@ -134,13 +140,37 @@ public class DisplayFx {
                     case DIGIT3: blue.fire(); break;
                     case DIGIT4: yellow.fire(); break;
                     case BACK_SPACE: revertLastMoveButton.fire(); break;
-                    case ENTER: executeNextMove(); break;
+                    case N: executeNextMove(); break;
+                    case ENTER: executeNextSequence(); break;
                 }
             }
         });
 
     }
 
+    //todo
+    //movelist does not empty if vp has reached properly
+    //otherwise does properly iterate random vp with treesearch
+    public void executeNextSequence(){
+        while (!this.visSeq.isEmpty()){
+            executeNextMove();
+        }
+        this.visSeq=ai.createSeq().getMoveCommands();
+        if (this.visSeq.isEmpty()){
+            this.visSeq=new ArrayList<MoveCommand>();
+            System.out.println("no result");
+            game.forceNewVictoryPoint();
+            this.moveListlist = new ArrayList<>();
+            redrawMovelist();
+            redrawRobots();
+        }
+        else{
+
+            redrawMovelist();
+            redrawRobots();
+            System.out.println("Solution found");
+        }
+    }
 
     public void visualizeSeq(ArrayList<MoveCommand> moveCommands){
         this.visSeq=moveCommands;

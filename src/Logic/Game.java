@@ -21,7 +21,7 @@ public class Game {
     //starts a new Game
     public Game(Config config){
         this.config=config;
-        VictoryPoint newVic = createNewVictoryPoint();
+        VictoryPoint newVic = createFirstVictoryPoint();
         //testPoint vor DLDF search(reachable within 5 moves)
         VictoryPoint testVic = new VictoryPoint(new Coord(4, 3),Colors.RED);
         Board board = new Board(config.getLength(),config.getHeight(),config.getObstacleList(),config.getRobotList()
@@ -108,11 +108,37 @@ public class Game {
 
     }
 
-    public VictoryPoint createNewVictoryPoint(){
+    //uninformed random VP selection
+    public VictoryPoint createFirstVictoryPoint(){
         Random rand = new Random();
         int newIndex= rand.nextInt(this.getConfig().getVictorySpawns().size());
         VictorySpawn spawn = this.getConfig().getVictorySpawns().get(newIndex);
         VictoryPoint nextVic = new VictoryPoint(spawn.getCoord(),spawn.getColor());
+        return nextVic;
+    }
+
+    //does not create returns the same Point as before
+    //does not create a VP where a Robot is already standing
+    public VictoryPoint createNewVictoryPoint(){
+        Random rand = new Random();
+        boolean vpValid=false;
+        VictoryPoint nextVic=null;
+        Coord oldCoord=this.state.getBoard().getVictoryPoint().getCoord();
+        while(!vpValid){
+            int newIndex= rand.nextInt(this.getConfig().getVictorySpawns().size());
+            VictorySpawn spawn = this.getConfig().getVictorySpawns().get(newIndex);
+            Coord newCoord = spawn.getCoord();
+            if(!oldCoord.equals(newCoord)){
+                nextVic = new VictoryPoint(spawn.getCoord(),spawn.getColor());
+                vpValid=true;
+            }
+            for(Robot curr :this.getState().getBoard().getRobots()){
+                if(curr.getCoord().equals(newCoord)){
+                    vpValid=false;
+                }
+            }
+        }
+
         return nextVic;
     }
 

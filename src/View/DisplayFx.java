@@ -21,6 +21,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+
+import javax.management.remote.rmi._RMIConnection_Stub;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -148,9 +150,8 @@ public class DisplayFx {
 
     }
 
-    //todo
-    //movelist does not empty if vp has reached properly
-    //otherwise does properly iterate random vp with treesearch
+    //Searches for TreeSearch solution if successful visSeq will be refilled
+    //otherwise visSeq is emptyList
     public void executeNextSequence(){
         while (!this.visSeq.isEmpty()){
             executeNextMove();
@@ -444,13 +445,21 @@ public class DisplayFx {
         fillMovelist();
 
         // used to determine if the robot hit a wall  (then returns -1)
-        if(game.moveRobot(mCmd)==-1){
-            crashWall = true;
-        }else {
-            crashWall = false;
+        //clears movelist if victorypoint is reached
+        switch(game.moveRobot(mCmd)){
+            case -1:
+                crashWall =true;
+                break;
+            case 0:
+                crashWall = false;
+                break;
+            case 1:
+                crashWall=false;
+                this.moveListlist = new ArrayList<>();
+                redrawMovelist();
+                break;
         }
-
-        redrawRobots ();
+        redrawRobots();
         score.setText("Score: " + game.getState().getScore());
         return crashWall;
     }

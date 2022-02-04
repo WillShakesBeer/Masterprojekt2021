@@ -27,5 +27,14 @@ public class Robot {
         this.colors = colors;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Coord coord = (Coord) ((Robot) o).getCoord();
+        Colors color = (Colors) ((Robot) o).getColor();
+        return this.colors.equals(color) && this.coord.equals(coord);
+    }
+
 
 }

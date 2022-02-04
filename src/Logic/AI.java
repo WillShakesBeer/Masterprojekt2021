@@ -27,6 +27,7 @@ public class AI {
         if (result == null) {
             return new MoveNode();
         } else {
+            //result.setMoveCommands(clearCycles(result.getMoveCommands()));
             return result;
         }
     }
@@ -91,15 +92,56 @@ public class AI {
         return 0;
     }
 
-    /*public void visualizeSeq(ArrayList<MoveCommand> moveCommands){
-        for(int i=0;i<moveCommands.size();i++){
-            MoveCommand curr = moveCommands.get(i);
-            view.setSelectedColor(curr.getColor());
-            view.setSelectedDirection(curr.getDir());
-            view.moveRobot(curr.getDir(), curr.getColor());
+    //todo
+    //bugfix pls
+    public ArrayList<MoveCommand> clearCycles(ArrayList<MoveCommand> moveCommands){
+        ArrayList<ArrayList<Robot>> robotListList= new ArrayList<ArrayList<Robot>>();
+        ArrayList<Robot> currRobots =this.game.getState().getBoard().getRobots();
+        ArrayList<Robot> currRobotsCopy = new ArrayList<Robot>();
+        for(Robot curr :currRobots){
+           currRobotsCopy.add(new Robot(curr.getCoord(),curr.getColor()));
         }
+        robotListList.add(currRobotsCopy);
+        for(int x = 0;x<moveCommands.size();x++){
+            MoveCommand cmd = moveCommands.get(x);
+            game.moveRobot(cmd);
+            boolean hasCycle=false;
+            boolean cycleHere=false;
+            int startOfCycle=-1;
+            for(int j =0;j<robotListList.size();j++){
+                ArrayList<Robot> robots = robotListList.get(j);
+                cycleHere=true;
+                for(int i=0;i<robots.size();i++){
+                    Robot robot = robots.get(i);
+                    if(!robot.equals(currRobots.get(i))){
+                        cycleHere=false;
+                    }
+                }
+                if(cycleHere){
+                    if(startOfCycle==-1 || startOfCycle > j){
+                        startOfCycle=j;
+                    }
+                    hasCycle=true;
+                }
+            }
+            if(hasCycle){
+                for(int j=startOfCycle;j<x;j++){
+                    moveCommands.remove(j);
+                    robotListList.remove(j);
+                }
+                hasCycle=false;
+            }else {
+                currRobotsCopy = new ArrayList<Robot>();
+                for(Robot curr :currRobots){
+                    currRobotsCopy.add(new Robot(curr.getCoord(),curr.getColor()));
+                }
+                robotListList.add(currRobotsCopy);
+            }
+        }
+        game.resetGame();
+        return moveCommands;
+    }
 
-    }*/
 
     /*
     //sorts out moves that doesnt move the robot, e.g if he would hit a wall

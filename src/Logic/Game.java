@@ -23,20 +23,16 @@ public class Game {
         this.config=config;
         VictoryPoint newVic = createFirstVictoryPoint();
         //testPoint vor DLDF search(reachable within 5 moves)
-        VictoryPoint testVic = new VictoryPoint(new Coord(4, 3),Colors.RED);
+        VictoryPoint testVic = new VictoryPoint(new Coord(13, 4),Colors.RED);
         Board board = new Board(config.getLength(),config.getHeight(),config.getObstacleList(),config.getRobotList()
         ,config.getVictorySpawns(),testVic);
         state = new Gamestate(board,0);
 
     }
 
-    //better Version:
     //Moves Robot, returns 0 if movement successful
     //returns -1 if already facing an obstacle
     //return 1 if robot has collected the victorypoint
-
-    //@Maddin es gibt 3 möglichkeiten
-    //wir brauchten ne extra darstellung für collected victorypoint
     public int moveRobot(MoveCommand cmd){
         Colors colors = cmd.getColor();
         Direction dir = cmd.getDir();

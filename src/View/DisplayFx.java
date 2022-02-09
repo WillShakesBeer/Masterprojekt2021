@@ -170,6 +170,7 @@ public class DisplayFx {
             redrawMovelist();
             redrawRobots();
             System.out.println("Solution found");
+            System.out.println("Moves: "+ this.visSeq.size());
         }
     }
 

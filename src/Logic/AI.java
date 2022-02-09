@@ -3,58 +3,129 @@ package Logic;
 import Data.*;
 import Data.Enums.Colors;
 import Data.Enums.Direction;
-import View.DisplayFx;
 
 import java.util.ArrayList;
-import java.util.Scanner;
+import java.util.Random;
+import java.util.Timer;
 
 // An AI that play on a given Game object
 public class AI {
+
     private Game game;
     private MoveNode root;
+    private ArrayList<Colors> onecolor;
+    private ArrayList<Colors> allcolors;
+    private ArrayList<Colors> testcolors;
 
     public AI(Game game){
         this.game = game;
         root = new MoveNode();
+        onecolor=new ArrayList<Colors>();
+        onecolor.add(Colors.BLUE);
+        allcolors=new ArrayList<Colors>();
+        allcolors.add(Colors.BLUE);
+        allcolors.add(Colors.RED);
+        allcolors.add(Colors.YELLOW);
+        allcolors.add(Colors.GREEN);
+        testcolors=new ArrayList<Colors>();
+        testcolors.add(Colors.GREEN);
+        testcolors.add(Colors.RED);
     }
 
     //test TreeSearch
+    //tryMore Colors has some bugs
     public MoveNode createSeq(){
         ArrayList<MoveNode> toExplore = new ArrayList<MoveNode>();
         toExplore=new ArrayList<MoveNode>();
         toExplore.add(root);
-        MoveNode result= buildNaiveTree(5,toExplore);
+        TreeSearch ts =new TreeSearch(game,20,toExplore,2,onecolor);
+        Thread t = new Thread(ts);
+        Timer timer = new Timer();
+        timer.schedule(new TimeOutTask(t, timer,this.game), 5*1000);
+        t.start();
+        MoveNode result;
+        try {
+            t.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        result=ts.getResult();
         if (result == null) {
-            return new MoveNode();
+            System.out.println("try more colors");
+            ts =new TreeSearch(game,11,toExplore,1,allcolors);
+            t = new Thread(ts);
+             timer = new Timer();
+            timer.schedule(new TimeOutTask(t, timer,this.game), 120*1000);
+            t.start();
+            try {
+                t.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            result=ts.getResult();
+            if(result==null){
+
+                return new MoveNode();
+            }else{
+                return result;
+            }
         } else {
             //result.setMoveCommands(clearCycles(result.getMoveCommands()));
             return result;
         }
     }
 
-    //reworked now uses Nodes with list of Commands
+    //deprecated
+    //heuristic=0
     //Uses Depth limited Depth first search
-    public MoveNode buildNaiveTree(int depthLimit, ArrayList<MoveNode> toExplore){
+    //heurisitc=1
+    //Uses Depth limited random first search
+    //heurisitc=2
+    //Uses Depth limited breadth first search
+    public MoveNode treeSearch(int depthLimit, ArrayList<MoveNode> toExplore, int heuristic, int colorsUsed){
         MoveNode curr = toExplore.get(0);
         Colors vicColor=game.getState().getBoard().getVictoryPoint().getColor();
         Colors color = vicColor;
         while(!toExplore.isEmpty()) {
-            curr=toExplore.get(0);
+            switch (heuristic){
+                case 0:
+                    curr=toExplore.get(0);
+                    break;
+                case 1:
+                    Random rand = new Random();
+                    int newIndex = rand.nextInt(toExplore.size());
+                    curr=toExplore.get(newIndex);
+                    break;
+                case 2:
+                    curr=toExplore.get(toExplore.size()-1);
+                    break;
+            }
             if(curr.getMoveCommands().size()>depthLimit){
                 toExplore.remove(curr);
             }else {
                 int seqCheck = isSeqSmart(curr.getMoveCommands());
                 if (seqCheck==0 || curr.getRoot()) {
                     //System.out.println("Expand further");
+                    if(colorsUsed==1) {
+                        for (Direction direction : Direction.values()) {
 
-                    for (Direction direction : Direction.values()) {
+                            curr.addChild(new MoveCommand(color, direction));
+                            toExplore.add(0, curr.getChilds().get(curr.getChilds().size() - 1));
+                        }
+                    }else{
+                        for(int i=0;i<colorsUsed;i++){
+                            Colors currColor = Colors.values()[i];
+                            for (Direction direction : Direction.values()) {
 
-                        curr.addChild(new MoveCommand(color, direction));
-                        toExplore.add(0, curr.getChilds().get(curr.getChilds().size() - 1));
+                                curr.addChild(new MoveCommand(currColor, direction));
+                                toExplore.add(0, curr.getChilds().get(curr.getChilds().size() - 1));
+                            }
+                        }
                     }
                     toExplore.remove(curr);
                 }
-                //cut out usless moves
+                //cut out useless moves
+                //useless move = crash against wall
                 if (seqCheck==-1) {
                     //System.out.println("Useless Move");
                     toExplore.remove(curr);
@@ -70,7 +141,6 @@ public class AI {
         }
         return null;
     }
-
 
     //checks if a Seq contains moves that end up crashing a Wall
     //0 => no crash
@@ -92,8 +162,14 @@ public class AI {
         return 0;
     }
 
-    //todo
-    //bugfix pls
+
+
+    //Input List of Movecommands with possible cycles
+    //Output List of Movecommands that does not contain cycles
+    //Cycle is defined as sequence of Movecommands that do not change the robots position if they were executed
+    //Probably to Complex to be used inside of Treesearch
+    //Can optimize some non-optimal Solutions
+    //Does not guarantee an optimal Solution
     public ArrayList<MoveCommand> clearCycles(ArrayList<MoveCommand> moveCommands){
         ArrayList<ArrayList<Robot>> robotListList= new ArrayList<ArrayList<Robot>>();
         ArrayList<Robot> currRobots =this.game.getState().getBoard().getRobots();
@@ -104,10 +180,17 @@ public class AI {
         robotListList.add(currRobotsCopy);
         for(int x = 0;x<moveCommands.size();x++){
             MoveCommand cmd = moveCommands.get(x);
-            game.moveRobot(cmd);
+            if(game.checkMove(cmd)!=1){
+                game.moveRobot(cmd);
+            }else{
+                //if the command collect VP exit
+                game.resetGame();
+                return moveCommands;
+            }
             boolean hasCycle=false;
             boolean cycleHere=false;
             int startOfCycle=-1;
+            //Search whether the current board positions were already visited
             for(int j =0;j<robotListList.size();j++){
                 ArrayList<Robot> robots = robotListList.get(j);
                 cycleHere=true;
@@ -124,13 +207,21 @@ public class AI {
                     hasCycle=true;
                 }
             }
+
+            //Delete Cycle
             if(hasCycle){
-                for(int j=startOfCycle;j<x;j++){
+                for(int j=x;j>=startOfCycle;j--){
                     moveCommands.remove(j);
-                    robotListList.remove(j);
+                    if(j>=1){
+                        robotListList.remove(j);
+                    }
+                    x=startOfCycle-1;
+                    game.resetGame();
                 }
                 hasCycle=false;
-            }else {
+            }
+            //No Cycle detected add new Board positions to the list
+            else {
                 currRobotsCopy = new ArrayList<Robot>();
                 for(Robot curr :currRobots){
                     currRobotsCopy.add(new Robot(curr.getCoord(),curr.getColor()));
@@ -138,6 +229,7 @@ public class AI {
                 robotListList.add(currRobotsCopy);
             }
         }
+        //will only be reached if the Movecommands do not collect the VP
         game.resetGame();
         return moveCommands;
     }
@@ -170,6 +262,12 @@ public class AI {
 
     }*/
 
+    public Game getGame() {
+        return game;
+    }
 
+    public void setGame(Game game) {
+        this.game = game;
+    }
 
 }

@@ -16,92 +16,147 @@ import java.util.Random;
 //Uses Depth limited random first search
 //heurisitc=2
 //Uses Depth limited breadth first search
+
+//Depthlimit is the limit of Moves that can be used in total
+//Setuplimit is the limit of the Moves that can be used on robots from colors other than the victorycolor
 public class TreeSearch extends Thread{
 
+    //input Parameters
     Game game;
-    MoveNode result=null;
-    int depthLimit;
-    ArrayList<MoveNode> toExplore;
     int heuristic;
-    int colorsUsed;
-    ArrayList<Colors> colorsInUse;
-    public TreeSearch(Game game,int depthLimit, ArrayList<MoveNode> toExplore, int heuristic, ArrayList<Colors> colorsInUse){
+    int setupLimit;
+    int depthLimit;
+
+    //output
+    MoveNode result=null;
+
+    //Expandable nodes of the Main tree search
+    ArrayList<MoveNode> toExplore;
+
+    //Expandable nodes of the Setup tree search
+    ArrayList<MoveNode> setupExplore;
+    //Setupnode that will be used as root of main tree
+    MoveNode setup;
+
+    //colors that are not victory colors
+    ArrayList<Colors> otherColors=new ArrayList<Colors>();
+
+
+    public TreeSearch(Game game,int depthLimit, int setupLimit, int heuristic){
         this.game=game;
         this.depthLimit=depthLimit;
-        this.toExplore=toExplore;
+        this.setupLimit=setupLimit;
         this.heuristic=heuristic;
-        this.colorsInUse=colorsInUse;
-    }
 
-    public MoveNode getResult() {
-        return result;
-    }
+        MoveNode root = new MoveNode();
+        this.setup=root;
+        this.setupExplore=new ArrayList<MoveNode>();
+        this.setupExplore.add(root);
 
-    public void setResult(MoveNode result) {
-        this.result = result;
     }
 
     @Override
     public void run() {
-        MoveNode curr = toExplore.get(0);
-        Colors vicColor=this.game.getState().getBoard().getVictoryPoint().getColor();
-        Colors color = vicColor;
-        while(!toExplore.isEmpty() && !Thread.currentThread().isInterrupted()) {
-            switch (this.heuristic){
-                case 0:
-                    curr=toExplore.get(0);
-                    break;
-                case 1:
-                    Random rand = new Random();
-                    int newIndex = rand.nextInt(toExplore.size());
-                    curr=toExplore.get(newIndex);
-                    break;
-                case 2:
-                    curr=toExplore.get(toExplore.size()-1);
-                    break;
+        MoveNode curr;
+        Colors vicColor = this.game.getState().getBoard().getVictoryPoint().getColor();
+        for(Colors currColor: Colors.values()){
+            if(currColor!=vicColor){
+                otherColors.add(currColor);
             }
-            if(curr.getMoveCommands().size()>depthLimit){
-                toExplore.remove(curr);
-            }else {
-                int seqCheck = isSeqSmart(curr.getMoveCommands());
-                if (seqCheck==0 || curr.getRoot()) {
-                    //System.out.println("Expand further");
-                    if(colorsInUse.size()==1) {
+        }
+        while (!this.setupExplore.isEmpty() && !Thread.currentThread().isInterrupted()){
+            toExplore=new ArrayList<MoveNode>();
+            MoveNode setupCopy = new MoveNode();
+            setupCopy.setMoveCommands(setup.getMoveCommands());
+            toExplore.add(setupCopy);
+            while (!toExplore.isEmpty()) {
+                switch (this.heuristic) {
+                    case 0:
+                        curr = toExplore.get(0);
+                        break;
+                    case 1:
+                        Random rand = new Random();
+                        int newIndex = rand.nextInt(toExplore.size());
+                        curr = toExplore.get(newIndex);
+                        break;
+                    case 2:
+                        curr = toExplore.get(toExplore.size() - 1);
+                        break;
+                    default:
+                        curr = toExplore.get(0);
+                        break;
+                }
+                if (curr.getMoveCommands().size() > depthLimit) {
+                    toExplore.remove(curr);
+                } else {
+                    int seqCheck = isSeqSmart(curr.getMoveCommands());
+                    if (seqCheck == 0 || curr.getRoot()) {
                         for (Direction direction : Direction.values()) {
-
-                            curr.addChild(new MoveCommand(color, direction));
+                            curr.addChild(new MoveCommand(vicColor, direction));
                             toExplore.add(0, curr.getChilds().get(curr.getChilds().size() - 1));
                         }
-                    }else{
-                        for(int i=0;i<colorsInUse.size();i++){
-                            Colors currColor = colorsInUse.get(i);
-                            for (Direction direction : Direction.values()) {
-
-                                curr.addChild(new MoveCommand(currColor, direction));
-                                toExplore.add(0, curr.getChilds().get(curr.getChilds().size() - 1));
-                            }
+                        toExplore.remove(curr);
+                    }
+                    //cut out useless moves
+                    //useless move = crash against wall
+                    if (seqCheck == -1) {
+                        //System.out.println("Useless Move");
+                        toExplore.remove(curr);
+                        if (!toExplore.isEmpty()) {
+                            curr = toExplore.get(0);
                         }
                     }
-                    toExplore.remove(curr);
-                }
-                //cut out useless moves
-                //useless move = crash against wall
-                if (seqCheck==-1) {
-                    //System.out.println("Useless Move");
-                    toExplore.remove(curr);
-                    if(!toExplore.isEmpty()){
-                        curr = toExplore.get(0);
+                    if (seqCheck == 1) {
+                        this.result = curr;
+                        return;
                     }
                 }
-                if(seqCheck==1){
-                    this.result=curr;
-                    return;
-                }
-            }
 
+            }
+            setup=createNewSetup();
         }
         this.result=null;
         return;
+    }
+
+
+    //created this function to solve multicolor problems
+    //will only be called if the problem is not feasible with only one color in the respective depth limit
+    //a setup is a move node with a Movecommand sequence enables the victorycolor to solve the problem
+    public MoveNode createNewSetup(){
+        MoveNode currSetup;
+        switch (this.heuristic) {
+            case 0:
+                currSetup = setupExplore.get(0);
+                break;
+            case 1:
+                Random rand = new Random();
+                int newIndex = rand.nextInt(setupExplore.size());
+                currSetup = setupExplore.get(newIndex);
+                break;
+            case 2:
+                currSetup = setupExplore.get(setupExplore.size() - 1);
+                break;
+            default:
+                currSetup = setupExplore.get(0);
+                break;
+        }
+        if(currSetup.getMoveCommands().size()>setupLimit){
+            setupExplore.remove(currSetup);
+        }else{
+            for (int i = 0; i < otherColors.size(); i++) {
+                Colors currColor = otherColors.get(i);
+                for (Direction direction : Direction.values()) {
+                    currSetup.addChild(new MoveCommand(currColor, direction));
+                    int seqCheck = isSeqSmart(currSetup.getChilds().get(currSetup.getChilds().size() -1).getMoveCommands());
+                    if (seqCheck == 0) {
+                        setupExplore.add(0, currSetup.getChilds().get(currSetup.getChilds().size() - 1));
+                    }
+                }
+            }
+            setupExplore.remove(currSetup);
+        }
+        return currSetup;
     }
 
     //checks if a Seq contains moves that end up crashing a Wall
@@ -123,4 +178,13 @@ public class TreeSearch extends Thread{
         game.resetGame();
         return 0;
     }
+
+    public MoveNode getResult() {
+        return result;
+    }
+
+    public void setResult(MoveNode result) {
+        this.result = result;
+    }
+
 }

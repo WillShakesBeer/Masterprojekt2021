@@ -43,7 +43,7 @@ public class RunDis extends Application {
         int length = 15;
         int height = 15;
         ArrayList<Robot> robotList = new ArrayList<Robot>();
-        robotList.add(new Data.Robot(new Coord(0,0), Colors.RED));
+        robotList.add(new Data.Robot(new Coord(1,0), Colors.RED));
         robotList.add(new Data.Robot(new Coord(0,15), Colors.BLUE));
         robotList.add(new Data.Robot(new Coord(15,0), Colors.YELLOW));
         robotList.add(new Robot(new Coord(15,15), Colors.GREEN));

@@ -82,6 +82,16 @@ public class TreeSearch extends Thread{
                     case 2:
                         curr = toExplore.get(toExplore.size() - 1);
                         break;
+                    case 3:
+                        int minHValue=Integer.MAX_VALUE;
+                        curr = toExplore.get(toExplore.size() - 1);
+                        for(MoveNode currNode: toExplore){
+                            if(currNode.getHValue()!=-1 && currNode.getHValue()<minHValue){
+                                curr=currNode;
+                                minHValue=curr.getHValue();
+                            }
+                        }
+                        break;
                     default:
                         curr = toExplore.get(0);
                         break;
@@ -90,13 +100,6 @@ public class TreeSearch extends Thread{
                     toExplore.remove(curr);
                 } else {
                     int seqCheck = isSeqSmart(curr.getMoveCommands());
-                    if (seqCheck == 0 || curr.getRoot()) {
-                        for (Direction direction : Direction.values()) {
-                            curr.addChild(new MoveCommand(vicColor, direction));
-                            toExplore.add(0, curr.getChilds().get(curr.getChilds().size() - 1));
-                        }
-                        toExplore.remove(curr);
-                    }
                     //cut out useless moves
                     //useless move = crash against wall
                     if (seqCheck == -1) {
@@ -109,6 +112,15 @@ public class TreeSearch extends Thread{
                     if (seqCheck == 1) {
                         this.result = curr;
                         return;
+                    }
+
+                    if (seqCheck >= 0 || curr.getRoot()) {
+                        for (Direction direction : Direction.values()) {
+                            int newHValue=curr.getHValue()+100+seqCheck;
+                            curr.addChild(new MoveCommand(vicColor, direction),newHValue);
+                            toExplore.add(0, curr.getChilds().get(curr.getChilds().size() - 1));
+                        }
+                        toExplore.remove(curr);
                     }
                 }
 
@@ -176,6 +188,13 @@ public class TreeSearch extends Thread{
             }
         }
         game.resetGame();
+        return 0;
+    }
+
+    public int distDiff(MoveNode node){
+        ArrayList<MoveCommand> cmds = node.getMoveCommands();
+        Colors color=cmds.get(cmds.size()-1).getColor();
+
         return 0;
     }
 

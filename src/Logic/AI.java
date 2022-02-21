@@ -22,11 +22,11 @@ public class AI {
     //test TreeSearch
     //tryMore Colors has some bugs
     public MoveNode createSeq(){
-        TreeSearch ts =new TreeSearch(game,11,4,2);
+        TreeSearch ts =new TreeSearch(game,11,4,3);
         Thread t = new Thread(ts);
         Timer timer = new Timer();
         System.out.println("Start Treesearch");
-        //timer.schedule(new TimeOutTask(t, timer,this.game), 5*1000);
+        timer.schedule(new TimeOutTask(t, timer,this.game), 5*1000);
         t.start();
         MoveNode result;
         try {

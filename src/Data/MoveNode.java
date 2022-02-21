@@ -9,19 +9,28 @@ public class MoveNode {
     Boolean isRoot;
     ArrayList<MoveCommand> moveCommands;
     ArrayList<MoveNode> childs;
+    int HValue;
 
     public MoveNode(){
         isRoot=true;
         this.moveCommands=new ArrayList<MoveCommand>();
         childs=new ArrayList<MoveNode>();
+        HValue=0;
     }
 
     public MoveNode(ArrayList<MoveCommand> moveCommands){
         isRoot=false;
         this.moveCommands=moveCommands;
         childs=new ArrayList<MoveNode>();
+        this.HValue=-1;
     }
 
+    public MoveNode(ArrayList<MoveCommand> moveCommands,int HValue){
+        isRoot=false;
+        this.moveCommands=moveCommands;
+        childs=new ArrayList<MoveNode>();
+        this.HValue=HValue;
+    }
     public void addChild(MoveNode mn){
         childs.add(mn);
     }
@@ -30,6 +39,12 @@ public class MoveNode {
         ArrayList<MoveCommand> childCommands= (ArrayList<MoveCommand>) this.moveCommands.clone();
         childCommands.add(mc);
         childs.add(new MoveNode(childCommands));
+    }
+
+    public void addChild(MoveCommand mc,int HValue){
+        ArrayList<MoveCommand> childCommands= (ArrayList<MoveCommand>) this.moveCommands.clone();
+        childCommands.add(mc);
+        childs.add(new MoveNode(childCommands,HValue));
     }
     public void addChild(ArrayList<MoveCommand> mcs){
         childs.add(new MoveNode(mcs));
@@ -57,5 +72,13 @@ public class MoveNode {
 
     public void setRoot(Boolean root) {
         isRoot = root;
+    }
+
+    public int getHValue() {
+        return HValue;
+    }
+
+    public void setHValue(int HValue) {
+        this.HValue = HValue;
     }
 }

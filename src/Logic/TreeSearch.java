@@ -1,9 +1,8 @@
 package Logic;
 
+import Data.*;
 import Data.Enums.Colors;
 import Data.Enums.Direction;
-import Data.MoveCommand;
-import Data.MoveNode;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -99,26 +98,35 @@ public class TreeSearch extends Thread{
                 if (curr.getMoveCommands().size() > depthLimit) {
                     toExplore.remove(curr);
                 } else {
-                    int seqCheck = isSeqSmart(curr.getMoveCommands());
+                    int seqCheck = isSeqSmartVicColor(curr.getMoveCommands());
                     //cut out useless moves
                     //useless move = crash against wall
-                    if (seqCheck == -1) {
+                    /*if (seqCheck == -2) {
                         //System.out.println("Useless Move");
                         toExplore.remove(curr);
                         if (!toExplore.isEmpty()) {
                             curr = toExplore.get(0);
                         }
                     }
-                    if (seqCheck == 1) {
+                    if (seqCheck == 0) {
                         this.result = curr;
                         return;
-                    }
+                    }*/
 
-                    if (seqCheck >= 0 || curr.getRoot()) {
+                    if (seqCheck >= -1 || curr.getRoot()) {
                         for (Direction direction : Direction.values()) {
-                            int newHValue=curr.getHValue()+100+seqCheck;
+                            int newHValue=curr.getHValue();
                             curr.addChild(new MoveCommand(vicColor, direction),newHValue);
-                            toExplore.add(0, curr.getChilds().get(curr.getChilds().size() - 1));
+                            MoveNode recentC=curr.getChilds().get(curr.getChilds().size()-1);
+                            int HInc=isSeqSmartVicColor(recentC.getMoveCommands());
+                            recentC.setHValue(recentC.getHValue()+HInc);
+                            if(HInc==0){
+                                this.result=recentC;
+                                return;
+                            }
+                            if(HInc>0){
+                                toExplore.add(0, recentC);
+                            }
                         }
                         toExplore.remove(curr);
                     }
@@ -147,6 +155,9 @@ public class TreeSearch extends Thread{
                 currSetup = setupExplore.get(newIndex);
                 break;
             case 2:
+                currSetup = setupExplore.get(setupExplore.size() - 1);
+                break;
+            case 3:
                 currSetup = setupExplore.get(setupExplore.size() - 1);
                 break;
             default:
@@ -191,6 +202,41 @@ public class TreeSearch extends Thread{
         return 0;
     }
 
+    public int isSeqSmartVicColor(ArrayList<MoveCommand> moveCommands){
+        if(moveCommands.size()==0){
+            return -1;
+        }
+        Colors color=moveCommands.get(moveCommands.size()-1).getColor();
+        for(int i =0;i<moveCommands.size();i++){
+            if(game.checkMove(moveCommands.get(i))==1){
+                game.resetGame();
+                return 0;
+            }
+            int result = game.moveRobot(moveCommands.get(i));
+            if(result==-1){
+                game.resetGame();
+                return -2;
+            }
+
+        }
+        double vicDist=-1;
+        ArrayList<Robot> robots = game.getState().getBoard().getRobots();
+        Robot vicRobot=null;
+        for(Robot robot: robots){
+            if(robot.getColor()==color){
+                vicRobot = robot;
+            }
+        }
+        VictoryPoint vicPoint = this.game.getState().getBoard().getVictoryPoint();
+        if(vicRobot!=null){
+           double xDist= Math.pow((double) (vicRobot.getCoord().getX()-vicPoint.getCoord().getX()),2);
+           double yDist= Math.pow((double) (vicRobot.getCoord().getY()-vicPoint.getCoord().getY()),2);
+           vicDist = Math.sqrt(xDist+yDist);
+        }
+        game.resetGame();
+        vicDist=vicDist+100;
+        return (int)(vicDist);
+    }
     public int distDiff(MoveNode node){
         ArrayList<MoveCommand> cmds = node.getMoveCommands();
         Colors color=cmds.get(cmds.size()-1).getColor();

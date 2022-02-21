@@ -26,7 +26,7 @@ public class AI {
         Thread t = new Thread(ts);
         Timer timer = new Timer();
         System.out.println("Start Treesearch");
-        timer.schedule(new TimeOutTask(t, timer,this.game), 5*1000);
+        //timer.schedule(new TimeOutTask(t, timer,this.game), 5*1000);
         t.start();
         MoveNode result;
         try {

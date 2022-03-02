@@ -133,6 +133,7 @@ public class TreeSearch extends Thread{
                 }
 
             }
+            System.out.println("new Setup needed");
             setup=createNewSetup();
         }
         this.result=null;

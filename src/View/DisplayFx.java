@@ -3,6 +3,7 @@ package View;
 import Data.*;
 import Data.Enums.Colors;
 import Data.Enums.Direction;
+import Data.Enums.Heuristics;
 import Data.Enums.ObsType;
 import Logic.AI;
 import Logic.Game;
@@ -21,6 +22,8 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
+
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import static javafx.application.Application.launch;
@@ -51,7 +54,7 @@ public class DisplayFx {
 
     private Label averageLabel =new Label("Average:" + '\n');
 
-
+    private ArrayList<RunStat> runStats = new ArrayList<>();
 
     private Button revertLastMoveButton = new Button("Revert Last Move");
 
@@ -64,6 +67,7 @@ public class DisplayFx {
     //to determine if a move is usefull, or the robot just runs in a wall
     private boolean crashWall;
     private ArrayList<MoveCommand> visSeq=new ArrayList<MoveCommand>();
+
 
     private Game game;
     private GridPane boardGrid;
@@ -298,7 +302,7 @@ public class DisplayFx {
                 vBoxColumns.setPadding(new Insets(10));
                 vBoxColumns.setSpacing(10);
 
-                Scene secondScene = new Scene(vBoxColumns, 970,800);
+                Scene secondScene = new Scene(vBoxColumns, 970,700);
                 secondaryWindow.setTitle("Analysis");
                 secondaryWindow.setScene(secondScene);
                 secondaryWindow.setX(0);
@@ -311,10 +315,67 @@ public class DisplayFx {
     }
 
     public Label drawAverage(){
+        updateAverage();
         return averageLabel;
     }
 
-    public void updateAverage(){}
+    public void updateAverage(){
+        long timeNeededDFS=0;
+        int movesUsedDFS=0;
+        int counterDFS=0;
+        long timeNeededRandFS=0;
+        int movesUsedRandFS=0;
+        int counterRandFS=0;
+        long timeNeededBFS=0;
+        int movesUsedBFS=0;
+        int counterBFS=0;
+
+        for (RunStat runStat:runStats){
+            switch (runStat.getHeuristic()){
+                case DEPTH_LIMITED_DFS:
+                    timeNeededDFS= timeNeededDFS +runStat.getTimeNeeded();
+                    movesUsedDFS = movesUsedDFS + runStat.getMovesUsed();
+                    counterDFS++;
+                    break;
+                case DEPTH_LIMITED_RANDFS:
+                    timeNeededRandFS= timeNeededRandFS +runStat.getTimeNeeded();
+                    movesUsedRandFS = movesUsedRandFS + runStat.getMovesUsed();
+                    counterRandFS++;
+                    break;
+                case DEPTH_LIMITED_BFS:
+                    timeNeededBFS = timeNeededBFS +runStat.getTimeNeeded();
+                    movesUsedBFS = movesUsedBFS + runStat.getMovesUsed();
+                    counterBFS++;
+                    break;
+                default:
+                    break;
+            }
+        }
+        double avgTimeNeededDFS =0;
+        double avgMovesUsedDFS=0;
+        if (counterDFS != 0){
+            avgTimeNeededDFS = timeNeededDFS / counterDFS;
+            avgMovesUsedDFS = movesUsedDFS /counterDFS;
+        }
+        double avgTimeNeededRandFS=0;
+        double avgMovesUsedRandFS=0;
+        if (timeNeededRandFS != 0){
+            avgTimeNeededRandFS =timeNeededRandFS /counterRandFS;
+            avgMovesUsedRandFS = movesUsedRandFS /counterRandFS;;
+        }
+        double avgTimeNeededBFS=0;
+        double avgMovesUsedBFS=0;
+        if (counterBFS != 0){
+            avgTimeNeededBFS = timeNeededBFS /counterBFS;
+            avgMovesUsedBFS = movesUsedBFS /counterBFS;
+        }
+
+        averageLabel.setText(
+                "Depth limited DFS: " + "\t" +"\t" + "Time needed:" + "\t" + avgTimeNeededDFS + "\t" + "Moves used:" + "\t" + avgMovesUsedDFS +  "\t" + "Runs " + counterDFS + '\n' +
+                        "Depth limited RandFS" + "\t"+ "Time needed:" + "\t" +  avgTimeNeededRandFS + "\t" + "Moves used:" + "\t" + avgMovesUsedRandFS +  "\t" + "Runs " + counterRandFS +  '\n' +
+                        "Depth limited BFS" + "\t" +"\t"+ "Time needed:" + "\t" +  avgTimeNeededBFS + "\t" + "Moves used:" + "\t" + avgMovesUsedBFS +  "\t" + "Runs " + counterBFS +  '\n'
+        );
+    }
 
     public HBox drawIterations(){
         final TextField iterationsTextField = new TextField();
@@ -326,10 +387,16 @@ public class DisplayFx {
             @Override
             public void handle(ActionEvent e) {
                 iterations = Integer.parseInt(iterationsTextField.getText());
+                System.out.println("Iterations set to: " + iterations);
+                for (int i=0; i<iterations; i++){
+                    executeNextSequence();
+                }
+
             }
         });
 
-        HBox hBoxRunIterations = new HBox();
+        HBox hBoxRunIterations = new HBox(iterationsTextField , applyButton);
+        hBoxRunIterations.setSpacing(10);
         return hBoxRunIterations;
     }
 
@@ -383,9 +450,10 @@ public class DisplayFx {
             }
         });
 
-
+        r2.setSelected(true);
         HBox heuristics = new HBox(r1,r2,r3,r4);
         heuristics.setSpacing(10);
+
 
         return heuristics;
     }
@@ -424,24 +492,38 @@ public class DisplayFx {
     }
 
     public void updateAnalysisLabel(long timeUsed , int movesUsed){
-
         analyisLabel.setText(analyisLabel.getText() + '\n'
-                + "Heuristic: " + heuristicChosenString(ai.getSelectedHeuristic()) + "  "
-                + "Depth Limit: " + ai.getDepthLimit()+ "  "
-                + "Setup Limit: " + ai.getSetupLimit() + " "
-                + "Time needed: " + timeUsed + " "
+                + "Heuristic: " + heuristicChosenString(ai.getSelectedHeuristic()) + "\t"
+                + "Depth Limit: " + ai.getDepthLimit()+ "\t"
+                + "Setup Limit: " + ai.getSetupLimit() + "\t"
+                + "Time needed: " + timeUsed + "\t"
                 + "Moves used: " + movesUsed);
+
+        Heuristics heuristic;
+        switch (ai.getSelectedHeuristic()) {
+            case 0:  heuristic = Heuristics.DEPTH_LIMITED_DFS;
+                break;
+            case 1:  heuristic = Heuristics.DEPTH_LIMITED_RANDFS;
+                break;
+            case 2:  heuristic = Heuristics.DEPTH_LIMITED_BFS;
+                break;
+            default: heuristic=null;
+        }
+
+        RunStat runStat = new RunStat(heuristic,ai.getDepthLimit(),ai.getSetupLimit(), timeUsed , movesUsed);
+        runStats.add(runStat);
+        updateAverage();
 
     }
 
     public String heuristicChosenString (int heuristicChosenInt){
         String heuristicChosenString;
         switch (heuristicChosenInt) {
-            case 0:  heuristicChosenString = "Depth limited DFS";
+            case 0:  heuristicChosenString = "Depth limited DFS" + "\t";
                 break;
             case 1:  heuristicChosenString = "Depth limited RandFS";
                 break;
-            case 2:  heuristicChosenString = "Depth limited BFS";
+            case 2:  heuristicChosenString = "Depth limited BFS" + "\t";
                 break;
             default: heuristicChosenString = "none";
         }
@@ -456,6 +538,8 @@ public class DisplayFx {
 
         while (!this.visSeq.isEmpty()){
             executeNextMove();
+            redrawMovelist();
+            redrawRobots();
         }
         this.visSeq=ai.createSeq().getMoveCommands();
         if (this.visSeq.isEmpty()){
@@ -477,6 +561,10 @@ public class DisplayFx {
         long timerEnd = System.currentTimeMillis();
         long timeUsed = (long) ((timerEnd-timerBegin)* 0.001);
         updateAnalysisLabel(timeUsed, movesUsed);
+
+
+        System.out.println("iterations to go: " + iterations);
+
     }
 
     public void visualizeSeq(ArrayList<MoveCommand> moveCommands){

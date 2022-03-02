@@ -14,17 +14,16 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-
-import javax.management.remote.rmi._RMIConnection_Stub;
 import java.util.ArrayList;
 import java.util.Random;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import static javafx.application.Application.launch;
 
 /**
  * Created by Martin Eberle aka WillShakesBeer on 14.12.2021.
@@ -32,15 +31,7 @@ import java.util.Random;
 
 public class DisplayFx {
 
-    private final String ANSI_RESET = "\u001B[0m";
-    private final String ANSI_BLACK = "\u001B[30m";
-    private final String ANSI_RED = "\u001B[31m";
-    private final String ANSI_GREEN = "\u001B[32m";
-    private final String ANSI_YELLOW = "\u001B[33m";
-    private final String ANSI_BLUE = "\u001B[34m";
-    private final String ANSI_PURPLE = "\u001B[35m";
-    private final String ANSI_CYAN = "\u001B[36m";
-    private final String ANSI_WHITE = "\u001B[37m";
+    private int iterations = 1;
 
     private Colors selectedColor;
     private Direction selectedDirection;
@@ -54,6 +45,13 @@ public class DisplayFx {
     private Button up = new Button("↑");
     private Button down = new Button("↓");
     private Button right = new Button("→");
+
+    private Button analysisButton = new Button("\uD83D\uDCC8");
+    private Label analyisLabel = new Label("Analysis run: ");
+
+    private Label averageLabel =new Label("Average:" + '\n');
+
+
 
     private Button revertLastMoveButton = new Button("Revert Last Move");
 
@@ -72,13 +70,12 @@ public class DisplayFx {
 
     private Logic.AI ai;
 
-
     public DisplayFx (){
-
     }
 
-    public void diplayVisuals(Stage primaryStage , Game game) {
+    public void diplayVisuals(Stage primaryStage , Game game , AI ai) {
         this.ai = ai;
+
         primaryStage.setTitle("Ricochet Robots");
         primaryStage.setResizable(true);
         //Starting with Input UI
@@ -122,10 +119,12 @@ public class DisplayFx {
         generateKeyhandlers(scene);
 
         primaryStage.setScene(scene);
-
+        primaryStage.setX(970);
+        primaryStage.setY(40);
         primaryStage.show();
 
-        this.ai = new AI(game);
+
+        analysisButton.fire();
     }
 
     public void generateKeyhandlers (Scene scene){
@@ -149,46 +148,6 @@ public class DisplayFx {
         });
 
     }
-
-    //Searches for TreeSearch solution if successful visSeq will be refilled
-    //otherwise visSeq is emptyList
-    public void executeNextSequence(){
-        while (!this.visSeq.isEmpty()){
-            executeNextMove();
-        }
-        this.visSeq=ai.createSeq().getMoveCommands();
-        if (this.visSeq.isEmpty()){
-            this.visSeq=new ArrayList<MoveCommand>();
-            System.out.println("no result");
-            game.forceNewVictoryPoint();
-            this.moveListlist = new ArrayList<>();
-            redrawMovelist();
-            redrawRobots();
-        }
-        else{
-
-            redrawMovelist();
-            redrawRobots();
-            System.out.println("Solution found");
-            System.out.println("Moves: "+ this.visSeq.size());
-        }
-    }
-
-    public void visualizeSeq(ArrayList<MoveCommand> moveCommands){
-        this.visSeq=moveCommands;
-    }
-
-    public void executeNextMove(){
-        if(!visSeq.isEmpty()){
-            MoveCommand curr = visSeq.get(0);
-            this.setSelectedColor(curr.getColor());
-            this.setSelectedDirection(curr.getDir());
-            this.moveRobot(curr.getDir(), curr.getColor());
-            visSeq.remove(curr);
-        }
-
-    }
-
 
     public void drawEmptyBoard(){
         for (int i = 0; i <= game.getConfig().getLength(); i++) {
@@ -266,6 +225,7 @@ public class DisplayFx {
             boardGrid.add(new ImageView(newObs), obstacle.getCoord1().getX(), obstacle.getCoord1().getY());
         }
     }
+
     public void drawRobots(){
         ArrayList<Robot> robots = game.getState().getBoard().getRobots();
         for (Robot robot : robots) {
@@ -301,21 +261,237 @@ public class DisplayFx {
         return movelistScrollPane;
     }
 
-
     public HBox drawButtons(){
 
-        Button revertLastMoveButton = drawRevertButton();
+        revertLastMoveButton = drawRevertButton();
+        analysisButton = drawAnalysisButton();
 
         HBox hBoxColor = drawColorButtons();
         HBox hBoxDirection = drawDirectionButtons();
 
         moveScore.setText("Moves: "+game.getState().getMoveList().size() );
 
-        HBox hBoxAllButtons = new HBox(score, revertLastMoveButton , hBoxColor, hBoxDirection , moveScore);
+
+
+        HBox hBoxAllButtons = new HBox(analysisButton, score, revertLastMoveButton , hBoxColor, hBoxDirection , moveScore);
         hBoxAllButtons.setSpacing(50);
         hBoxAllButtons.setAlignment(Pos.BASELINE_CENTER);
 
         return hBoxAllButtons;
+    }
+
+    public Button drawAnalysisButton(){
+        analysisButton.setOnAction(new EventHandler<ActionEvent>() {
+
+            @Override
+            public void handle(ActionEvent event) {
+                Stage secondaryWindow = new Stage();
+
+                HBox hBoxHeuristics = drawHeuristicsSelecter();
+                HBox hBoxLimits = drawLimitsSelecter();
+                ScrollPane analysisTextScrollPane = drawAnalysisScrollPane();
+
+                HBox hBoxRunIterations = drawIterations();
+                Label average = drawAverage();
+
+                VBox vBoxColumns = new VBox(hBoxHeuristics , hBoxLimits, analysisTextScrollPane , average , hBoxRunIterations);
+                vBoxColumns.setPadding(new Insets(10));
+                vBoxColumns.setSpacing(10);
+
+                Scene secondScene = new Scene(vBoxColumns, 970,800);
+                secondaryWindow.setTitle("Analysis");
+                secondaryWindow.setScene(secondScene);
+                secondaryWindow.setX(0);
+                secondaryWindow.setY(40);
+                secondaryWindow.show();
+            }
+        });
+
+        return analysisButton;
+    }
+
+    public Label drawAverage(){
+        return averageLabel;
+    }
+
+    public void updateAverage(){}
+
+    public HBox drawIterations(){
+        final TextField iterationsTextField = new TextField();
+        iterationsTextField.setPromptText("Enter Iteration Cicles (1)");
+        iterationsTextField.setPrefColumnCount(20);
+
+        Button applyButton = new Button("Apply");
+        applyButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent e) {
+                iterations = Integer.parseInt(iterationsTextField.getText());
+            }
+        });
+
+        HBox hBoxRunIterations = new HBox();
+        return hBoxRunIterations;
+    }
+
+    public HBox drawHeuristicsSelecter(){
+        //heuristic=0
+        //Uses Depth limited Depth first search
+        //heurisitc=1
+        //Uses Depth limited random first search
+        //heurisitc=2
+        //Uses Depth limited breadth first search
+        RadioButton r1 = new RadioButton("All");
+        RadioButton r2 = new RadioButton("Depth limited DFS");
+        RadioButton r3 = new RadioButton("Depth limited RandFS");
+        RadioButton r4 = new RadioButton("Depth limited BFS");
+
+        // create a toggle group
+        ToggleGroup tg = new ToggleGroup();
+        r1.setToggleGroup(tg);
+        r2.setToggleGroup(tg);
+        r3.setToggleGroup(tg);
+        r4.setToggleGroup(tg);
+
+        r1.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent e) {
+                System.out.println("Selected Heu:" + ai.getSelectedHeuristic() );
+            }
+        });
+        //heuristic=0
+        //Uses Depth limited Depth first search
+        r2.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent e) {
+                ai.setSelectedHeuristic(0);
+            }
+        });
+        //heurisitc=1
+        //Uses Depth limited random first search
+        r3.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent e) {
+                ai.setSelectedHeuristic(1);
+            }
+        });
+        //heurisitc=2
+        //Uses Depth limited breadth first search
+        r4.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent e) {
+                ai.setSelectedHeuristic(2);
+            }
+        });
+
+
+        HBox heuristics = new HBox(r1,r2,r3,r4);
+        heuristics.setSpacing(10);
+
+        return heuristics;
+    }
+
+    public HBox drawLimitsSelecter(){
+
+        final TextField depthLimitTextField = new TextField();
+        depthLimitTextField.setPromptText("Enter depthLimit (11)");
+        depthLimitTextField.setPrefColumnCount(10);
+
+        final TextField setupLimitTextField = new TextField();
+        setupLimitTextField.setPromptText("Enter setupLimit (4)");
+        setupLimitTextField.setPrefColumnCount(10);
+
+        Button applyButton = new Button("Apply");
+        applyButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent e) {
+                ai.setDepthLimit(Integer.parseInt(depthLimitTextField.getText()));
+                ai.setSetupLimit(Integer.parseInt(setupLimitTextField.getText()));
+                System.out.println("depthLimit: " + ai.getDepthLimit() + "         setupLimit: " + ai.getSetupLimit());
+            }
+        });
+
+        HBox hBoxLimits = new HBox(depthLimitTextField , setupLimitTextField , applyButton);
+        hBoxLimits.setSpacing(10);
+
+        return hBoxLimits;
+    }
+
+    public ScrollPane drawAnalysisScrollPane(){
+        ScrollPane scrollPane = new ScrollPane(analyisLabel);
+        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        scrollPane.setPrefViewportHeight(400);
+        return scrollPane;
+    }
+
+    public void updateAnalysisLabel(long timeUsed , int movesUsed){
+
+        analyisLabel.setText(analyisLabel.getText() + '\n'
+                + "Heuristic: " + heuristicChosenString(ai.getSelectedHeuristic()) + "  "
+                + "Depth Limit: " + ai.getDepthLimit()+ "  "
+                + "Setup Limit: " + ai.getSetupLimit() + " "
+                + "Time needed: " + timeUsed + " "
+                + "Moves used: " + movesUsed);
+
+    }
+
+    public String heuristicChosenString (int heuristicChosenInt){
+        String heuristicChosenString;
+        switch (heuristicChosenInt) {
+            case 0:  heuristicChosenString = "Depth limited DFS";
+                break;
+            case 1:  heuristicChosenString = "Depth limited RandFS";
+                break;
+            case 2:  heuristicChosenString = "Depth limited BFS";
+                break;
+            default: heuristicChosenString = "none";
+        }
+        return heuristicChosenString;
+    }
+
+    //Searches for TreeSearch solution if successful visSeq will be refilled
+    //otherwise visSeq is emptyList
+    public void executeNextSequence(){
+        int movesUsed = -1;
+        long timerBegin = System.currentTimeMillis();
+
+        while (!this.visSeq.isEmpty()){
+            executeNextMove();
+        }
+        this.visSeq=ai.createSeq().getMoveCommands();
+        if (this.visSeq.isEmpty()){
+            this.visSeq=new ArrayList<MoveCommand>();
+            System.out.println("no result");
+            game.forceNewVictoryPoint();
+            this.moveListlist = new ArrayList<>();
+            redrawMovelist();
+            redrawRobots();
+        }
+        else{
+            redrawMovelist();
+            redrawRobots();
+            System.out.println("Solution found");
+            movesUsed = this.visSeq.size();
+            System.out.println("Moves: "+ movesUsed);
+
+        }
+        long timerEnd = System.currentTimeMillis();
+        long timeUsed = (long) ((timerEnd-timerBegin)* 0.001);
+        updateAnalysisLabel(timeUsed, movesUsed);
+    }
+
+    public void visualizeSeq(ArrayList<MoveCommand> moveCommands){
+        this.visSeq=moveCommands;
+    }
+
+    public void executeNextMove(){
+        if(!visSeq.isEmpty()){
+            MoveCommand curr = visSeq.get(0);
+            this.setSelectedColor(curr.getColor());
+            this.setSelectedDirection(curr.getDir());
+            this.moveRobot(curr.getDir(), curr.getColor());
+            visSeq.remove(curr);
+        }
+
     }
 
     public Button drawRevertButton (){
@@ -394,8 +570,6 @@ public class DisplayFx {
         hBoxColor.setPadding(new Insets(0, 0, 0, 0));
         return hBoxColor;
     }
-
-
 
     public HBox drawDirectionButtons(){
         left.setOnAction(new EventHandler<ActionEvent>() {
@@ -591,5 +765,11 @@ public class DisplayFx {
         this.crashWall = crashWall;
     }
 
+    public AI getAi() {
+        return ai;
+    }
 
+    public void setAi(AI ai) {
+        this.ai = ai;
+    }
 }

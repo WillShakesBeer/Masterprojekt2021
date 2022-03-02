@@ -13,6 +13,11 @@ public class AI {
 
     private Game game;
     private MoveNode root;
+    private TreeSearch treeSearch;
+    private int selectedHeuristic;
+    private int depthLimit;
+    private int setupLimit;
+
 
     public AI(Game game){
         this.game = game;
@@ -22,8 +27,8 @@ public class AI {
     //test TreeSearch
     //tryMore Colors has some bugs
     public MoveNode createSeq(){
-        TreeSearch ts =new TreeSearch(game,11,4,3);
-        Thread t = new Thread(ts);
+        treeSearch =new TreeSearch(game,depthLimit,setupLimit,selectedHeuristic);
+        Thread t = new Thread(treeSearch);
         Timer timer = new Timer();
         System.out.println("Start Treesearch");
         //timer.schedule(new TimeOutTask(t, timer,this.game), 5*1000);
@@ -34,7 +39,7 @@ public class AI {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        result=ts.getResult();
+        result=treeSearch.getResult();
         if (result == null) {
             return new MoveNode();
         } else {
@@ -122,4 +127,35 @@ public class AI {
         this.game = game;
     }
 
+    public TreeSearch getTreeSearch() {
+        return treeSearch;
+    }
+
+    public void setTreeSearch(TreeSearch treeSearch) {
+        this.treeSearch = treeSearch;
+    }
+
+    public int getSelectedHeuristic() {
+        return selectedHeuristic;
+    }
+
+    public void setSelectedHeuristic(int selectedHeuristic) {
+        this.selectedHeuristic = selectedHeuristic;
+    }
+
+    public int getDepthLimit() {
+        return depthLimit;
+    }
+
+    public void setDepthLimit(int depthLimit) {
+        this.depthLimit = depthLimit;
+    }
+
+    public int getSetupLimit() {
+        return setupLimit;
+    }
+
+    public void setSetupLimit(int setupLimit) {
+        this.setupLimit = setupLimit;
+    }
 }

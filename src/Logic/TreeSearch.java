@@ -22,7 +22,7 @@ public class TreeSearch extends Thread{
 
     //input Parameters
     Game game;
-    int heuristic;
+    int selectedHeuristic;
     int setupLimit;
     int depthLimit;
 
@@ -41,11 +41,11 @@ public class TreeSearch extends Thread{
     ArrayList<Colors> otherColors=new ArrayList<Colors>();
 
 
-    public TreeSearch(Game game,int depthLimit, int setupLimit, int heuristic){
+    public TreeSearch(Game game,int depthLimit, int setupLimit, int selectedHeuristic){
         this.game=game;
         this.depthLimit=depthLimit;
         this.setupLimit=setupLimit;
-        this.heuristic=heuristic;
+        this.selectedHeuristic = selectedHeuristic;
 
         MoveNode root = new MoveNode();
         this.setup=root;
@@ -69,7 +69,7 @@ public class TreeSearch extends Thread{
             setupCopy.setMoveCommands(setup.getMoveCommands());
             toExplore.add(setupCopy);
             while (!toExplore.isEmpty()) {
-                switch (this.heuristic) {
+                switch (this.selectedHeuristic) {
                     case 0:
                         curr = toExplore.get(0);
                         break;
@@ -145,7 +145,7 @@ public class TreeSearch extends Thread{
     //a setup is a move node with a Movecommand sequence enables the victorycolor to solve the problem
     public MoveNode createNewSetup(){
         MoveNode currSetup;
-        switch (this.heuristic) {
+        switch (this.selectedHeuristic) {
             case 0:
                 currSetup = setupExplore.get(0);
                 break;
@@ -237,6 +237,7 @@ public class TreeSearch extends Thread{
         vicDist=vicDist+100;
         return (int)(vicDist);
     }
+
     public int distDiff(MoveNode node){
         ArrayList<MoveCommand> cmds = node.getMoveCommands();
         Colors color=cmds.get(cmds.size()-1).getColor();

@@ -27,17 +27,26 @@ public class RunDis extends Application {
         and the colors can be selected with 1 2 3 4
         Backspace reverts the last move
          */
-        launch();
+        launch(args);
     }
 
-    public void start(Stage primaryStage){
+
+    public void start(final Stage primaryStage){
         Game game = new Game(DefaultGame());
+
+        AI ai = new AI(game);
+        setAiDefaults(ai);
+
         DisplayFx displayFx = new DisplayFx();
-        displayFx.diplayVisuals(primaryStage,game);
+        displayFx.diplayVisuals(primaryStage,game, ai);
         //ai.doSmartStuff();
     }
 
-
+    public static void setAiDefaults(AI ai) {
+        ai.setSetupLimit(4);
+        ai.setDepthLimit(11);
+        ai.setSelectedHeuristic(0);
+    }
 
     public static Config DefaultGame(){
         int length = 15;
@@ -118,8 +127,4 @@ public class RunDis extends Application {
         Config config = new Config(robotList,obstacleList,victorySpawns,length,height);
         return config;
     }
-
-
-
-
 }

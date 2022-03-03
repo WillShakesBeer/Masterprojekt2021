@@ -45,7 +45,7 @@ public class RunDis extends Application {
     public static void setAiDefaults(AI ai) {
         ai.setSetupLimit(4);
         ai.setDepthLimit(11);
-        ai.setSelectedHeuristic(0);
+        ai.setSelectedHeuristic(3);
     }
 
     public static Config DefaultGame(){

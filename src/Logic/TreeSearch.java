@@ -15,6 +15,9 @@ import java.util.Random;
 //Uses Depth limited random first search
 //heurisitc=2
 //Uses Depth limited breadth first search
+//heurisitc=3
+//Uses air distance to the VictoryPoint for PrimarySearch
+//Depth Limited Breath First Search for Setup
 
 //Depthlimit is the limit of Moves that can be used in total
 //Setuplimit is the limit of the Moves that can be used on robots from colors other than the victorycolor
@@ -40,6 +43,8 @@ public class TreeSearch extends Thread{
     //colors that are not victory colors
     ArrayList<Colors> otherColors=new ArrayList<Colors>();
 
+    Coord currVicCoord;
+
 
     public TreeSearch(Game game,int depthLimit, int setupLimit, int selectedHeuristic){
         this.game=game;
@@ -51,6 +56,9 @@ public class TreeSearch extends Thread{
         this.setup=root;
         this.setupExplore=new ArrayList<MoveNode>();
         this.setupExplore.add(root);
+        currVicCoord=this.game.getState().getBoard().getVictoryPoint().getCoord();
+        ArrayList<ArrayList<Coord>> CriticalPostions=getCriticalPositions(3);
+        System.out.println("lol");
 
     }
 
@@ -98,38 +106,29 @@ public class TreeSearch extends Thread{
                 if (curr.getMoveCommands().size() > depthLimit) {
                     toExplore.remove(curr);
                 } else {
-                    int seqCheck = isSeqSmartVicColor(curr.getMoveCommands());
-                    //cut out useless moves
-                    //useless move = crash against wall
-                    /*if (seqCheck == -2) {
-                        //System.out.println("Useless Move");
-                        toExplore.remove(curr);
-                        if (!toExplore.isEmpty()) {
-                            curr = toExplore.get(0);
+                    for (Direction direction : Direction.values()) {
+                        int newHValue=curr.getHValue();
+                        curr.addChild(new MoveCommand(vicColor, direction),newHValue);
+                        MoveNode recentC=curr.getChilds().get(curr.getChilds().size()-1);
+                        int HInc;
+                        switch (this.selectedHeuristic){
+                            case 3:
+                                HInc=isSeqSmartVicColor(recentC.getMoveCommands());
+                                break;
+                            default:
+                                HInc=isSeqSmart(recentC.getMoveCommands());
+                                break;
+                        }
+                        recentC.setHValue(recentC.getHValue()+HInc);
+                        if(HInc==0){
+                            this.result=recentC;
+                            return;
+                        }
+                        if(HInc>0){
+                            toExplore.add(0, recentC);
                         }
                     }
-                    if (seqCheck == 0) {
-                        this.result = curr;
-                        return;
-                    }*/
-
-                    if (seqCheck >= -1 || curr.getRoot()) {
-                        for (Direction direction : Direction.values()) {
-                            int newHValue=curr.getHValue();
-                            curr.addChild(new MoveCommand(vicColor, direction),newHValue);
-                            MoveNode recentC=curr.getChilds().get(curr.getChilds().size()-1);
-                            int HInc=isSeqSmartVicColor(recentC.getMoveCommands());
-                            recentC.setHValue(recentC.getHValue()+HInc);
-                            if(HInc==0){
-                                this.result=recentC;
-                                return;
-                            }
-                            if(HInc>0){
-                                toExplore.add(0, recentC);
-                            }
-                        }
-                        toExplore.remove(curr);
-                    }
+                    toExplore.remove(curr);
                 }
 
             }
@@ -173,7 +172,7 @@ public class TreeSearch extends Thread{
                 for (Direction direction : Direction.values()) {
                     currSetup.addChild(new MoveCommand(currColor, direction));
                     int seqCheck = isSeqSmart(currSetup.getChilds().get(currSetup.getChilds().size() -1).getMoveCommands());
-                    if (seqCheck == 0) {
+                    if (seqCheck >=0) {
                         setupExplore.add(0, currSetup.getChilds().get(currSetup.getChilds().size() - 1));
                     }
                 }
@@ -184,14 +183,14 @@ public class TreeSearch extends Thread{
     }
 
     //checks if a Seq contains moves that end up crashing a Wall
-    //0 => no crash
+    //1 => no crash
     //-1 => crash
-    //1 => Point Scored
+    //0 => Point Scored
     public int isSeqSmart(ArrayList<MoveCommand> moveCommands){
         for(int i =0;i<moveCommands.size();i++){
             if(game.checkMove(moveCommands.get(i))==1){
                 game.resetGame();
-                return 1;
+                return 0;
             }
             int result = game.moveRobot(moveCommands.get(i));
             if(result==-1){
@@ -200,9 +199,14 @@ public class TreeSearch extends Thread{
             }
         }
         game.resetGame();
-        return 0;
+        return 1;
     }
 
+    // Gives feedback if Seq leads to achieving a Victorypoint
+    //0=> Victory achieved
+    //-1 => No Movement
+    //-2 => Crash Wall
+    //positive Int: AmountOfMoves*100+DistToVictoryPoint
     public int isSeqSmartVicColor(ArrayList<MoveCommand> moveCommands){
         if(moveCommands.size()==0){
             return -1;
@@ -239,11 +243,114 @@ public class TreeSearch extends Thread{
         return (int)(vicDist);
     }
 
-    public int distDiff(MoveNode node){
-        ArrayList<MoveCommand> cmds = node.getMoveCommands();
-        Colors color=cmds.get(cmds.size()-1).getColor();
+    //todo implement and integrate
 
+    // Gives feedback if Seq leads to a meaningful Setup
+    //-1 => No Movement
+    //-2 => Crash Wall
+    //positive Float: PositionScore/AmountOfMoves
+    // PositionScore := CritcalPostionsTaken*CriticalDegree
+    public float isSeqSmartSetup(ArrayList<MoveCommand> moveCommands){
+        if(moveCommands.size()==0){
+            return -1;
+        }
+        Colors color=moveCommands.get(moveCommands.size()-1).getColor();
+        for(int i =0;i<moveCommands.size();i++){
+            int result = game.moveRobot(moveCommands.get(i));
+            if(result==-1){
+                game.resetGame();
+                return -2;
+            }
+
+        }
         return 0;
+    }
+
+    //returns the surrounding Positions of the Paths to the current VictoryPoint
+    //The Degree of a critical Position is defined by the amount of turns the Path
+    //to the VictoryPoint has
+    //returns a list of list
+    //Element 0 => Critical Positions of Degree 1
+    //Element 1 => Critical Positions of Degree 2
+    //...
+    public ArrayList<ArrayList<Coord>> getCriticalPositions(int degree){
+        ArrayList<Coord> startPos = new ArrayList<Coord>();
+        ArrayList<ArrayList<Coord>> criticalPositions = new ArrayList<ArrayList<Coord>>();
+        ArrayList<Coord> oldStartPos = new ArrayList<Coord>();
+        ArrayList<Coord> newStartPos = new ArrayList<Coord>();
+        newStartPos.add(currVicCoord);
+        while (degree > 0){
+            startPos=(ArrayList<Coord>)newStartPos.clone();
+            newStartPos = new ArrayList<Coord>();
+            ArrayList<Coord> newCritPos = new ArrayList<Coord>();
+            criticalPositions.add(newCritPos);
+            while(!startPos.isEmpty()) {
+                Coord currPos = startPos.get(startPos.size() - 1);
+                oldStartPos.add(currPos);
+                startPos.remove(currPos);
+                for (Direction dir : Direction.values()) {
+                    Coord collisionPos = game.checkMovement(currPos.clone(), dir, game.getState().getBoard());
+                    boolean collisionPosSmart = true;
+                    for (Coord checkPos : startPos) {
+                        if (collisionPos.equals(checkPos)) {
+                            collisionPosSmart = false;
+                        }
+                    }
+                    for (Coord checkPos : oldStartPos) {
+                        if (collisionPos.equals(checkPos)) {
+                            collisionPosSmart = false;
+                        }
+                    }
+                    if (collisionPosSmart) {
+                        newStartPos.add(collisionPos);
+                        switch (dir) {
+                            case DOWN:
+                                for (int y = currPos.getY(); y <= collisionPos.getY(); y++) {
+                                    if (currPos.getX() + 1 < 15) {
+                                        newCritPos.add(new Coord(currPos.getX() + 1, y));
+                                    }
+                                    if (currPos.getX() - 1 > 0) {
+                                        newCritPos.add(new Coord(currPos.getX() - 1, y));
+                                    }
+                                }
+                            break;
+                            case UP:
+                                for (int y = currPos.getY(); y >= collisionPos.getY(); y--) {
+                                    if (currPos.getX() + 1 < 15) {
+                                        newCritPos.add(new Coord(currPos.getX() + 1, y));
+                                    }
+                                    if (currPos.getX() - 1 >0) {
+                                        newCritPos.add(new Coord(currPos.getX() - 1, y));
+                                    }
+                                }
+                            break;
+                            case RIGHT:
+                                for (int x = currPos.getX(); x <= collisionPos.getX(); x++) {
+                                    if (currPos.getY() + 1 < 15) {
+                                        newCritPos.add(new Coord(x, currPos.getY() + 1));
+                                    }
+                                    if (currPos.getY() - 1 > 0) {
+                                        newCritPos.add(new Coord(x, currPos.getY() - 1));
+                                    }
+                                }
+                            break;
+                            case LEFT:
+                                for (int x = currPos.getX(); x >= collisionPos.getX(); x--) {
+                                    if (currPos.getY() + 1 < 15) {
+                                        newCritPos.add(new Coord(x, currPos.getY() + 1));
+                                    }
+                                    if (currPos.getY() - 1 > 0) {
+                                        newCritPos.add(new Coord(x, currPos.getY() - 1));
+                                    }
+                                }
+                            break;
+                        }
+                    }
+                }
+            }
+            degree--;
+        }
+        return criticalPositions;
     }
 
     public MoveNode getResult() {

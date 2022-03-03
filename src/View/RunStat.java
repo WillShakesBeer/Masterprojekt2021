@@ -5,6 +5,8 @@ import Data.Enums.Heuristics;
 /**
  * Created by Martin Eberle aka WillShakesBeer on 02.03.2022.
  */
+
+//Should probably be located in Data
 public class RunStat {
     Heuristics heuristic;
     int depthLimit;

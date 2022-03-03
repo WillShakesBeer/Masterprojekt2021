@@ -77,6 +77,8 @@ public class DisplayFx {
     public DisplayFx (){
     }
 
+    //not sure but maybe consider splitting the class
+    //e.g. analysis view in new class
     public void diplayVisuals(Stage primaryStage , Game game , AI ai) {
         this.ai = ai;
 
@@ -128,7 +130,8 @@ public class DisplayFx {
         primaryStage.show();
 
 
-        analysisButton.fire();
+        //Commented out for debugging
+        //analysisButton.fire();
     }
 
     public void generateKeyhandlers (Scene scene){
@@ -507,7 +510,7 @@ public class DisplayFx {
                 break;
             case 2:  heuristic = Heuristics.DEPTH_LIMITED_BFS;
                 break;
-            default: heuristic=null;
+            default: heuristic=Heuristics.UNDEFINED;
         }
 
         RunStat runStat = new RunStat(heuristic,ai.getDepthLimit(),ai.getSetupLimit(), timeUsed , movesUsed);

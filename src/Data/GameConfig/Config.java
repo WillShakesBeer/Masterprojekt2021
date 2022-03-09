@@ -1,9 +1,6 @@
 package Data.GameConfig;
 
-import Data.Board;
-import Data.Obstacle;
-import Data.Robot;
-import Data.VictorySpawn;
+import Data.*;
 import Logic.Gamestate;
 
 import java.util.ArrayList;
@@ -15,16 +12,18 @@ public class Config {
     ArrayList<Obstacle> obstacleList;
     ArrayList<Robot> robotList;
     ArrayList<VictorySpawn> victorySpawns;
+    VictoryPoint startVic;
     int length;
     int height;
 
     public Config(ArrayList<Robot> robotList, ArrayList<Obstacle> obstacleList,
-                  ArrayList<VictorySpawn> victorySpawns, int length,int height) {
+                  ArrayList<VictorySpawn> victorySpawns, int length,int height,VictoryPoint startVic) {
         this.victorySpawns = victorySpawns;
         this.obstacleList = obstacleList;
         this.robotList = robotList;
         this.length=length;
         this.height=height;
+        this.startVic=startVic;
     }
 
     public ArrayList<Obstacle> getObstacleList() {
@@ -67,5 +66,11 @@ public class Config {
         this.victorySpawns = victorySpawns;
     }
 
+    public VictoryPoint getStartVic() {
+        return startVic;
+    }
 
+    public void setStartVic(VictoryPoint startVic) {
+        this.startVic = startVic;
+    }
 }

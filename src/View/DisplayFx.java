@@ -425,7 +425,7 @@ public class DisplayFx {
         r1.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
-                System.out.println("Selected Heu:" + ai.getSelectedHeuristic() );
+                System.out.println("Selected Heu:" + ai.getSelectedVicHeuristic() );
             }
         });
         //heuristic=0
@@ -433,7 +433,7 @@ public class DisplayFx {
         r2.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
-                ai.setSelectedHeuristic(0);
+                ai.setSelectedVicHeuristic(0);
             }
         });
         //heurisitc=1
@@ -441,7 +441,7 @@ public class DisplayFx {
         r3.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
-                ai.setSelectedHeuristic(1);
+                ai.setSelectedVicHeuristic(1);
             }
         });
         //heurisitc=2
@@ -449,7 +449,7 @@ public class DisplayFx {
         r4.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
-                ai.setSelectedHeuristic(2);
+                ai.setSelectedVicHeuristic(2);
             }
         });
 
@@ -496,14 +496,14 @@ public class DisplayFx {
 
     public void updateAnalysisLabel(long timeUsed , int movesUsed){
         analyisLabel.setText(analyisLabel.getText() + '\n'
-                + "Heuristic: " + heuristicChosenString(ai.getSelectedHeuristic()) + "\t"
+                + "Heuristic: " + heuristicChosenString(ai.getSelectedVicHeuristic()) + "\t"
                 + "Depth Limit: " + ai.getDepthLimit()+ "\t"
                 + "Setup Limit: " + ai.getSetupLimit() + "\t"
                 + "Time needed: " + timeUsed + "\t"
                 + "Moves used: " + movesUsed);
 
         Heuristics heuristic;
-        switch (ai.getSelectedHeuristic()) {
+        switch (ai.getSelectedVicHeuristic()) {
             case 0:  heuristic = Heuristics.DEPTH_LIMITED_DFS;
                 break;
             case 1:  heuristic = Heuristics.DEPTH_LIMITED_RANDFS;

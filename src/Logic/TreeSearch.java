@@ -17,7 +17,10 @@ import java.util.Random;
 //Uses Depth limited breadth first search
 //heurisitc=3
 //Uses air distance to the VictoryPoint for PrimarySearch
-//Depth Limited Breath First Search for Setup
+//PosScore Heuristic for SetupSearch
+//heuristic=4
+//Depth limited breadth first search VicColor
+//PosScore Heuristic for SetupSearch
 
 //Depthlimit is the limit of Moves that can be used in total
 //Setuplimit is the limit of the Moves that can be used on robots from colors other than the victorycolor
@@ -25,7 +28,8 @@ public class TreeSearch extends Thread{
 
     //input Parameters
     Game game;
-    int selectedHeuristic;
+    int selectedVicHeuristic;
+    int selectedSetupHeuristic;
     int setupLimit;
     int depthLimit;
 
@@ -45,20 +49,26 @@ public class TreeSearch extends Thread{
 
     Coord currVicCoord;
 
+    ArrayList<ArrayList<Coord>> critPositions;
 
-    public TreeSearch(Game game,int depthLimit, int setupLimit, int selectedHeuristic){
+    int maxDegree=3;
+
+
+    public TreeSearch(Game game,int depthLimit, int setupLimit, int selectedHeuristic,int selectedSetupHeuristic){
         this.game=game;
         this.depthLimit=depthLimit;
         this.setupLimit=setupLimit;
-        this.selectedHeuristic = selectedHeuristic;
+        this.selectedVicHeuristic = selectedHeuristic;
+        this.selectedSetupHeuristic= selectedSetupHeuristic;
 
         MoveNode root = new MoveNode();
         this.setup=root;
         this.setupExplore=new ArrayList<MoveNode>();
         this.setupExplore.add(root);
         currVicCoord=this.game.getState().getBoard().getVictoryPoint().getCoord();
-        ArrayList<ArrayList<Coord>> CriticalPostions=getCriticalPositions(3);
-        System.out.println("lol");
+        if(this.selectedSetupHeuristic==3 || this.selectedSetupHeuristic==4){
+             this.critPositions=getCriticalPositions(maxDegree);
+        }
 
     }
 
@@ -77,7 +87,7 @@ public class TreeSearch extends Thread{
             setupCopy.setMoveCommands(setup.getMoveCommands());
             toExplore.add(setupCopy);
             while (!toExplore.isEmpty()) {
-                switch (this.selectedHeuristic) {
+                switch (this.selectedVicHeuristic) {
                     case 0:
                         curr = toExplore.get(0);
                         break;
@@ -90,7 +100,8 @@ public class TreeSearch extends Thread{
                         curr = toExplore.get(toExplore.size() - 1);
                         break;
                     case 3:
-                        int minHValue=Integer.MAX_VALUE;
+                        //selects Node with minHValue(shortest distance to VP)
+                        float minHValue=Integer.MAX_VALUE;
                         curr = toExplore.get(toExplore.size() - 1);
                         for(MoveNode currNode: toExplore){
                             if(currNode.getHValue()!=-1 && currNode.getHValue()<minHValue){
@@ -107,11 +118,11 @@ public class TreeSearch extends Thread{
                     toExplore.remove(curr);
                 } else {
                     for (Direction direction : Direction.values()) {
-                        int newHValue=curr.getHValue();
+                        float newHValue=curr.getHValue();
                         curr.addChild(new MoveCommand(vicColor, direction),newHValue);
                         MoveNode recentC=curr.getChilds().get(curr.getChilds().size()-1);
                         int HInc;
-                        switch (this.selectedHeuristic){
+                        switch (this.selectedVicHeuristic){
                             case 3:
                                 HInc=isSeqSmartVicColor(recentC.getMoveCommands());
                                 break;
@@ -145,7 +156,7 @@ public class TreeSearch extends Thread{
     //a setup is a move node with a Movecommand sequence enables the victorycolor to solve the problem
     public MoveNode createNewSetup(){
         MoveNode currSetup;
-        switch (this.selectedHeuristic) {
+        switch (this.selectedSetupHeuristic) {
             case 0:
                 currSetup = setupExplore.get(0);
                 break;
@@ -158,7 +169,15 @@ public class TreeSearch extends Thread{
                 currSetup = setupExplore.get(setupExplore.size() - 1);
                 break;
             case 3:
+                //selects Node with highstHValue(Best Setup Score)
+                float maxHValue=0;
                 currSetup = setupExplore.get(setupExplore.size() - 1);
+                for(MoveNode currNode: setupExplore){
+                    if(currNode.getHValue()>maxHValue){
+                        currSetup=currNode;
+                        maxHValue=currSetup.getHValue();
+                    }
+                }
                 break;
             default:
                 currSetup = setupExplore.get(0);
@@ -171,7 +190,12 @@ public class TreeSearch extends Thread{
                 Colors currColor = otherColors.get(i);
                 for (Direction direction : Direction.values()) {
                     currSetup.addChild(new MoveCommand(currColor, direction));
-                    int seqCheck = isSeqSmart(currSetup.getChilds().get(currSetup.getChilds().size() -1).getMoveCommands());
+                    MoveNode recentC=currSetup.getChilds().get(currSetup.getChilds().size()-1);
+                    int seqCheck = isSeqSmart(recentC.getMoveCommands());
+                    if(this.selectedSetupHeuristic==3){
+                        float HValue=isSeqSmartSetup(recentC.getMoveCommands());
+                        recentC.setHValue(HValue);
+                    }
                     if (seqCheck >=0) {
                         setupExplore.add(0, currSetup.getChilds().get(currSetup.getChilds().size() - 1));
                     }
@@ -243,14 +267,17 @@ public class TreeSearch extends Thread{
         return (int)(vicDist);
     }
 
-    //todo implement and integrate
 
     // Gives feedback if Seq leads to a meaningful Setup
     //-1 => No Movement
     //-2 => Crash Wall
     //positive Float: PositionScore/AmountOfMoves
-    // PositionScore := CritcalPostionsTaken*CriticalDegree
+    //PositionScore := CritcalPostionsTaken/CriticalDegree
+    //Does only Consider cirticalDegree of a maximum of 3
     public float isSeqSmartSetup(ArrayList<MoveCommand> moveCommands){
+        float posScore=0;
+        float setupScore;
+        int maxDegree=3;
         if(moveCommands.size()==0){
             return -1;
         }
@@ -263,19 +290,43 @@ public class TreeSearch extends Thread{
             }
 
         }
-        return 0;
+        ArrayList<Robot> robots=this.game.getState().getBoard().getRobots();
+        for(Robot currRob:robots){
+            Coord currCoord=currRob.getCoord();
+            int lowestDegree=-1;
+            for(int i=1;i<maxDegree;i++){
+                ArrayList<Coord> currCritPosList=critPositions.get(i);
+                for(Coord currCritPos: currCritPosList){
+                    if(currCritPos.equals(currCoord)){
+                       if(lowestDegree==-1 || lowestDegree>i){
+                           lowestDegree=i;
+                       }
+                    }
+                }
+            }
+            if(lowestDegree!=-1){
+                posScore=posScore+(1/lowestDegree);
+            }
+        }
+        game.resetGame();
+        setupScore=posScore/moveCommands.size();
+        return setupScore;
     }
 
     //returns the surrounding Positions of the Paths to the current VictoryPoint
     //The Degree of a critical Position is defined by the amount of turns the Path
+    //Degree0 being the VictoryPoint only
     //to the VictoryPoint has
     //returns a list of list
-    //Element 0 => Critical Positions of Degree 1
-    //Element 1 => Critical Positions of Degree 2
+    //Element 0 => Critical Positions of Degree 0
+    //Element 1 => Critical Positions of Degree 1
     //...
     public ArrayList<ArrayList<Coord>> getCriticalPositions(int degree){
         ArrayList<Coord> startPos = new ArrayList<Coord>();
         ArrayList<ArrayList<Coord>> criticalPositions = new ArrayList<ArrayList<Coord>>();
+        ArrayList<Coord> degree0 = new ArrayList<Coord>();
+        degree0.add(currVicCoord);
+        criticalPositions.add(degree0);
         ArrayList<Coord> oldStartPos = new ArrayList<Coord>();
         ArrayList<Coord> newStartPos = new ArrayList<Coord>();
         newStartPos.add(currVicCoord);

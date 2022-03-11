@@ -46,7 +46,7 @@ public class RunDis extends Application {
         ai.setSetupLimit(4);
         ai.setDepthLimit(11);
         ai.setSelectedVicHeuristic(2);
-        ai.setSelectedSetupHeuristic(3);
+        ai.setSelectedSetupHeuristic(4);
     }
 
     public static Config DefaultGame(){
@@ -125,10 +125,11 @@ public class RunDis extends Application {
         victorySpawns.add(new VictorySpawn(new Coord(5,6), Colors.GREEN));
         victorySpawns.add(new VictorySpawn(new Coord(11,5), Colors.GREEN));
 
-        VictoryPoint testVic = new VictoryPoint(new Coord(11, 5),Colors.GREEN);
+        VictoryPoint testVic = new VictoryPoint(new Coord(3, 9),Colors.BLUE);
         //VictoryPoint testVic1 = new VictoryPoint(new Coord(12, 9),Colors.YELLOW);
         //VictoryPoint testVic2 = new VictoryPoint(new Coord(11, 5),Colors.GREEN);
         //VictoryPoint testVic3 = new VictoryPoint(new Coord(1, 12),Colors.RED);
+        //VictoryPoint testVic4 = new VictoryPoint(new Coord(11, 5),Colors.GREEN);
         Config config = new Config(robotList,obstacleList,victorySpawns,length,height,testVic);
         return config;
     }

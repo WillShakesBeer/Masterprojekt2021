@@ -25,6 +25,13 @@ public class AI {
         root = new MoveNode();
     }
 
+    public void setAiDefaults() {
+        setupLimit= 4;
+        depthLimit = 11;
+        selectedVicHeuristic =2 ;
+        selectedSetupHeuristic = 3;
+    }
+
     //test TreeSearch
     //tryMore Colors has some bugs
     public MoveNode createSeq(){

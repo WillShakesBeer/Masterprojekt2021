@@ -5,12 +5,15 @@ import Data.Enums.Colors;
 import Data.Enums.Direction;
 import Data.Enums.Heuristics;
 import Data.Enums.ObsType;
+import Data.GameConfig.Config;
+import Data.Testing.SavedConfigs;
 import Logic.AI;
 import Logic.Game;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -19,10 +22,10 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import java.util.ArrayList;
 import java.util.Random;
-import java.util.concurrent.TimeUnit;
 
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -77,24 +80,106 @@ public class DisplayFx {
     public DisplayFx (){
     }
 
+    public void runGame(Stage startWindow ){
+
+        startWindow.setTitle("Choose!");
+
+        Button gameplay = new Button("just play");
+        gameplay.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent e) {
+                playGame(startWindow);
+            }
+        });
+        Button analysis = new Button("analysis");
+        analysis.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent e) {
+                runAnalysis(startWindow);
+            }
+        });
+
+
+        HBox hBoxAllButtons = new HBox(gameplay,analysis);
+        hBoxAllButtons.setPadding(new Insets(10));
+        hBoxAllButtons.setSpacing(110);
+
+        Scene scene = new Scene(hBoxAllButtons, 250, 45);        startWindow.setScene(scene);
+        startWindow.show();
+
+
+        Rectangle2D primScreenBounds = Screen.getPrimary().getVisualBounds();
+        startWindow.setX((primScreenBounds.getWidth() - startWindow.getWidth()) / 2);
+        startWindow.setY((primScreenBounds.getHeight() - startWindow.getHeight()) / 2);
+
+    }
+
+
+    public void runAnalysis(Stage analysisWindow ){
+
+        Scene scene = new Scene(generateAnalysisAreas());
+
+        analysisWindow.setScene(scene);
+        analysisWindow.setX(970);
+        analysisWindow.setY(40);
+        analysisWindow.show();
+    }
+
+    public VBox generateAnalysisAreas(){
+
+        SavedConfigs testConfig= new SavedConfigs();
+
+        VBox allAreas = new VBox();
+        for (Config currentAnalysisConfig : testConfig.loadAnalyseConfigs()) {
+
+            allAreas.getChildren().add(generateSingelAnalysisArea(new Game(currentAnalysisConfig)));
+        }
+        return allAreas;
+    }
+
+    public HBox generateSingelAnalysisArea(Game game){
+
+        this.game =game;
+
+        //draw empty board
+        drawEmptyBoard();
+
+        //draw Walls
+        drawObstacles();
+
+        //draw VPs
+        drawVP();
+
+        //draw Robots
+        drawRobots();
+
+        //Grid and listofMoves
+        movelistScrollPane = drawListOfMoves();
+        return new HBox(boardGrid , movelistScrollPane);
+
+    }
+
+
+
+
+
+
     //not sure but maybe consider splitting the class
     //e.g. analysis view in new class
-    public void diplayVisuals(Stage primaryStage , Game game , AI ai) {
-        this.ai = ai;
+    public void playGame(Stage gameplayWindow ) {
 
-        primaryStage.setTitle("Ricochet Robots");
-        primaryStage.setResizable(true);
+        SavedConfigs testConfig= new SavedConfigs();
+        this.game = new Game(testConfig.loadDefaultGameConfig());
+
+        this.ai = new AI(game);
+        ai.setAiDefaults();
+
+        gameplayWindow.setTitle("Ricochet Robots");
+        gameplayWindow.setResizable(true);
         //Starting with Input UI
         //Color Selection with Radio Buttons
         //Direction with Buttons
-
         System.out.println("Spielfeld: " + game.getConfig().getLength() + " x " + game.getConfig().getHeight() );
-
-        this.game = game;
-        boardGrid = new GridPane();
-        boardGrid.setHgap(0);
-        boardGrid.setVgap(0);
-        boardGrid.setPadding(new Insets(10, 10, 0, 10));
 
         //draw empty board
         drawEmptyBoard();
@@ -124,15 +209,17 @@ public class DisplayFx {
 
         generateKeyhandlers(scene);
 
-        primaryStage.setScene(scene);
-        primaryStage.setX(970);
-        primaryStage.setY(40);
-        primaryStage.show();
+        gameplayWindow.setScene(scene);
+        gameplayWindow.setX(970);
+        gameplayWindow.setY(40);
+        gameplayWindow.show();
 
 
         //Commented out for debugging
-        //analysisButton.fire();
+        analysisButton.fire();
     }
+
+
 
     public void generateKeyhandlers (Scene scene){
         scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
@@ -157,6 +244,12 @@ public class DisplayFx {
     }
 
     public void drawEmptyBoard(){
+
+        boardGrid = new GridPane();
+        boardGrid.setHgap(0);
+        boardGrid.setVgap(0);
+        boardGrid.setPadding(new Insets(10, 10, 0, 10));
+
         for (int i = 0; i <= game.getConfig().getLength(); i++) {
             for (int j = 0; j <= game.getConfig().getHeight(); j++) {
                 Random random = new Random();
@@ -292,7 +385,7 @@ public class DisplayFx {
 
             @Override
             public void handle(ActionEvent event) {
-                Stage secondaryWindow = new Stage();
+                Stage analysisWindow = new Stage();
 
                 HBox hBoxHeuristics = drawHeuristicsSelecter();
                 HBox hBoxLimits = drawLimitsSelecter();
@@ -306,11 +399,11 @@ public class DisplayFx {
                 vBoxColumns.setSpacing(10);
 
                 Scene secondScene = new Scene(vBoxColumns, 970,700);
-                secondaryWindow.setTitle("Analysis");
-                secondaryWindow.setScene(secondScene);
-                secondaryWindow.setX(0);
-                secondaryWindow.setY(40);
-                secondaryWindow.show();
+                analysisWindow.setTitle("Analysis");
+                analysisWindow.setScene(secondScene);
+                analysisWindow.setX(0);
+                analysisWindow.setY(40);
+                analysisWindow.show();
             }
         });
 
@@ -385,7 +478,7 @@ public class DisplayFx {
         iterationsTextField.setPromptText("Enter Iteration Cicles (1)");
         iterationsTextField.setPrefColumnCount(20);
 
-        Button applyButton = new Button("Apply");
+        Button applyButton = new Button("Run x Times");
         applyButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {

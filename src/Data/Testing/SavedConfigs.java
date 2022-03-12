@@ -108,12 +108,12 @@ public class SavedConfigs {
     }
 
     public void generateAnalysisConfigs(){
-        analyseConfigs.add(generateTestconfig00());
-        analyseConfigs.add(generateTestconfig01());
-        analyseConfigs.add(generateTestconfig02());
+        analyseConfigs.add(generateTestConfig00());
+        analyseConfigs.add(generateTestConfig01());
+        analyseConfigs.add(generateTestConfig02());
     }
 
-    public Config generateTestconfig00(){
+    public Config generateTestConfig00(){
         int length = 3;
         int height = 3;
         ArrayList<Robot> robotList = new ArrayList<Robot>();
@@ -136,7 +136,7 @@ public class SavedConfigs {
         return config;
     }
 
-    public Config generateTestconfig01(){
+    public Config generateTestConfig01(){
         int length = 3;
         int height = 3;
         ArrayList<Robot> robotList = new ArrayList<Robot>();
@@ -159,7 +159,7 @@ public class SavedConfigs {
         return config;
     }
 
-    public Config generateTestconfig02(){
+    public Config generateTestConfig02(){
         int length = 3;
         int height = 3;
         ArrayList<Robot> robotList = new ArrayList<Robot>();

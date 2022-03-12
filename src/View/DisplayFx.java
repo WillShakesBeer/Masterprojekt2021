@@ -216,7 +216,7 @@ public class DisplayFx {
 
 
         //Commented out for debugging
-        analysisButton.fire();
+        // analysisButton.fire();
     }
 
 

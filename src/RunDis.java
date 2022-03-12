@@ -28,7 +28,6 @@ public class RunDis extends Application {
     public void start(final Stage startWindow){
         DisplayFx displayFx = new DisplayFx();
         displayFx.runGame(startWindow);
-
     }
 
 }

@@ -99,7 +99,7 @@ public class SavedConfigs {
         victorySpawns.add(new VictorySpawn(new Coord(5,6), Colors.GREEN));
         victorySpawns.add(new VictorySpawn(new Coord(11,5), Colors.GREEN));
 
-        VictoryPoint testVic = new VictoryPoint(new Coord(11, 5),Colors.GREEN);
+        VictoryPoint testVic = new VictoryPoint(new Coord(3, 9),Colors.BLUE);
         //VictoryPoint testVic1 = new VictoryPoint(new Coord(12, 9),Colors.YELLOW);
         //VictoryPoint testVic2 = new VictoryPoint(new Coord(11, 5),Colors.GREEN);
         //VictoryPoint testVic3 = new VictoryPoint(new Coord(1, 12),Colors.RED);

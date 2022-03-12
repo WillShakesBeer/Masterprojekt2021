@@ -1,11 +1,8 @@
 package Logic;
 
-import Data.Coord;
+import Data.*;
 import Data.Enums.Colors;
 import Data.Enums.Direction;
-import Data.MoveCommand;
-import Data.Robot;
-import Data.VictoryPoint;
 
 import java.util.ArrayList;
 
@@ -14,20 +11,27 @@ public class Utility {
     Coord currVicCoord;
     Game game;
 
-    ArrayList<ArrayList<Coord>> critPositions;
+    //A critical path consists of positions that can reach the VictoryPoint with a set number of Moves
+    //The degree of the path is equivalent to the amount of moves needed to reach the VictoryPoint
+    //The ArrayList is ordered by the degree of the paths
+    //Element 0 => Critical Path degree 0
+    //Element 1 => Critical Path degree 1
+    //usw
+    //For calculation efficiency the Array is Split in horizontal and vertical paths
     ArrayList<ArrayList<Coord>> critHorizontalPath;
     ArrayList<ArrayList<Coord>> critVerticalPath;
-    ArrayList<ArrayList<Coord>> crossBlockPostitions;
+    //Critical positions are coordinates adjacent to critical paths
+    //They are ordered by degree just like the critical paths
+    ArrayList<ArrayList<Coord>> critPositions;
+    //CrossBlockPositions are positions that if blocked enable the vicColor to enter a critical path
+    ArrayList<CrossBlockPos> crossBlockPositions;
     int maxDegree=3;
 
     public Utility(Game game){
         this.game=game;
         currVicCoord=this.game.getState().getBoard().getVictoryPoint().getCoord();
         critPositions=null;
-        crossBlockPostitions=new ArrayList<ArrayList<Coord>>();
-        for(int i=0;i<maxDegree;i++){
-            crossBlockPostitions.add(new ArrayList<Coord>());
-        }
+        crossBlockPositions=new ArrayList<CrossBlockPos>();
     }
 
     public void loadCriticalPositions(int degree){
@@ -152,6 +156,20 @@ public class Utility {
         return setupScore;
     }
 
+    //checks if there is already a crossBlockPos with the same coord and same Degree
+    //if there is the corrBlockPos with lesser Moves needed takes precedence
+    public void insertCrossBlockPos(CrossBlockPos crossBlockPos){
+        for(CrossBlockPos currPos:crossBlockPositions){
+           if(currPos.equalsCoord(crossBlockPos) && currPos.getDegree()==crossBlockPos.getDegree()){
+               if(currPos.getMovesNeeded()>crossBlockPos.getMovesNeeded()){
+                   currPos=crossBlockPos;
+               }else{
+                   return;
+               }
+           }
+        }
+        crossBlockPositions.add(crossBlockPos);
+    }
 
     //checks if a Seq contains moves that end up crashing a Wall
     //1 => no crash
@@ -159,55 +177,91 @@ public class Utility {
     //0 => Point Scored
     //will RememberCrossings with an Critical Path for Setupheuristic
     public int isSeqSmartRememberCrossings(ArrayList<MoveCommand> moveCommands){
+        Board board = this.game.state.getBoard();
         for(int i =0;i<moveCommands.size();i++){
             if(i==moveCommands.size()-1){
+                Direction currDir = moveCommands.get(i).getDir();
+                //check if last move just negates the move before that
+                if(moveCommands.size()>=2){
+                    switch (moveCommands.get(moveCommands.size()-2).getDir()){
+                        case UP:
+                            if(currDir==Direction.DOWN){
+                                return -2;
+                            }
+                            break;
+                        case DOWN:
+                            if(currDir==Direction.UP){
+                                return -2;
+                            }
+                            break;
+                        case LEFT:
+                            if(currDir==Direction.RIGHT){
+                                return -2;
+                            }
+                            break;
+                        case RIGHT:
+                            if(currDir==Direction.LEFT){
+                                return -2;
+                            }
+                            break;
+                    }
+                }
                 Colors vicColor =moveCommands.get(i).getColor();
                 Coord startPos = game.getState().getBoard().getRobot(vicColor).getCoord();
                 Coord collisionPos = game.checkMovement(startPos.clone(), moveCommands.get(i).getDir(), game.getState().getBoard());
-                switch (moveCommands.get(i).getDir()){
+                switch (currDir){
                     case UP:
-                        for (int y = startPos.getY(); y >= collisionPos.getY(); y--) {
+                        for (int y = startPos.getY()-1; y >= collisionPos.getY(); y--) {
                             Coord currCoord=new Coord(startPos.getX(),y);
-                            for(int j=0;j<maxDegree;j++){
+                            for(int j=1;j<maxDegree;j++){
                                 for(Coord critPos: critHorizontalPath.get(j)){
-                                    if(currCoord.equals(critPos) && critPos.getY()>0){
-                                        this.crossBlockPostitions.get(j).add(new Coord(currCoord.getX(),currCoord.getY()-1));
+                                    Coord newCoord = new Coord(currCoord.getX(),currCoord.getY()-1);
+                                    if(currCoord.equals(critPos) && critPos.getY()>0 && game.checkPos(newCoord,board,currDir)){
+                                        CrossBlockPos newPos= new CrossBlockPos(newCoord,j,moveCommands.size());
+                                        insertCrossBlockPos(newPos);
                                     }
                                 }
                             }
                         }
                         break;
                     case DOWN:
-                        for (int y = startPos.getY(); y <= collisionPos.getY(); y++) {
+                        for (int y = startPos.getY()+1; y <= collisionPos.getY(); y++) {
                             Coord currCoord=new Coord(startPos.getX(),y);
-                            for(int j=0;j<maxDegree;j++){
+                            for(int j=1;j<maxDegree;j++){
                                 for(Coord critPos: critHorizontalPath.get(j)){
-                                    if(currCoord.equals(critPos) && critPos.getY()<15){
-                                        this.crossBlockPostitions.get(j).add(new Coord(currCoord.getX(),currCoord.getY()+1));
+
+                                    Coord newCoord = new Coord(currCoord.getX(),currCoord.getY()+1);
+                                    if(currCoord.equals(critPos) && critPos.getY()<15&& game.checkPos(newCoord,board,currDir)){
+                                        CrossBlockPos newPos= new CrossBlockPos(newCoord,j,moveCommands.size());
+                                        insertCrossBlockPos(newPos);
                                     }
                                 }
                             }
                         }
                         break;
                     case RIGHT:
-                        for (int x = startPos.getX(); x <= collisionPos.getX(); x++) {
+                        for (int x = startPos.getX()+1; x <= collisionPos.getX(); x++) {
                             Coord currCoord=new Coord(x,startPos.getY());
-                            for(int j=0;j<maxDegree;j++){
+                            for(int j=1;j<maxDegree;j++){
                                 for(Coord critPos: critVerticalPath.get(j)){
-                                    if(currCoord.equals(critPos) && critPos.getX()<15){
-                                        this.crossBlockPostitions.get(j).add(new Coord(currCoord.getX()+1,currCoord.getY()));
+                                    Coord newCoord = new Coord(currCoord.getX()+1,currCoord.getY());
+                                    if(currCoord.equals(critPos) && critPos.getX()<15 &&game.checkPos(newCoord,board,currDir)){
+                                        CrossBlockPos newPos= new CrossBlockPos(newCoord,j,moveCommands.size());
+                                        insertCrossBlockPos(newPos);
                                     }
                                 }
                             }
                         }
                         break;
                     case LEFT:
-                        for (int x = startPos.getX(); x >= collisionPos.getX(); x--) {
+                        for (int x = startPos.getX()-1; x >= collisionPos.getX(); x--) {
                             Coord currCoord=new Coord(x,startPos.getY());
-                            for(int j=0;j<maxDegree;j++){
+                            for(int j=1;j<maxDegree;j++){
                                 for(Coord critPos: critVerticalPath.get(j)){
-                                    if(currCoord.equals(critPos)&&critPos.getX()>0){
-                                        this.crossBlockPostitions.get(j).add(new Coord(currCoord.getX()-1,currCoord.getY()));
+                                    Coord newCoord = new Coord(currCoord.getX()-1,currCoord.getY());
+                                    if(currCoord.equals(critPos)&&critPos.getX()>0&&game.checkPos(newCoord,board,currDir)){
+                                        CrossBlockPos newPos= new CrossBlockPos(newCoord,j,moveCommands.size());
+                                        insertCrossBlockPos(newPos);
                                     }
                                 }
                             }
@@ -215,10 +269,13 @@ public class Utility {
                         break;
                 }
             }
+
+            //Test if game is won
             if(game.checkMove(moveCommands.get(i))==1){
                 game.resetGame();
                 return 0;
             }
+            //Move Robot and continue the sequence
             int result = game.moveRobot(moveCommands.get(i));
             if(result==-1){
                 game.resetGame();
@@ -259,11 +316,6 @@ public class Utility {
                 for (Direction dir : Direction.values()) {
                     Coord collisionPos = game.checkMovement(currPos.clone(), dir, game.getState().getBoard());
                     boolean collisionPosSmart = true;
-                    for (Coord checkPos : startPos) {
-                        if (collisionPos.equals(checkPos)) {
-                            collisionPosSmart = false;
-                        }
-                    }
                     for (Coord checkPos : oldStartPos) {
                         if (collisionPos.equals(checkPos)) {
                             collisionPosSmart = false;
@@ -347,16 +399,53 @@ public class Utility {
                 oldStartPos.add(currPos);
                 startPos.remove(currPos);
                 for (Direction dir : Direction.values()) {
+                    //draw paths from endpoints of critical paths of lower degree
                     Coord collisionPos = game.checkMovement(currPos.clone(), dir, game.getState().getBoard());
                     boolean collisionPosSmart = true;
-                    for (Coord checkPos : startPos) {
+                    //Test if we move at all
+                    //Or if we move to a point we already were
+                    for (Coord checkPos : oldStartPos) {
                         if (collisionPos.equals(checkPos)) {
                             collisionPosSmart = false;
                         }
                     }
-                    for (Coord checkPos : oldStartPos) {
-                        if (collisionPos.equals(checkPos)) {
-                            collisionPosSmart = false;
+                    //test if the movement will work reversly
+                    //there has to be an obstacle on the other side
+                    //so critical paths of lower degrees can be accessed
+                    //if not the roboter will slip through the lower degree path
+                    if(collisionPosSmart==true){
+                        Board board = this.game.getState().getBoard();
+                        Coord reversePos;
+                        Direction reverseDir;
+                        switch (dir){
+                            case UP:
+                                reversePos=new Coord(currPos.getX(),currPos.getY()+1);
+                                reverseDir=Direction.DOWN;
+                                if(game.checkPos(reversePos,board,reverseDir)){
+                                   collisionPosSmart=false;
+                                }
+                                break;
+                            case DOWN:
+                                reversePos=new Coord(currPos.getX(),currPos.getY()-1);
+                                reverseDir=Direction.UP;
+                                if(game.checkPos(reversePos,board,reverseDir)){
+                                    collisionPosSmart=false;
+                                }
+                                break;
+                            case LEFT:
+                                reversePos=new Coord(currPos.getX()+1,currPos.getY());
+                                reverseDir=Direction.RIGHT;
+                                if(game.checkPos(reversePos,board,reverseDir)){
+                                    collisionPosSmart=false;
+                                }
+                                break;
+                            case RIGHT:
+                                reversePos=new Coord(currPos.getX()-1,currPos.getY());
+                                reverseDir=Direction.LEFT;
+                                if(game.checkPos(reversePos,board,reverseDir)){
+                                    collisionPosSmart=false;
+                                }
+                                break;
                         }
                     }
                     if (collisionPosSmart) {

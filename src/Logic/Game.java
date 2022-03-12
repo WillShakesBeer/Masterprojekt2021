@@ -182,7 +182,6 @@ public class Game {
 
         if(pos.getX()<0 || pos.getX()>board.getLength() || pos.getY()<0 || pos.getY()>board.getHeight()){
             result=false;
-            //System.out.println("hit wall" + board.getLength());
         }
         switch (dir){
             case UP: case DOWN:
@@ -195,7 +194,6 @@ public class Game {
         for(Obstacle obstacle:obstacles){
             switch (dir){
                 case DOWN: case RIGHT:
-                    //System.out.println(pos.equals(obstacle.getCoord2()) +" " + pos.getX()+ " " +obstacle.getCoord2().getX()+ "       " + pos.getY()+ " " +obstacle.getCoord2().getY());
                     if(pos.equals(obstacle.getCoord2())){
                         result=false;
                     }

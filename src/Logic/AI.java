@@ -26,9 +26,9 @@ public class AI {
     }
 
     public void setAiDefaults() {
-        setupLimit= 4;
+        setupLimit=6;
         depthLimit = 11;
-        selectedVicHeuristic = 2;
+        selectedVicHeuristic = 4;
         selectedSetupHeuristic = 4;
     }
 
@@ -39,6 +39,7 @@ public class AI {
         Thread t = new Thread(treeSearch);
         Timer timer = new Timer();
         System.out.println("Start Treesearch");
+        long startTime = System.nanoTime();
         //timer.schedule(new TimeOutTask(t, timer,this.game), 5*1000);
         t.start();
         MoveNode result;
@@ -51,6 +52,9 @@ public class AI {
         if (result == null) {
             return new MoveNode();
         } else {
+            long stopTime = System.nanoTime();
+            long timeUsed=(stopTime-startTime)/(long)(1000000000);
+            System.out.println("Time used "+(timeUsed)+" seconds");
             //result.setMoveCommands(clearCycles(result.getMoveCommands()));
             return result;
         }

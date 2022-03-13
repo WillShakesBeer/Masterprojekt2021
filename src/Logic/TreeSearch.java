@@ -9,18 +9,17 @@ import java.util.Random;
 
 
 
-//heuristic=0
+//Vicheuristic=0
 //Uses Depth limited Depth first search
-//heurisitc=1
+//Vicheurisitc=1
 //Uses Depth limited random first search
-//heurisitc=2
+//Vicheurisitc=2
 //Uses Depth limited breadth first search
-//heurisitc=3
+//Vicheurisitc=3
 //Uses air distance to the VictoryPoint for PrimarySearch
-//PosScore Heuristic for SetupSearch
-//heuristic=4
+//Vicheuristic=4
 //Depth limited breadth first search VicColor
-//PosScore Heuristic for SetupSearch
+//preloads every Setup within the setupLimit
 
 //Depthlimit is the limit of Moves that can be used in total
 //Setuplimit is the limit of the Moves that can be used on robots from colors other than the victorycolor
@@ -35,6 +34,7 @@ public class TreeSearch extends Thread{
 
     //output
     MoveNode result=null;
+    ArrayList<ArrayList<MoveCommand>> resultList;
 
     //Expandable nodes of the Main tree search
     ArrayList<MoveNode> toExplore;
@@ -59,18 +59,21 @@ public class TreeSearch extends Thread{
         this.selectedVicHeuristic = selectedHeuristic;
         this.selectedSetupHeuristic= selectedSetupHeuristic;
 
-        setupSearch = new SetupSearch(this.selectedSetupHeuristic,this.setupLimit,game);
+        utility=new Utility(game);
+
+        setupSearch = new SetupSearch(this.selectedSetupHeuristic,this.setupLimit,game,utility);
         setupExplore=setupSearch.getSetupExplore();
         setup=setupSearch.getSetup();
 
-        utility=new Utility(game);
+
+        resultList=new ArrayList<ArrayList<MoveCommand>>();
     }
 
     @Override
     public void run() {
 
         if(this.selectedSetupHeuristic==4){
-            utility.loadCriticalPath(3);
+            utility.loadCriticalPath(utility.getMaxDegree());
         }
         MoveNode curr;
         Colors vicColor = this.game.getState().getBoard().getVictoryPoint().getColor();
@@ -80,11 +83,41 @@ public class TreeSearch extends Thread{
             }
         }
         while (!this.setupExplore.isEmpty() && !Thread.currentThread().isInterrupted()){
-            toExplore=new ArrayList<MoveNode>();
-            MoveNode setupCopy = new MoveNode();
-            setupCopy.setMoveCommands(setup.getMoveCommands());
-            toExplore.add(setupCopy);
+            if(selectedSetupHeuristic!=4) {
+                if (this.selectedVicHeuristic == 4) {
+                    ArrayList<MoveNode> setupList = setupSearch.loadAllSetups();
+                    toExplore = new ArrayList<MoveNode>();
+                    for (MoveNode currSetup : setupList) {
+                        MoveNode currSetupCopy = new MoveNode((ArrayList<MoveCommand>) currSetup.getMoveCommands().clone(), currSetup.getHValue());
+                        toExplore.add(currSetupCopy);
+                    }
+                } else {
+                    toExplore = new ArrayList<MoveNode>();
+                    MoveNode setupCopy = new MoveNode((ArrayList<MoveCommand>) setup.getMoveCommands().clone(), setup.getHValue());
+                    toExplore.add(setupCopy);
+                }
+            }else{
+                if(utility.crossBlockPositions.size()==0){
+                    toExplore=new ArrayList<MoveNode>();
+                    MoveNode root = new MoveNode();
+                    toExplore.add(root);
+                }else{
+                    if (this.selectedVicHeuristic == 4) {
+                        ArrayList<MoveNode> setupList = setupSearch.loadAllSetups();
+                        toExplore = new ArrayList<MoveNode>();
+                        for (MoveNode currSetup : setupList) {
+                            MoveNode currSetupCopy = new MoveNode((ArrayList<MoveCommand>) currSetup.getMoveCommands().clone(), currSetup.getHValue());
+                            toExplore.add(currSetupCopy);
+                        }
+                    } else {
+                        toExplore = new ArrayList<MoveNode>();
+                        MoveNode setupCopy = new MoveNode((ArrayList<MoveCommand>) setup.getMoveCommands().clone(), setup.getHValue());
+                        toExplore.add(setupCopy);
+                    }
+                }
+            }
             while (!toExplore.isEmpty()) {
+                float minHValue;
                 switch (this.selectedVicHeuristic) {
                     case 0:
                         curr = toExplore.get(0);
@@ -98,8 +131,7 @@ public class TreeSearch extends Thread{
                         curr = toExplore.get(toExplore.size() - 1);
                         break;
                     case 3:
-                        //selects Node with minHValue(shortest distance to VP)
-                        float minHValue=Integer.MAX_VALUE;
+                        minHValue=Integer.MAX_VALUE;
                         curr = toExplore.get(toExplore.size() - 1);
                         for(MoveNode currNode: toExplore){
                             if(currNode.getHValue()!=-1 && currNode.getHValue()<minHValue){
@@ -109,7 +141,7 @@ public class TreeSearch extends Thread{
                         }
                         break;
                     default:
-                        curr = toExplore.get(0);
+                        curr = toExplore.get(toExplore.size() - 1);
                         break;
                 }
                 if (curr.getMoveCommands().size() > depthLimit) {
@@ -117,8 +149,9 @@ public class TreeSearch extends Thread{
                 } else {
                     for (Direction direction : Direction.values()) {
                         float newHValue=curr.getHValue();
-                        curr.addChild(new MoveCommand(vicColor, direction),newHValue);
-                        MoveNode recentC=curr.getChilds().get(curr.getChilds().size()-1);
+                        ArrayList<MoveCommand> childCommands= (ArrayList<MoveCommand>) curr.getMoveCommands().clone();
+                        childCommands.add(new MoveCommand(vicColor,direction));
+                        MoveNode recentC=new MoveNode(childCommands,newHValue);
                         int HInc;
                         switch (this.selectedVicHeuristic){
                             case 3:
@@ -134,23 +167,49 @@ public class TreeSearch extends Thread{
                         }
                         recentC.setHValue(recentC.getHValue()+HInc);
                         if(HInc==0){
-                            this.result=recentC;
-                            return;
+                            if(this.selectedVicHeuristic==4){
+                                resultList.add(recentC.getMoveCommands());
+                                if(!(this.selectedSetupHeuristic==4 && this.utility.crossBlockPositions.size()==0)){
+                                    this.result=recentC;
+                                    return;
+                                }
+                            }else{
+                                this.result=recentC;
+                                return;
+                            }
                         }
                         if(HInc>0){
-                            toExplore.add(0, recentC);
+                            utility.insertInOrder(recentC,toExplore);
+                            //toExplore.add(0, recentC);
                         }
                     }
                     toExplore.remove(curr);
                 }
 
             }
-            System.out.println("new Setup needed");
-            setup=setupSearch.createNewSetup();
+            if(selectedVicHeuristic!=4) {
+                System.out.println("new Setup needed");
+                setup = setupSearch.createNewSetup();
+            }
         }
-        this.result=null;
+        if(selectedVicHeuristic==4){
+            int minMoves=-1;
+            result=new MoveNode();
+            for (ArrayList<MoveCommand> currRes : resultList){
+                if(currRes.size()<minMoves || minMoves==-1){
+                   result.setMoveCommands(currRes);
+                   minMoves=currRes.size();
+                }
+            }
+            if(minMoves==-1){
+                this.result=null;
+            }
+        }else{
+            this.result=null;
+        }
         return;
     }
+
 
 
     public MoveNode getResult() {

@@ -25,7 +25,7 @@ public class Utility {
     ArrayList<ArrayList<Coord>> critPositions;
     //CrossBlockPositions are positions that if blocked enable the vicColor to enter a critical path
     ArrayList<CrossBlockPos> crossBlockPositions;
-    int maxDegree=3;
+    int maxDegree=20;
 
     public Utility(Game game){
         this.game=game;
@@ -50,6 +50,41 @@ public class Utility {
     //0 => Point Scored
     public int isSeqSmart(ArrayList<MoveCommand> moveCommands){
         for(int i =0;i<moveCommands.size();i++){
+
+            if(i==moveCommands.size()-1 && moveCommands.size()>=2){
+                Direction currDir = moveCommands.get(i).getDir();
+                Colors currColor= moveCommands.get(i).getColor();
+                Colors prevColor = moveCommands.get(i-1).getColor();
+                //check if last move just negates the move before that
+                if(currColor.equals(prevColor)){
+                    switch (moveCommands.get(moveCommands.size()-2).getDir()){
+                        case UP:
+                            if(currDir==Direction.DOWN){
+                                game.resetGame();
+                                return -2;
+                            }
+                            break;
+                        case DOWN:
+                            if(currDir==Direction.UP){
+                                game.resetGame();
+                                return -2;
+                            }
+                            break;
+                        case LEFT:
+                            if(currDir==Direction.RIGHT){
+                                game.resetGame();
+                                return -2;
+                            }
+                            break;
+                        case RIGHT:
+                            if(currDir==Direction.LEFT){
+                                game.resetGame();
+                                return -2;
+                            }
+                            break;
+                    }
+                }
+            }
             if(game.checkMove(moveCommands.get(i))==1){
                 game.resetGame();
                 return 0;
@@ -112,7 +147,6 @@ public class Utility {
     //-2 => Crash Wall
     //positive Float: PositionScore/AmountOfMoves
     //PositionScore := CritcalPostionsTaken/CriticalDegree
-    //Does only Consider cirticalDegree of a maximum of 3
     public float isSeqSmartSetup(ArrayList<MoveCommand> moveCommands){
 
         if(critPositions==null){
@@ -120,11 +154,10 @@ public class Utility {
         }
         float posScore=0;
         float setupScore;
-        int maxDegree=3;
         if(moveCommands.size()==0){
             return -1;
         }
-        Colors color=moveCommands.get(moveCommands.size()-1).getColor();
+        //Colors color=moveCommands.get(moveCommands.size()-1).getColor();
         for(int i =0;i<moveCommands.size();i++){
             int result = game.moveRobot(moveCommands.get(i));
             if(result==-1){
@@ -137,7 +170,7 @@ public class Utility {
         for(Robot currRob:robots){
             Coord currCoord=currRob.getCoord();
             int lowestDegree=-1;
-            for(int i=1;i<maxDegree;i++){
+            for(int i=1;i<this.maxDegree;i++){
                 ArrayList<Coord> currCritPosList=critPositions.get(i);
                 for(Coord currCritPos: currCritPosList){
                     if(currCritPos.equals(currCoord)){
@@ -148,7 +181,7 @@ public class Utility {
                 }
             }
             if(lowestDegree!=-1){
-                posScore=posScore+(1/lowestDegree);
+                posScore=posScore+(1/(float)lowestDegree);
             }
         }
         game.resetGame();
@@ -156,6 +189,39 @@ public class Utility {
         return setupScore;
     }
 
+    // Gives feedback if Seq leads to a meaningful Setup
+    //-1 => No Movement
+    //-2 => Crash Wall
+    //postive float the best HValue of an CrossBlockPos that is taken
+    //HValue of CrossBlockPos movesNeededVicColor+Degree+movesNeededSetup
+    public float isSeqSmartSetupCrossBlock(ArrayList<MoveCommand> moveCommands){
+        float hValue=0;
+        if(moveCommands.size()==0){
+            return -1;
+        }
+        for(int i =0;i<moveCommands.size();i++){
+            int result = game.moveRobot(moveCommands.get(i));
+            if(result==-1){
+                game.resetGame();
+                return -2;
+            }
+
+        }
+        ArrayList<Robot> robots=this.game.getState().getBoard().getRobots();
+        for(Robot currRob:robots){
+            Coord currCoord=currRob.getCoord();
+           for(CrossBlockPos currCrossBlock : this.crossBlockPositions){
+               if(currCoord.equals(currCrossBlock.getCoord())){
+                   float newHValue = moveCommands.size()+currCrossBlock.getDegree()+currCrossBlock.getMovesNeeded();
+                   if(newHValue>hValue){
+                       hValue=newHValue;
+                   }
+               }
+           }
+        }
+        game.resetGame();
+        return hValue;
+    }
     //checks if there is already a crossBlockPos with the same coord and same Degree
     //if there is the corrBlockPos with lesser Moves needed takes precedence
     public void insertCrossBlockPos(CrossBlockPos crossBlockPos){
@@ -182,28 +248,36 @@ public class Utility {
             if(i==moveCommands.size()-1){
                 Direction currDir = moveCommands.get(i).getDir();
                 //check if last move just negates the move before that
+                Colors currColor= moveCommands.get(i).getColor();
                 if(moveCommands.size()>=2){
-                    switch (moveCommands.get(moveCommands.size()-2).getDir()){
-                        case UP:
-                            if(currDir==Direction.DOWN){
-                                return -2;
-                            }
-                            break;
-                        case DOWN:
-                            if(currDir==Direction.UP){
-                                return -2;
-                            }
-                            break;
-                        case LEFT:
-                            if(currDir==Direction.RIGHT){
-                                return -2;
-                            }
-                            break;
-                        case RIGHT:
-                            if(currDir==Direction.LEFT){
-                                return -2;
-                            }
-                            break;
+                    Colors prevColor = moveCommands.get(i-1).getColor();
+                    if(prevColor.equals(currColor)){
+                        switch (moveCommands.get(moveCommands.size() - 2).getDir()) {
+                            case UP:
+                                if (currDir == Direction.DOWN) {
+                                    game.resetGame();
+                                    return -2;
+                                }
+                                break;
+                            case DOWN:
+                                if (currDir == Direction.UP) {
+                                    game.resetGame();
+                                    return -2;
+                                }
+                                break;
+                            case LEFT:
+                                if (currDir == Direction.RIGHT) {
+                                    game.resetGame();
+                                    return -2;
+                                }
+                                break;
+                            case RIGHT:
+                                if (currDir == Direction.LEFT) {
+                                    game.resetGame();
+                                    return -2;
+                                }
+                                break;
+                        }
                     }
                 }
                 Colors vicColor =moveCommands.get(i).getColor();
@@ -321,6 +395,45 @@ public class Utility {
                             collisionPosSmart = false;
                         }
                     }
+                    //test if the movement will work reversly
+                    //there has to be an obstacle on the other side
+                    //so critical paths of lower degrees can be accessed
+                    //if not the roboter will slip through the lower degree path
+                    if(collisionPosSmart==true){
+                        Board board = this.game.getState().getBoard();
+                        Coord reversePos;
+                        Direction reverseDir;
+                        switch (dir){
+                            case UP:
+                                reversePos=new Coord(currPos.getX(),currPos.getY()+1);
+                                reverseDir=Direction.DOWN;
+                                if(game.checkPos(reversePos,board,reverseDir)){
+                                    collisionPosSmart=false;
+                                }
+                                break;
+                            case DOWN:
+                                reversePos=new Coord(currPos.getX(),currPos.getY()-1);
+                                reverseDir=Direction.UP;
+                                if(game.checkPos(reversePos,board,reverseDir)){
+                                    collisionPosSmart=false;
+                                }
+                                break;
+                            case LEFT:
+                                reversePos=new Coord(currPos.getX()+1,currPos.getY());
+                                reverseDir=Direction.RIGHT;
+                                if(game.checkPos(reversePos,board,reverseDir)){
+                                    collisionPosSmart=false;
+                                }
+                                break;
+                            case RIGHT:
+                                reversePos=new Coord(currPos.getX()-1,currPos.getY());
+                                reverseDir=Direction.LEFT;
+                                if(game.checkPos(reversePos,board,reverseDir)){
+                                    collisionPosSmart=false;
+                                }
+                                break;
+                        }
+                    }
                     if (collisionPosSmart) {
                         newStartPos.add(collisionPos);
                         switch (dir) {
@@ -409,45 +522,45 @@ public class Utility {
                             collisionPosSmart = false;
                         }
                     }
-                    //test if the movement will work reversly
-                    //there has to be an obstacle on the other side
-                    //so critical paths of lower degrees can be accessed
-                    //if not the roboter will slip through the lower degree path
-                    if(collisionPosSmart==true){
-                        Board board = this.game.getState().getBoard();
-                        Coord reversePos;
-                        Direction reverseDir;
-                        switch (dir){
-                            case UP:
-                                reversePos=new Coord(currPos.getX(),currPos.getY()+1);
-                                reverseDir=Direction.DOWN;
-                                if(game.checkPos(reversePos,board,reverseDir)){
-                                   collisionPosSmart=false;
-                                }
-                                break;
-                            case DOWN:
-                                reversePos=new Coord(currPos.getX(),currPos.getY()-1);
-                                reverseDir=Direction.UP;
-                                if(game.checkPos(reversePos,board,reverseDir)){
-                                    collisionPosSmart=false;
-                                }
-                                break;
-                            case LEFT:
-                                reversePos=new Coord(currPos.getX()+1,currPos.getY());
-                                reverseDir=Direction.RIGHT;
-                                if(game.checkPos(reversePos,board,reverseDir)){
-                                    collisionPosSmart=false;
-                                }
-                                break;
-                            case RIGHT:
-                                reversePos=new Coord(currPos.getX()-1,currPos.getY());
-                                reverseDir=Direction.LEFT;
-                                if(game.checkPos(reversePos,board,reverseDir)){
-                                    collisionPosSmart=false;
-                                }
-                                break;
-                        }
+                //test if the movement will work reversly
+                //there has to be an obstacle on the other side
+                //so critical paths of lower degrees can be accessed
+                //if not the roboter will slip through the lower degree path
+                if(collisionPosSmart==true){
+                    Board board = this.game.getState().getBoard();
+                    Coord reversePos;
+                    Direction reverseDir;
+                    switch (dir){
+                        case UP:
+                            reversePos=new Coord(currPos.getX(),currPos.getY()+1);
+                            reverseDir=Direction.DOWN;
+                            if(game.checkPos(reversePos,board,reverseDir)){
+                               collisionPosSmart=false;
+                            }
+                            break;
+                        case DOWN:
+                            reversePos=new Coord(currPos.getX(),currPos.getY()-1);
+                            reverseDir=Direction.UP;
+                            if(game.checkPos(reversePos,board,reverseDir)){
+                                collisionPosSmart=false;
+                            }
+                            break;
+                        case LEFT:
+                            reversePos=new Coord(currPos.getX()+1,currPos.getY());
+                            reverseDir=Direction.RIGHT;
+                            if(game.checkPos(reversePos,board,reverseDir)){
+                                collisionPosSmart=false;
+                            }
+                            break;
+                        case RIGHT:
+                            reversePos=new Coord(currPos.getX()-1,currPos.getY());
+                            reverseDir=Direction.LEFT;
+                            if(game.checkPos(reversePos,board,reverseDir)){
+                                collisionPosSmart=false;
+                            }
+                            break;
                     }
+                }
                     if (collisionPosSmart) {
                         newStartPos.add(collisionPos);
                         switch (dir) {
@@ -480,5 +593,29 @@ public class Utility {
         return criticalPath;
     }
 
+    public void insertInOrder(MoveNode mn,ArrayList<MoveNode> mnList){
+        if(mnList.size()==0){
+            mnList.add(mn);
+            return;
+        }
+        float hValue = mn.getHValue();
+        boolean inserted=false;
+        for(int i=0;i<mnList.size();i++){
+            if(hValue>=mnList.get(i).getHValue() && !inserted){
+                mnList.add(i,mn);
+                inserted=true;
+            }
+        }
+        if(!inserted){
+            mnList.add(mnList.size()-1,mn);
+        }
+    }
 
+    public int getMaxDegree() {
+        return maxDegree;
+    }
+
+    public void setMaxDegree(int maxDegree) {
+        this.maxDegree = maxDegree;
+    }
 }

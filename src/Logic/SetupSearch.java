@@ -2,6 +2,7 @@ package Logic;
 
 import Data.Enums.Colors;
 import Data.Enums.Direction;
+import Data.Move;
 import Data.MoveCommand;
 import Data.MoveNode;
 
@@ -22,11 +23,12 @@ public class SetupSearch {
 
     Utility utility;
 
-    public SetupSearch(int selectedSetupHeuristic,int setupLimit,Game game){
+    public SetupSearch(int selectedSetupHeuristic,int setupLimit,Game game,Utility utility){
         this.selectedSetupHeuristic=selectedSetupHeuristic;
         this.setupLimit=setupLimit;
         this.game=game;
-        this.utility=new Utility(game);
+        this.utility=utility;
+
 
         MoveNode root = new MoveNode();
         this.setup=root;
@@ -40,7 +42,7 @@ public class SetupSearch {
     //a setup is a move node with a Movecommand sequence enables the victorycolor to solve the problem
     public MoveNode createNewSetup(){
         if(this.selectedSetupHeuristic==3){
-            utility.loadCriticalPositions(3);
+            utility.loadCriticalPositions(utility.getMaxDegree());
         }
         ArrayList<Colors> otherColors=new ArrayList<Colors>();
         Colors vicColor = this.game.getState().getBoard().getVictoryPoint().getColor();
@@ -89,31 +91,59 @@ public class SetupSearch {
                 currSetup = setupExplore.get(0);
                 break;
         }
-        if(currSetup.getMoveCommands().size()>setupLimit){
+        if(currSetup.getMoveCommands().size()>=setupLimit){
             setupExplore.remove(currSetup);
         }else{
             for (int i = 0; i < otherColors.size(); i++) {
                 Colors currColor = otherColors.get(i);
                 for (Direction direction : Direction.values()) {
-                    currSetup.addChild(new MoveCommand(currColor, direction));
-                    MoveNode recentC=currSetup.getChilds().get(currSetup.getChilds().size()-1);
+
+                    ArrayList<MoveCommand> childCommands= (ArrayList<MoveCommand>) currSetup.getMoveCommands().clone();
+                    childCommands.add(new MoveCommand(currColor,direction));
+                    MoveNode recentC=new MoveNode(childCommands);
                     int seqCheck = utility.isSeqSmart(recentC.getMoveCommands());
-                    if(this.selectedSetupHeuristic==3){
-                        float HValue=utility.isSeqSmartSetup(recentC.getMoveCommands());
-                        recentC.setHValue(HValue);
-                    }
-                    if(this.selectedSetupHeuristic==4){
-                        float HValue=utility.isSeqSmartSetup(recentC.getMoveCommands());
-                        recentC.setHValue(HValue);
+                    float HValue;
+                    switch (this.selectedSetupHeuristic){
+                        case 3:
+                            HValue=utility.isSeqSmartSetup(recentC.getMoveCommands());
+                            recentC.setHValue(HValue);
+                            break;
+                        case 4:
+                            HValue=utility.isSeqSmartSetupCrossBlock(recentC.getMoveCommands());
+                            recentC.setHValue(HValue);
+                            break;
+                        default:
+                            HValue=recentC.getMoveCommands().size();
+                            recentC.setHValue(HValue);
+                            break;
                     }
                     if (seqCheck >=0) {
-                        setupExplore.add(0, currSetup.getChilds().get(currSetup.getChilds().size() - 1));
+                        setupExplore.add(0, recentC);
                     }
                 }
             }
             setupExplore.remove(currSetup);
         }
         return currSetup;
+    }
+
+    public ArrayList<MoveNode> loadAllSetups(){
+        ArrayList<MoveNode> setupList = new ArrayList<MoveNode>();
+        while (!this.setupExplore.isEmpty()){
+            MoveNode newSetup = createNewSetup();
+            switch (selectedSetupHeuristic){
+                case 3: case 4:
+                    if(newSetup.getHValue()>0 || newSetup.getRoot()){
+                        newSetup.setHValue(newSetup.getMoveCommands().size());
+                        utility.insertInOrder(newSetup,setupList);
+                    }
+                break;
+                default:
+                    utility.insertInOrder(newSetup,setupList);
+                break;
+            }
+        }
+        return setupList;
     }
 
     public MoveNode getSetup() {

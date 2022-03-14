@@ -62,9 +62,9 @@ public class AI {
         }
     }
 
-    //Input List of Movecommands with possible cycles
-    //Output List of Movecommands that does not contain cycles
-    //Cycle is defined as sequence of Movecommands that do not change the robots position if they were executed
+    //Input List of Move commands with possible cycles
+    //Output List of Move commands that does not contain cycles
+    //Cycle is defined as sequence of Move commands that do not change the robots position if they were executed
     //Probably to Complex to be used inside of Treesearch
     //Can optimize some non-optimal Solutions
     //Does not guarantee an optimal Solution
@@ -162,11 +162,11 @@ public class AI {
         return setupLimit;
     }
 
-    public int getSelectedVicHeuristic() {
+    public int getSelectedVicAlgorithm() {
         return selectedVicHeuristic;
     }
 
-    public void setSelectedVicHeuristic(int selectedVicHeuristic) {
+    public void setSelectedVicAlgorithm(int selectedVicHeuristic) {
         this.selectedVicHeuristic = selectedVicHeuristic;
     }
 

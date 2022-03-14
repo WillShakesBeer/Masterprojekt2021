@@ -1,9 +1,9 @@
 package View;
 
 import Data.*;
+import Data.Enums.Algorithms;
 import Data.Enums.Colors;
 import Data.Enums.Direction;
-import Data.Enums.Heuristics;
 import Data.Enums.ObsType;
 import Data.GameConfig.Config;
 import Data.Testing.SavedConfigs;
@@ -72,6 +72,8 @@ public class DisplayFx {
     private ArrayList<MoveCommand> visSeq=new ArrayList<MoveCommand>();
 
 
+    private int selectedVicAlgo;
+
     private Game game;
     private GridPane boardGrid;
 
@@ -115,31 +117,78 @@ public class DisplayFx {
     }
 
 
-    public void runAnalysis(Stage analysisWindow ){
+    public void runAnalysis(Stage analysisWindow){
 
-        Scene scene = new Scene(generateAnalysisAreas());
-
+        Scene scene = new Scene(generateAnalysisChooseButton(), 950, 900);
+        generateKeyhandlers(scene);
         analysisWindow.setScene(scene);
-        analysisWindow.setX(970);
-        analysisWindow.setY(40);
+        analysisWindow.setHeight(1000);
+        analysisWindow.setWidth(1000);
+        analysisWindow.setMaximized(true);
         analysisWindow.show();
     }
 
-    public VBox generateAnalysisAreas(){
+    public VBox generateAnalysisChooseButton(){
 
         SavedConfigs testConfig= new SavedConfigs();
+        VBox buttonsAndField = new VBox();
 
-        VBox allAreas = new VBox();
+
+        MenuButton algorithmChooseButton = new MenuButton("Choose Algorithm");
+        for ( int i = 0 ; i <= 4 ; i++) {
+
+            MenuItem menuItem = new MenuItem(""+ i);
+            menuItem.setOnAction(new EventHandler<ActionEvent>() {
+                @Override
+                public void handle(ActionEvent event) {
+                    selectedVicAlgo = Integer.valueOf(menuItem.getText());
+                    ai.setSelectedVicAlgorithm(selectedVicAlgo);
+                }
+            });
+            algorithmChooseButton.getItems().add(menuItem);
+
+        }
+
+        MenuButton analysisChooseButton = new MenuButton("Choose Area");
         for (Config currentAnalysisConfig : testConfig.loadAnalyseConfigs()) {
 
-            allAreas.getChildren().add(generateSingelAnalysisArea(new Game(currentAnalysisConfig)));
+            MenuItem menuItem = new MenuItem(currentAnalysisConfig.toString());
+            menuItem.setOnAction(new EventHandler<ActionEvent>() {
+                @Override
+                public void handle(ActionEvent event) {
+
+                    if (buttonsAndField.getChildren().size()>2){
+                        buttonsAndField.getChildren().remove(2);
+                    }
+                    buttonsAndField.getChildren().add(generateSingleAnalysisArea(new Game(currentAnalysisConfig)));
+                }
+            });
+            analysisChooseButton.getItems().add(menuItem);
+
         }
-        return allAreas;
+
+        Button runAI = new Button("solve");
+        runAI.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                System.out.println("algo: " + selectedVicAlgo + "  Game: " + game + "  State "+ game.getState() + "   Vic: " + game.getState().getBoard().getVictoryPoint());
+                executeNextSequence();
+
+             }
+        });
+
+        HBox allButtons = new HBox(algorithmChooseButton, analysisChooseButton , runAI );
+        buttonsAndField.getChildren().add(allButtons);
+        buttonsAndField.getChildren().add(analysisChooseButton);
+        return buttonsAndField;
     }
 
-    public HBox generateSingelAnalysisArea(Game game){
+    public HBox generateSingleAnalysisArea(Game game){
 
         this.game =game;
+        this.ai = new AI(game);
+
+        ai.setSelectedVicAlgorithm(selectedVicAlgo);
 
         //draw empty board
         drawEmptyBoard();
@@ -155,14 +204,14 @@ public class DisplayFx {
 
         //Grid and listofMoves
         movelistScrollPane = drawListOfMoves();
-        return new HBox(boardGrid , movelistScrollPane);
+
+        HBox hBoxAllButtons = drawButtons();
+        HBox gridAndMoveList = new HBox(boardGrid , movelistScrollPane);
+        VBox vBoxAll = new VBox(gridAndMoveList, hBoxAllButtons);
+
+        return new HBox(vBoxAll);
 
     }
-
-
-
-
-
 
     //not sure but maybe consider splitting the class
     //e.g. analysis view in new class
@@ -218,8 +267,6 @@ public class DisplayFx {
         //Commented out for debugging
         // analysisButton.fire();
     }
-
-
 
     public void generateKeyhandlers (Scene scene){
         scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
@@ -387,14 +434,14 @@ public class DisplayFx {
             public void handle(ActionEvent event) {
                 Stage analysisWindow = new Stage();
 
-                HBox hBoxHeuristics = drawHeuristicsSelecter();
+                HBox hBoxAlgorithms = drawAlgorithmSelecter();
                 HBox hBoxLimits = drawLimitsSelecter();
                 ScrollPane analysisTextScrollPane = drawAnalysisScrollPane();
 
                 HBox hBoxRunIterations = drawIterations();
                 Label average = drawAverage();
 
-                VBox vBoxColumns = new VBox(hBoxHeuristics , hBoxLimits, analysisTextScrollPane , average , hBoxRunIterations);
+                VBox vBoxColumns = new VBox(hBoxAlgorithms , hBoxLimits, analysisTextScrollPane , average , hBoxRunIterations);
                 vBoxColumns.setPadding(new Insets(10));
                 vBoxColumns.setSpacing(10);
 
@@ -427,7 +474,7 @@ public class DisplayFx {
         int counterBFS=0;
 
         for (RunStat runStat:runStats){
-            switch (runStat.getHeuristic()){
+            switch (runStat.getAlgorithm()){
                 case DEPTH_LIMITED_DFS:
                     timeNeededDFS= timeNeededDFS +runStat.getTimeNeeded();
                     movesUsedDFS = movesUsedDFS + runStat.getMovesUsed();
@@ -496,12 +543,12 @@ public class DisplayFx {
         return hBoxRunIterations;
     }
 
-    public HBox drawHeuristicsSelecter(){
-        //heuristic=0
+    public HBox drawAlgorithmSelecter(){
+        //Algorithm=0
         //Uses Depth limited Depth first search
-        //heurisitc=1
+        //Algorithm=1
         //Uses Depth limited random first search
-        //heurisitc=2
+        //Algorithm=2
         //Uses Depth limited breadth first search
         RadioButton r1 = new RadioButton("All");
         RadioButton r2 = new RadioButton("Depth limited DFS");
@@ -518,40 +565,40 @@ public class DisplayFx {
         r1.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
-                System.out.println("Selected Heu:" + ai.getSelectedVicHeuristic() );
+                System.out.println("Selected Heu:" + ai.getSelectedVicAlgorithm() );
             }
         });
-        //heuristic=0
+        //Algorithm=0
         //Uses Depth limited Depth first search
         r2.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
-                ai.setSelectedVicHeuristic(0);
+                ai.setSelectedVicAlgorithm(0);
             }
         });
-        //heurisitc=1
+        //Algorithm=1
         //Uses Depth limited random first search
         r3.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
-                ai.setSelectedVicHeuristic(1);
+                ai.setSelectedVicAlgorithm(1);
             }
         });
-        //heurisitc=2
+        //Algorithm=2
         //Uses Depth limited breadth first search
         r4.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
-                ai.setSelectedVicHeuristic(2);
+                ai.setSelectedVicAlgorithm(2);
             }
         });
 
         r2.setSelected(true);
-        HBox heuristics = new HBox(r1,r2,r3,r4);
-        heuristics.setSpacing(10);
+        HBox algorithms = new HBox(r1,r2,r3,r4);
+        algorithms.setSpacing(10);
 
 
-        return heuristics;
+        return algorithms;
     }
 
     public HBox drawLimitsSelecter(){
@@ -589,41 +636,41 @@ public class DisplayFx {
 
     public void updateAnalysisLabel(long timeUsed , int movesUsed){
         analyisLabel.setText(analyisLabel.getText() + '\n'
-                + "Heuristic: " + heuristicChosenString(ai.getSelectedVicHeuristic()) + "\t"
+                + "Algorithm: " + algorithmChosenString(ai.getSelectedVicAlgorithm()) + "\t"
                 + "Depth Limit: " + ai.getDepthLimit()+ "\t"
                 + "Setup Limit: " + ai.getSetupLimit() + "\t"
                 + "Time needed: " + timeUsed + "\t"
                 + "Moves used: " + movesUsed);
 
-        Heuristics heuristic;
-        switch (ai.getSelectedVicHeuristic()) {
-            case 0:  heuristic = Heuristics.DEPTH_LIMITED_DFS;
+        Algorithms algorithm;
+        switch (ai.getSelectedVicAlgorithm()) {
+            case 0:  algorithm = Algorithms.DEPTH_LIMITED_DFS;
                 break;
-            case 1:  heuristic = Heuristics.DEPTH_LIMITED_RANDFS;
+            case 1:  algorithm = Algorithms.DEPTH_LIMITED_RANDFS;
                 break;
-            case 2:  heuristic = Heuristics.DEPTH_LIMITED_BFS;
+            case 2:  algorithm = Algorithms.DEPTH_LIMITED_BFS;
                 break;
-            default: heuristic=Heuristics.UNDEFINED;
+            default: algorithm= Algorithms.UNDEFINED;
         }
 
-        RunStat runStat = new RunStat(heuristic,ai.getDepthLimit(),ai.getSetupLimit(), timeUsed , movesUsed);
+        RunStat runStat = new RunStat(algorithm,ai.getDepthLimit(),ai.getSetupLimit(), timeUsed , movesUsed);
         runStats.add(runStat);
         updateAverage();
 
     }
 
-    public String heuristicChosenString (int heuristicChosenInt){
-        String heuristicChosenString;
-        switch (heuristicChosenInt) {
-            case 0:  heuristicChosenString = "Depth limited DFS" + "\t";
+    public String algorithmChosenString(int algorithmChosenInt){
+        String algorithmChosenString;
+        switch (algorithmChosenInt) {
+            case 0:  algorithmChosenString = "Depth limited DFS" + "\t";
                 break;
-            case 1:  heuristicChosenString = "Depth limited RandFS";
+            case 1:  algorithmChosenString = "Depth limited RandFS";
                 break;
-            case 2:  heuristicChosenString = "Depth limited BFS" + "\t";
+            case 2:  algorithmChosenString = "Depth limited BFS" + "\t";
                 break;
-            default: heuristicChosenString = "none";
+            default: algorithmChosenString = "none";
         }
-        return heuristicChosenString;
+        return algorithmChosenString;
     }
 
     //Searches for TreeSearch solution if successful visSeq will be refilled
@@ -659,7 +706,7 @@ public class DisplayFx {
         updateAnalysisLabel(timeUsed, movesUsed);
 
 
-        System.out.println("iterations to go: " + iterations);
+        //System.out.println("iterations to go: " + iterations);
 
     }
 
@@ -850,7 +897,6 @@ public class DisplayFx {
         movelist.setText(movelistString);
         //scrolls to the bottom
         movelistScrollPane.setVvalue(movelistScrollPane.getVmax());
-
     }
 
     public Colors getSelectedColor() {

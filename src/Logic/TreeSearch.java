@@ -31,6 +31,7 @@ public class TreeSearch extends Thread{
     int selectedSetupHeuristic;
     int setupLimit;
     int depthLimit;
+    int maxDegree;
 
     //output
     MoveNode result=null;
@@ -52,20 +53,20 @@ public class TreeSearch extends Thread{
 
 
 
-    public TreeSearch(Game game,int depthLimit, int setupLimit, int selectedHeuristic,int selectedSetupHeuristic){
+    public TreeSearch(Game game,int depthLimit, int setupLimit, int selectedHeuristic,int selectedSetupHeuristic,int maxDegree){
         this.game=game;
         this.depthLimit=depthLimit;
         this.setupLimit=setupLimit;
         this.selectedVicHeuristic = selectedHeuristic;
         this.selectedSetupHeuristic= selectedSetupHeuristic;
 
-        utility=new Utility(game);
+        utility=new Utility(game,maxDegree);
 
         setupSearch = new SetupSearch(this.selectedSetupHeuristic,this.setupLimit,game,utility);
         setupExplore=setupSearch.getSetupExplore();
         setup=setupSearch.getSetup();
 
-
+        this.maxDegree=maxDegree;
         resultList=new ArrayList<ArrayList<MoveCommand>>();
     }
 
@@ -118,6 +119,8 @@ public class TreeSearch extends Thread{
             }
             while (!toExplore.isEmpty()) {
                 float minHValue;
+
+                //selects the next expanded Node
                 switch (this.selectedVicHeuristic) {
                     case 0:
                         curr = toExplore.get(0);
@@ -144,6 +147,7 @@ public class TreeSearch extends Thread{
                         curr = toExplore.get(toExplore.size() - 1);
                         break;
                 }
+                //nodes expanded +1
                 if (curr.getMoveCommands().size() > depthLimit) {
                     toExplore.remove(curr);
                 } else {

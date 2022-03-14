@@ -143,6 +143,7 @@ public class SetupSearch {
                 break;
             }
         }
+        //setupListe.size()
         return setupList;
     }
 

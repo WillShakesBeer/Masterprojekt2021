@@ -27,11 +27,12 @@ public class Utility {
     ArrayList<CrossBlockPos> crossBlockPositions;
     int maxDegree=20;
 
-    public Utility(Game game){
+    public Utility(Game game,int maxDegree){
         this.game=game;
         currVicCoord=this.game.getState().getBoard().getVictoryPoint().getCoord();
         critPositions=null;
         crossBlockPositions=new ArrayList<CrossBlockPos>();
+        this.maxDegree=maxDegree;
     }
 
     public void loadCriticalPositions(int degree){

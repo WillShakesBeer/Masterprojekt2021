@@ -18,6 +18,7 @@ public class AI {
     private int selectedSetupHeuristic;
     private int depthLimit;
     private int setupLimit;
+    private int maxDegree;
 
 
     public AI(Game game){
@@ -30,12 +31,13 @@ public class AI {
         depthLimit = 11;
         selectedVicHeuristic = 4;
         selectedSetupHeuristic = 4;
+        maxDegree=10;
     }
 
     //test TreeSearch
     //tryMore Colors has some bugs
     public MoveNode createSeq(){
-        treeSearch =new TreeSearch(game,depthLimit,setupLimit,selectedVicHeuristic,selectedSetupHeuristic);
+        treeSearch =new TreeSearch(game,depthLimit,setupLimit,selectedVicHeuristic,selectedSetupHeuristic,maxDegree);
         Thread t = new Thread(treeSearch);
         Timer timer = new Timer();
         System.out.println("Start Treesearch");

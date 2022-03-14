@@ -23,6 +23,4 @@ public class AnalysisScene {
         ai = new AI(game);
         ai.setAiDefaults();
     }
-
-
 }

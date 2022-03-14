@@ -1,6 +1,6 @@
 package View;
 
-import Data.Enums.Heuristics;
+import Data.Enums.Algorithms;
 
 /**
  * Created by Martin Eberle aka WillShakesBeer on 02.03.2022.
@@ -8,13 +8,13 @@ import Data.Enums.Heuristics;
 
 //Should probably be located in Data
 public class RunStat {
-    Heuristics heuristic;
+    Algorithms heuristic;
     int depthLimit;
     int setupLimit;
     long timeNeeded;
     int movesUsed;
 
-    public RunStat(Heuristics heuristic, int depthLimit, int setupLimit, long timeNeeded, int movesUsed){
+    public RunStat(Algorithms heuristic, int depthLimit, int setupLimit, long timeNeeded, int movesUsed){
         this.heuristic=heuristic;
         this.depthLimit=depthLimit;
         this.setupLimit=setupLimit;
@@ -23,11 +23,11 @@ public class RunStat {
 
     }
 
-    public Heuristics getHeuristic() {
+    public Algorithms getAlgorithm() {
         return heuristic;
     }
 
-    public void setHeuristic(Heuristics heuristic) {
+    public void setHeuristic(Algorithms heuristic) {
         this.heuristic = heuristic;
     }
 

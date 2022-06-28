@@ -20,6 +20,7 @@ import java.util.Random;
 //Vicheuristic=4
 //Depth limited breadth first search VicColor
 //preloads every Setup within the setupLimit
+//Every heuristic != 4 loads setups on demand
 
 //Depthlimit is the limit of Moves that can be used in total
 //Setuplimit is the limit of the Moves that can be used on robots from colors other than the victorycolor

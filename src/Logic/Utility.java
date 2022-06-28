@@ -194,7 +194,7 @@ public class Utility {
     //-1 => No Movement
     //-2 => Crash Wall
     //postive float the best HValue of an CrossBlockPos that is taken
-    //HValue of CrossBlockPos movesNeededVicColor+Degree+movesNeededSetup
+    //HValue of CrossBlockPos movesNeededVicColor+Degree+movesNeededSet^up
     public float isSeqSmartSetupCrossBlock(ArrayList<MoveCommand> moveCommands){
         float hValue=0;
         if(moveCommands.size()==0){

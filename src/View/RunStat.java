@@ -1,6 +1,6 @@
 package View;
 
-import Data.Enums.Algorithms;
+import Data.Enums.VicAlgorithms;
 
 /**
  * Created by Martin Eberle aka WillShakesBeer on 02.03.2022.
@@ -8,13 +8,13 @@ import Data.Enums.Algorithms;
 
 //Should probably be located in Data
 public class RunStat {
-    Algorithms heuristic;
+    VicAlgorithms heuristic;
     int depthLimit;
     int setupLimit;
     long timeNeeded;
     int movesUsed;
 
-    public RunStat(Algorithms heuristic, int depthLimit, int setupLimit, long timeNeeded, int movesUsed){
+    public RunStat(VicAlgorithms heuristic, int depthLimit, int setupLimit, long timeNeeded, int movesUsed){
         this.heuristic=heuristic;
         this.depthLimit=depthLimit;
         this.setupLimit=setupLimit;
@@ -23,11 +23,11 @@ public class RunStat {
 
     }
 
-    public Algorithms getAlgorithm() {
+    public VicAlgorithms getAlgorithm() {
         return heuristic;
     }
 
-    public void setHeuristic(Algorithms heuristic) {
+    public void setHeuristic(VicAlgorithms heuristic) {
         this.heuristic = heuristic;
     }
 

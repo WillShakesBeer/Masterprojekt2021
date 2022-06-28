@@ -13,6 +13,18 @@ public class SetupSearch {
 
     Game game;
     //Running parameters
+
+    //SetupHeuristic=0:
+    //Depth first search
+    //SetupHeuristic=1:
+    //Random first search
+    //SetupHeuristic=2:
+    //Breadth first search
+    //SetupHeuristic=3:
+    //Best Position score first
+    //SetupHeuristic=4:
+    //Best Cross block score first
+
     int selectedSetupHeuristic;
     int setupLimit;
 
@@ -66,7 +78,8 @@ public class SetupSearch {
                 currSetup = setupExplore.get(setupExplore.size() - 1);
                 break;
             case 3:
-                //selects Node with highstHValue(Best Setup Score)
+                //selects Node with highstHValue
+                //position score heuristic
                 float maxHValue3=0;
                 currSetup = setupExplore.get(setupExplore.size() - 1);
                 for(MoveNode currNode: setupExplore){
@@ -77,7 +90,8 @@ public class SetupSearch {
                 }
                 break;
             case 4:
-                //selects Node with highstHValue(Best Setup Score)
+                //selects Node with highstHValue
+                //crossblock score heuristic
                 float maxHValue4=0;
                 currSetup = setupExplore.get(setupExplore.size() - 1);
                 for(MoveNode currNode: setupExplore){

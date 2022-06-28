@@ -34,8 +34,6 @@ public class AI {
         maxDegree=10;
     }
 
-    //test TreeSearch
-    //tryMore Colors has some bugs
     public MoveNode createSeq(){
         treeSearch =new TreeSearch(game,depthLimit,setupLimit,selectedVicHeuristic,selectedSetupHeuristic,maxDegree);
         Thread t = new Thread(treeSearch);

@@ -1,7 +1,7 @@
 package View;
 
 import Data.*;
-import Data.Enums.Algorithms;
+import Data.Enums.VicAlgorithms;
 import Data.Enums.Colors;
 import Data.Enums.Direction;
 import Data.Enums.ObsType;
@@ -73,6 +73,7 @@ public class DisplayFx {
 
 
     private int selectedVicAlgo;
+    private int setupVicAlgo;
 
     private Game game;
     private GridPane boardGrid;
@@ -435,13 +436,14 @@ public class DisplayFx {
                 Stage analysisWindow = new Stage();
 
                 HBox hBoxAlgorithms = drawAlgorithmSelecter();
+                HBox hBoxSetupAlgorithms = drawSetupAlgorithmSelecter();
                 HBox hBoxLimits = drawLimitsSelecter();
                 ScrollPane analysisTextScrollPane = drawAnalysisScrollPane();
 
                 HBox hBoxRunIterations = drawIterations();
                 Label average = drawAverage();
 
-                VBox vBoxColumns = new VBox(hBoxAlgorithms , hBoxLimits, analysisTextScrollPane , average , hBoxRunIterations);
+                VBox vBoxColumns = new VBox(hBoxAlgorithms,hBoxSetupAlgorithms , hBoxLimits, analysisTextScrollPane , average , hBoxRunIterations);
                 vBoxColumns.setPadding(new Insets(10));
                 vBoxColumns.setSpacing(10);
 
@@ -475,17 +477,17 @@ public class DisplayFx {
 
         for (RunStat runStat:runStats){
             switch (runStat.getAlgorithm()){
-                case DEPTH_LIMITED_DFS:
+                case DFS:
                     timeNeededDFS= timeNeededDFS +runStat.getTimeNeeded();
                     movesUsedDFS = movesUsedDFS + runStat.getMovesUsed();
                     counterDFS++;
                     break;
-                case DEPTH_LIMITED_RANDFS:
+                case RFS:
                     timeNeededRandFS= timeNeededRandFS +runStat.getTimeNeeded();
                     movesUsedRandFS = movesUsedRandFS + runStat.getMovesUsed();
                     counterRandFS++;
                     break;
-                case DEPTH_LIMITED_BFS:
+                case BFS:
                     timeNeededBFS = timeNeededBFS +runStat.getTimeNeeded();
                     movesUsedBFS = movesUsedBFS + runStat.getMovesUsed();
                     counterBFS++;
@@ -543,6 +545,57 @@ public class DisplayFx {
         return hBoxRunIterations;
     }
 
+    public HBox drawSetupAlgorithmSelecter(){
+
+        RadioButton s1 = new RadioButton("Depth First Search");
+        RadioButton s2 = new RadioButton("Random First Search");
+        RadioButton s3 = new RadioButton("Breadth First Search");
+        RadioButton s4 = new RadioButton("Position Score");
+        RadioButton s5 = new RadioButton("Cross Block Score");
+
+        // create a toggle group
+        ToggleGroup sg = new ToggleGroup();
+        s1.setToggleGroup(sg);
+        s2.setToggleGroup(sg);
+        s3.setToggleGroup(sg);
+        s4.setToggleGroup(sg);
+        s5.setToggleGroup(sg);
+        s1.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent e) {
+                ai.setSelectedSetupHeuristic(0);
+            }
+        });
+        s2.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent e) {
+                ai.setSelectedSetupHeuristic(1);
+            }
+        });
+        s3.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent e) {
+                ai.setSelectedSetupHeuristic(2);
+            }
+        });
+        s4.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent e) {
+                ai.setSelectedSetupHeuristic(3);
+            }
+        });
+        s5.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent e) {
+                ai.setSelectedSetupHeuristic(4);
+            }
+        });
+
+        s1.setSelected(true);
+        HBox setupAlgorithms = new HBox(s1,s2,s3,s4,s5);
+        setupAlgorithms.setSpacing(10);
+        return setupAlgorithms;
+    }
     public HBox drawAlgorithmSelecter(){
         //Algorithm=0
         //Uses Depth limited Depth first search
@@ -550,55 +603,64 @@ public class DisplayFx {
         //Uses Depth limited random first search
         //Algorithm=2
         //Uses Depth limited breadth first search
-        RadioButton r1 = new RadioButton("All");
-        RadioButton r2 = new RadioButton("Depth limited DFS");
-        RadioButton r3 = new RadioButton("Depth limited RandFS");
-        RadioButton r4 = new RadioButton("Depth limited BFS");
+        RadioButton v1 = new RadioButton("Depth First Search");
+        RadioButton v2 = new RadioButton("Random First Search");
+        RadioButton v3 = new RadioButton("Breadth First Search");
+        RadioButton v4 = new RadioButton("Air First Search");
+        RadioButton v5 = new RadioButton("Bredth First Search preloaded Setups");
 
         // create a toggle group
-        ToggleGroup tg = new ToggleGroup();
-        r1.setToggleGroup(tg);
-        r2.setToggleGroup(tg);
-        r3.setToggleGroup(tg);
-        r4.setToggleGroup(tg);
+        ToggleGroup vg = new ToggleGroup();
+        v1.setToggleGroup(vg);
+        v2.setToggleGroup(vg);
+        v3.setToggleGroup(vg);
+        v4.setToggleGroup(vg);
+        v5.setToggleGroup(vg);
 
-        r1.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent e) {
-                System.out.println("Selected Heu:" + ai.getSelectedVicAlgorithm() );
-            }
-        });
-        //Algorithm=0
-        //Uses Depth limited Depth first search
-        r2.setOnAction(new EventHandler<ActionEvent>() {
+
+        v1.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
                 ai.setSelectedVicAlgorithm(0);
             }
         });
-        //Algorithm=1
-        //Uses Depth limited random first search
-        r3.setOnAction(new EventHandler<ActionEvent>() {
+        //Algorithm=0
+        //Uses Depth limited Depth first search
+        v2.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
                 ai.setSelectedVicAlgorithm(1);
             }
         });
-        //Algorithm=2
-        //Uses Depth limited breadth first search
-        r4.setOnAction(new EventHandler<ActionEvent>() {
+        //Algorithm=1
+        //Uses Depth limited random first search
+        v3.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
                 ai.setSelectedVicAlgorithm(2);
             }
         });
+        //Algorithm=2
+        //Uses Depth limited breadth first search
+        v4.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent e) {
+                ai.setSelectedVicAlgorithm(3);
+            }
+        });
+        v5.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent e) {
+                ai.setSelectedVicAlgorithm(4);
+            }
+        });
 
-        r2.setSelected(true);
-        HBox algorithms = new HBox(r1,r2,r3,r4);
-        algorithms.setSpacing(10);
+        v1.setSelected(true);
+        HBox vicAlgorithms = new HBox(v1,v2,v3,v4,v5);
+        vicAlgorithms.setSpacing(10);
 
 
-        return algorithms;
+        return vicAlgorithms;
     }
 
     public HBox drawLimitsSelecter(){
@@ -642,15 +704,15 @@ public class DisplayFx {
                 + "Time needed: " + timeUsed + "\t"
                 + "Moves used: " + movesUsed);
 
-        Algorithms algorithm;
+        VicAlgorithms algorithm;
         switch (ai.getSelectedVicAlgorithm()) {
-            case 0:  algorithm = Algorithms.DEPTH_LIMITED_DFS;
+            case 0:  algorithm = VicAlgorithms.DFS;
                 break;
-            case 1:  algorithm = Algorithms.DEPTH_LIMITED_RANDFS;
+            case 1:  algorithm = VicAlgorithms.RFS;
                 break;
-            case 2:  algorithm = Algorithms.DEPTH_LIMITED_BFS;
+            case 2:  algorithm = VicAlgorithms.BFS;
                 break;
-            default: algorithm= Algorithms.UNDEFINED;
+            default: algorithm= VicAlgorithms.UNDEFINED;
         }
 
         RunStat runStat = new RunStat(algorithm,ai.getDepthLimit(),ai.getSetupLimit(), timeUsed , movesUsed);

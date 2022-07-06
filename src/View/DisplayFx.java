@@ -463,8 +463,6 @@ public class DisplayFx {
         long timeDiff = timerEnd-timerBegin;
         float timeUsed = (float) timeDiff* (float) 0.001;
         anaWindow.updateAnalysisLabel(timeUsed, movesUsed,0);
-
-
         //System.out.println("iterations to go: " + iterations);
 
     }

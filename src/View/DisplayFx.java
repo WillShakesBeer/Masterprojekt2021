@@ -1,10 +1,7 @@
 package View;
 
 import Data.*;
-import Data.Enums.VicAlgorithms;
-import Data.Enums.Colors;
-import Data.Enums.Direction;
-import Data.Enums.ObsType;
+import Data.Enums.*;
 import Data.GameConfig.Config;
 import Data.Testing.SavedConfigs;
 import Logic.AI;
@@ -13,7 +10,6 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -22,14 +18,12 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.stage.Screen;
 import javafx.stage.Stage;
 import java.util.ArrayList;
 import java.util.Random;
 
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import static javafx.application.Application.launch;
 
 /**
  * Created by Martin Eberle aka WillShakesBeer on 14.12.2021.
@@ -37,53 +31,57 @@ import static javafx.application.Application.launch;
 
 public class DisplayFx {
 
-    private int iterations = 1;
+    //Associated Classes
+    private Game game;
+    private Logic.AI ai;
+    private DisplayUtility utility = new DisplayUtility();
+    private AnalysisWindow anaWindow;
 
-    private Colors selectedColor;
-    private Direction selectedDirection;
+    //Ui Declaration
+    private ScrollPane movelistScrollPane;
+    private GridPane boardGrid;
 
+    //Buttondeclaration
     private RadioButton red = new RadioButton("Red ");
     private RadioButton green = new RadioButton("Green ");
     private RadioButton blue = new RadioButton("Blue ");
     private RadioButton yellow = new RadioButton("Yellow ");
-
     private Button left = new Button("←");
     private Button up = new Button("↑");
     private Button down = new Button("↓");
     private Button right = new Button("→");
-
     private Button analysisButton = new Button("\uD83D\uDCC8");
-    private Label analyisLabel = new Label("Analysis run: ");
-
-    private Label averageLabel =new Label("Average:" + '\n');
-
-    private ArrayList<RunStat> runStats = new ArrayList<>();
-
     private Button revertLastMoveButton = new Button("Revert Last Move");
 
+    //Labeldeclaraiton
+    private Label analyisLabel = new Label("Analysis run: ");
+    private Label averageLabel =new Label("Average:" + '\n');
     private Label score = new Label("Score: 0");
     private Label moveScore = new Label ("Moves: ");
     private Label movelist = new Label("Made moves: ");
-    private ArrayList<String> moveListlist = new ArrayList<>();
-    private ScrollPane movelistScrollPane;
 
-    //to determine if a move is usefull, or the robot just runs in a wall
+
+    //Data
+
+    //Current state variables
+    private Colors selectedColor;
+    private Direction selectedDirection;
     private boolean crashWall;
+    private int selectedVicAlgo;
+    private int setupVicAlgo;
     private ArrayList<MoveCommand> visSeq=new ArrayList<MoveCommand>();
 
 
-    private int selectedVicAlgo;
-    private int setupVicAlgo;
-
-    private Game game;
-    private GridPane boardGrid;
-
-    private Logic.AI ai;
+    //Stat tracking data
+    private int iterations = 1;
+    private ArrayList<RunConfig> configList = new ArrayList<RunConfig>();
+    private ArrayList<RunStat> runStats = new ArrayList<>();
+    private ArrayList<String> moveListlist = new ArrayList<>();
 
     public DisplayFx (){
     }
 
-    public void runGame(Stage startWindow ){
+    /*public void runGame(Stage startWindow ){
 
         startWindow.setTitle("Choose!");
 
@@ -115,9 +113,23 @@ public class DisplayFx {
         startWindow.setX((primScreenBounds.getWidth() - startWindow.getWidth()) / 2);
         startWindow.setY((primScreenBounds.getHeight() - startWindow.getHeight()) / 2);
 
+    }*/
+
+    //This Method is used for testing prupose
+    //I dont want to deal with AnalysisScene just yet
+    public void runGame(Stage startWindow){
+        SavedConfigs testConfig= new SavedConfigs();
+        this.game = new Game(testConfig.loadDefaultGameConfig());
+
+        this.ai = new AI(game);
+        ai.setAiDefaults();
+        anaWindow = new AnalysisWindow(game,ai,this);
+        playGame(startWindow);
     }
 
 
+    //Analysis Area code pls refactor to another class
+    //starts here
     public void runAnalysis(Stage analysisWindow){
 
         Scene scene = new Scene(generateAnalysisChooseButton(), 950, 900);
@@ -213,47 +225,25 @@ public class DisplayFx {
         return new HBox(vBoxAll);
 
     }
+    //analysis code ends here
 
-    //not sure but maybe consider splitting the class
-    //e.g. analysis view in new class
+
+    //Main Game
     public void playGame(Stage gameplayWindow ) {
 
-        SavedConfigs testConfig= new SavedConfigs();
-        this.game = new Game(testConfig.loadDefaultGameConfig());
-
-        this.ai = new AI(game);
-        ai.setAiDefaults();
-
+        //Basic UI Setup
         gameplayWindow.setTitle("Ricochet Robots");
         gameplayWindow.setResizable(true);
-        //Starting with Input UI
-        //Color Selection with Radio Buttons
-        //Direction with Buttons
-        System.out.println("Spielfeld: " + game.getConfig().getLength() + " x " + game.getConfig().getHeight() );
 
-        //draw empty board
         drawEmptyBoard();
-
-        //draw Walls
         drawObstacles();
-
-        //draw VPs
         drawVP();
-
-        //draw Robots
         drawRobots();
-
-        //Grid and listofMoves
 
         movelistScrollPane = drawListOfMoves();
         HBox gridAndMoveList = new HBox(boardGrid , movelistScrollPane);
-
-        //generateButtons
         HBox hBoxAllButtons = drawButtons();
-
-        //fullBoard with Buttons + move score
         VBox vBoxAll = new VBox(gridAndMoveList, hBoxAllButtons);
-
         //Scene scene = new Scene(vbox,(int)(Screen.getPrimary().getBounds().getWidth()),(int)(Screen.getPrimary().getBounds().getHeight()));
         Scene scene = new Scene(vBoxAll, 950, 900);
 
@@ -264,8 +254,6 @@ public class DisplayFx {
         gameplayWindow.setY(40);
         gameplayWindow.show();
 
-
-        //Commented out for debugging
         // analysisButton.fire();
     }
 
@@ -431,309 +419,16 @@ public class DisplayFx {
     public Button drawAnalysisButton(){
         analysisButton.setOnAction(new EventHandler<ActionEvent>() {
 
+
             @Override
             public void handle(ActionEvent event) {
-                Stage analysisWindow = new Stage();
-
-                HBox hBoxAlgorithms = drawAlgorithmSelecter();
-                HBox hBoxSetupAlgorithms = drawSetupAlgorithmSelecter();
-                HBox hBoxLimits = drawLimitsSelecter();
-                ScrollPane analysisTextScrollPane = drawAnalysisScrollPane();
-
-                HBox hBoxRunIterations = drawIterations();
-                Label average = drawAverage();
-
-                VBox vBoxColumns = new VBox(hBoxAlgorithms,hBoxSetupAlgorithms , hBoxLimits, analysisTextScrollPane , average , hBoxRunIterations);
-                vBoxColumns.setPadding(new Insets(10));
-                vBoxColumns.setSpacing(10);
-
-                Scene secondScene = new Scene(vBoxColumns, 970,700);
-                analysisWindow.setTitle("Analysis");
-                analysisWindow.setScene(secondScene);
-                analysisWindow.setX(0);
-                analysisWindow.setY(40);
-                analysisWindow.show();
+                anaWindow.createWindow();
             }
         });
 
         return analysisButton;
     }
 
-    public Label drawAverage(){
-        updateAverage();
-        return averageLabel;
-    }
-
-    public void updateAverage(){
-        long timeNeededDFS=0;
-        int movesUsedDFS=0;
-        int counterDFS=0;
-        long timeNeededRandFS=0;
-        int movesUsedRandFS=0;
-        int counterRandFS=0;
-        long timeNeededBFS=0;
-        int movesUsedBFS=0;
-        int counterBFS=0;
-
-        for (RunStat runStat:runStats){
-            switch (runStat.getAlgorithm()){
-                case DFS:
-                    timeNeededDFS= timeNeededDFS +runStat.getTimeNeeded();
-                    movesUsedDFS = movesUsedDFS + runStat.getMovesUsed();
-                    counterDFS++;
-                    break;
-                case RFS:
-                    timeNeededRandFS= timeNeededRandFS +runStat.getTimeNeeded();
-                    movesUsedRandFS = movesUsedRandFS + runStat.getMovesUsed();
-                    counterRandFS++;
-                    break;
-                case BFS:
-                    timeNeededBFS = timeNeededBFS +runStat.getTimeNeeded();
-                    movesUsedBFS = movesUsedBFS + runStat.getMovesUsed();
-                    counterBFS++;
-                    break;
-                default:
-                    break;
-            }
-        }
-        double avgTimeNeededDFS =0;
-        double avgMovesUsedDFS=0;
-        if (counterDFS != 0){
-            avgTimeNeededDFS = timeNeededDFS / counterDFS;
-            avgMovesUsedDFS = movesUsedDFS /counterDFS;
-        }
-        double avgTimeNeededRandFS=0;
-        double avgMovesUsedRandFS=0;
-        if (timeNeededRandFS != 0){
-            avgTimeNeededRandFS =timeNeededRandFS /counterRandFS;
-            avgMovesUsedRandFS = movesUsedRandFS /counterRandFS;;
-        }
-        double avgTimeNeededBFS=0;
-        double avgMovesUsedBFS=0;
-        if (counterBFS != 0){
-            avgTimeNeededBFS = timeNeededBFS /counterBFS;
-            avgMovesUsedBFS = movesUsedBFS /counterBFS;
-        }
-
-        averageLabel.setText(
-                "Depth limited DFS: " + "\t" +"\t" + "Time needed:" + "\t" + avgTimeNeededDFS + "\t" + "Moves used:" + "\t" + avgMovesUsedDFS +  "\t" + "Runs " + counterDFS + '\n' +
-                        "Depth limited RandFS" + "\t"+ "Time needed:" + "\t" +  avgTimeNeededRandFS + "\t" + "Moves used:" + "\t" + avgMovesUsedRandFS +  "\t" + "Runs " + counterRandFS +  '\n' +
-                        "Depth limited BFS" + "\t" +"\t"+ "Time needed:" + "\t" +  avgTimeNeededBFS + "\t" + "Moves used:" + "\t" + avgMovesUsedBFS +  "\t" + "Runs " + counterBFS +  '\n'
-        );
-    }
-
-    public HBox drawIterations(){
-        final TextField iterationsTextField = new TextField();
-        iterationsTextField.setPromptText("Enter Iteration Cicles (1)");
-        iterationsTextField.setPrefColumnCount(20);
-
-        Button applyButton = new Button("Run x Times");
-        applyButton.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent e) {
-                iterations = Integer.parseInt(iterationsTextField.getText());
-                System.out.println("Iterations set to: " + iterations);
-                for (int i=0; i<iterations; i++){
-                    executeNextSequence();
-                }
-
-            }
-        });
-
-        HBox hBoxRunIterations = new HBox(iterationsTextField , applyButton);
-        hBoxRunIterations.setSpacing(10);
-        return hBoxRunIterations;
-    }
-
-    public HBox drawSetupAlgorithmSelecter(){
-
-        RadioButton s1 = new RadioButton("Depth First Search");
-        RadioButton s2 = new RadioButton("Random First Search");
-        RadioButton s3 = new RadioButton("Breadth First Search");
-        RadioButton s4 = new RadioButton("Position Score");
-        RadioButton s5 = new RadioButton("Cross Block Score");
-
-        // create a toggle group
-        ToggleGroup sg = new ToggleGroup();
-        s1.setToggleGroup(sg);
-        s2.setToggleGroup(sg);
-        s3.setToggleGroup(sg);
-        s4.setToggleGroup(sg);
-        s5.setToggleGroup(sg);
-        s1.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent e) {
-                ai.setSelectedSetupHeuristic(0);
-            }
-        });
-        s2.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent e) {
-                ai.setSelectedSetupHeuristic(1);
-            }
-        });
-        s3.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent e) {
-                ai.setSelectedSetupHeuristic(2);
-            }
-        });
-        s4.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent e) {
-                ai.setSelectedSetupHeuristic(3);
-            }
-        });
-        s5.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent e) {
-                ai.setSelectedSetupHeuristic(4);
-            }
-        });
-
-        s1.setSelected(true);
-        HBox setupAlgorithms = new HBox(s1,s2,s3,s4,s5);
-        setupAlgorithms.setSpacing(10);
-        return setupAlgorithms;
-    }
-    public HBox drawAlgorithmSelecter(){
-        //Algorithm=0
-        //Uses Depth limited Depth first search
-        //Algorithm=1
-        //Uses Depth limited random first search
-        //Algorithm=2
-        //Uses Depth limited breadth first search
-        RadioButton v1 = new RadioButton("Depth First Search");
-        RadioButton v2 = new RadioButton("Random First Search");
-        RadioButton v3 = new RadioButton("Breadth First Search");
-        RadioButton v4 = new RadioButton("Air First Search");
-        RadioButton v5 = new RadioButton("Bredth First Search preloaded Setups");
-
-        // create a toggle group
-        ToggleGroup vg = new ToggleGroup();
-        v1.setToggleGroup(vg);
-        v2.setToggleGroup(vg);
-        v3.setToggleGroup(vg);
-        v4.setToggleGroup(vg);
-        v5.setToggleGroup(vg);
-
-
-        v1.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent e) {
-                ai.setSelectedVicAlgorithm(0);
-            }
-        });
-        //Algorithm=0
-        //Uses Depth limited Depth first search
-        v2.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent e) {
-                ai.setSelectedVicAlgorithm(1);
-            }
-        });
-        //Algorithm=1
-        //Uses Depth limited random first search
-        v3.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent e) {
-                ai.setSelectedVicAlgorithm(2);
-            }
-        });
-        //Algorithm=2
-        //Uses Depth limited breadth first search
-        v4.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent e) {
-                ai.setSelectedVicAlgorithm(3);
-            }
-        });
-        v5.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent e) {
-                ai.setSelectedVicAlgorithm(4);
-            }
-        });
-
-        v1.setSelected(true);
-        HBox vicAlgorithms = new HBox(v1,v2,v3,v4,v5);
-        vicAlgorithms.setSpacing(10);
-
-
-        return vicAlgorithms;
-    }
-
-    public HBox drawLimitsSelecter(){
-
-        final TextField depthLimitTextField = new TextField();
-        depthLimitTextField.setPromptText("Enter depthLimit (11)");
-        depthLimitTextField.setPrefColumnCount(10);
-
-        final TextField setupLimitTextField = new TextField();
-        setupLimitTextField.setPromptText("Enter setupLimit (4)");
-        setupLimitTextField.setPrefColumnCount(10);
-
-        Button applyButton = new Button("Apply");
-        applyButton.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent e) {
-                ai.setDepthLimit(Integer.parseInt(depthLimitTextField.getText()));
-                ai.setSetupLimit(Integer.parseInt(setupLimitTextField.getText()));
-                System.out.println("depthLimit: " + ai.getDepthLimit() + "         setupLimit: " + ai.getSetupLimit());
-            }
-        });
-
-        HBox hBoxLimits = new HBox(depthLimitTextField , setupLimitTextField , applyButton);
-        hBoxLimits.setSpacing(10);
-
-        return hBoxLimits;
-    }
-
-    public ScrollPane drawAnalysisScrollPane(){
-        ScrollPane scrollPane = new ScrollPane(analyisLabel);
-        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
-        scrollPane.setPrefViewportHeight(400);
-        return scrollPane;
-    }
-
-    public void updateAnalysisLabel(long timeUsed , int movesUsed){
-        analyisLabel.setText(analyisLabel.getText() + '\n'
-                + "Algorithm: " + algorithmChosenString(ai.getSelectedVicAlgorithm()) + "\t"
-                + "Depth Limit: " + ai.getDepthLimit()+ "\t"
-                + "Setup Limit: " + ai.getSetupLimit() + "\t"
-                + "Time needed: " + timeUsed + "\t"
-                + "Moves used: " + movesUsed);
-
-        VicAlgorithms algorithm;
-        switch (ai.getSelectedVicAlgorithm()) {
-            case 0:  algorithm = VicAlgorithms.DFS;
-                break;
-            case 1:  algorithm = VicAlgorithms.RFS;
-                break;
-            case 2:  algorithm = VicAlgorithms.BFS;
-                break;
-            default: algorithm= VicAlgorithms.UNDEFINED;
-        }
-
-        RunStat runStat = new RunStat(algorithm,ai.getDepthLimit(),ai.getSetupLimit(), timeUsed , movesUsed);
-        runStats.add(runStat);
-        updateAverage();
-
-    }
-
-    public String algorithmChosenString(int algorithmChosenInt){
-        String algorithmChosenString;
-        switch (algorithmChosenInt) {
-            case 0:  algorithmChosenString = "Depth limited DFS" + "\t";
-                break;
-            case 1:  algorithmChosenString = "Depth limited RandFS";
-                break;
-            case 2:  algorithmChosenString = "Depth limited BFS" + "\t";
-                break;
-            default: algorithmChosenString = "none";
-        }
-        return algorithmChosenString;
-    }
 
     //Searches for TreeSearch solution if successful visSeq will be refilled
     //otherwise visSeq is emptyList
@@ -750,6 +445,7 @@ public class DisplayFx {
         if (this.visSeq.isEmpty()){
             this.visSeq=new ArrayList<MoveCommand>();
             System.out.println("no result");
+            anaWindow.updateAnalysisLabel(0,0,1);
             game.forceNewVictoryPoint();
             this.moveListlist = new ArrayList<>();
             redrawMovelist();
@@ -764,16 +460,13 @@ public class DisplayFx {
 
         }
         long timerEnd = System.currentTimeMillis();
-        long timeUsed = (long) ((timerEnd-timerBegin)* 0.001);
-        updateAnalysisLabel(timeUsed, movesUsed);
+        long timeDiff = timerEnd-timerBegin;
+        float timeUsed = (float) timeDiff* (float) 0.001;
+        anaWindow.updateAnalysisLabel(timeUsed, movesUsed,0);
 
 
         //System.out.println("iterations to go: " + iterations);
 
-    }
-
-    public void visualizeSeq(ArrayList<MoveCommand> moveCommands){
-        this.visSeq=moveCommands;
     }
 
     public void executeNextMove(){
@@ -802,17 +495,6 @@ public class DisplayFx {
         });
 
         return revertLastMoveButton;
-    }
-
-    //same functionality as the Button but accessible for the AI
-    public void revertMove(){
-        game.revertMove();
-        redrawRobots();
-        if (moveListlist.size() > 0){
-            moveListlist.remove(moveListlist.size()-1);
-        }
-        redrawMovelist();
-        redrawRobots();
     }
 
     public HBox drawColorButtons(){
@@ -907,6 +589,7 @@ public class DisplayFx {
 
     }
 
+    //Visually Moves the Robot, Calls certain redraw Methods
     public boolean moveRobot(Direction selectedDirection, Colors selectedColor){
         System.out.println("Selected: " + selectedColor + " " + selectedDirection);
         MoveCommand mCmd = new MoveCommand(selectedColor, selectedDirection);
@@ -961,6 +644,9 @@ public class DisplayFx {
         movelistScrollPane.setVvalue(movelistScrollPane.getVmax());
     }
 
+
+
+    //Getter and Setter madness
     public Colors getSelectedColor() {
         return selectedColor;
     }

@@ -1,26 +1,35 @@
 package View;
 
+import Data.Enums.SetupAlgorithms;
 import Data.Enums.VicAlgorithms;
+import Data.RunConfig;
 
 /**
  * Created by Martin Eberle aka WillShakesBeer on 02.03.2022.
  */
 
 //Should probably be located in Data
+//contains data from one analysis run (one iteration)
 public class RunStat {
+
+    RunConfig config;
     VicAlgorithms heuristic;
+    SetupAlgorithms setupHeuristic;
     int depthLimit;
     int setupLimit;
-    long timeNeeded;
+    float timeNeeded;
     int movesUsed;
 
-    public RunStat(VicAlgorithms heuristic, int depthLimit, int setupLimit, long timeNeeded, int movesUsed){
-        this.heuristic=heuristic;
-        this.depthLimit=depthLimit;
-        this.setupLimit=setupLimit;
+    int timesFailed;
+
+    public RunStat(RunConfig config, float timeNeeded, int movesUsed, int timesFailed){
+        this.config= config;
         this.timeNeeded=timeNeeded;
         this.movesUsed=movesUsed;
-
+        this.heuristic=config.getVicAlgo();
+        this.setupHeuristic=config.getSetupAlgo();
+        this.depthLimit=config.getDepthLimit();
+        this.setupLimit=config.getSetupLimit();
     }
 
     public VicAlgorithms getAlgorithm() {
@@ -47,7 +56,7 @@ public class RunStat {
         this.setupLimit = setupLimit;
     }
 
-    public long getTimeNeeded() {
+    public float getTimeNeeded() {
         return timeNeeded;
     }
 
@@ -61,5 +70,33 @@ public class RunStat {
 
     public void setMovesUsed(int movesUsed) {
         this.movesUsed = movesUsed;
+    }
+
+    public VicAlgorithms getHeuristic() {
+        return heuristic;
+    }
+
+    public int getTimesFailed() {
+        return timesFailed;
+    }
+
+    public void setTimesFailed(int timesFailed) {
+        this.timesFailed = timesFailed;
+    }
+
+    public SetupAlgorithms getSetupHeuristic() {
+        return setupHeuristic;
+    }
+
+    public void setSetupHeuristic(SetupAlgorithms setupHeuristic) {
+        this.setupHeuristic = setupHeuristic;
+    }
+
+    public RunConfig getConfig() {
+        return config;
+    }
+
+    public void setConfig(RunConfig config) {
+        this.config = config;
     }
 }

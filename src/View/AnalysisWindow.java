@@ -123,7 +123,7 @@ public class AnalysisWindow {
         RadioButton v2 = new RadioButton("Random First Search");
         RadioButton v3 = new RadioButton("Breadth First Search");
         RadioButton v4 = new RadioButton("Air First Search");
-        RadioButton v5 = new RadioButton("Bredth First Search preloaded Setups");
+        RadioButton v5 = new RadioButton("Breadth First Search preloaded Setups");
 
         // create a toggle group
         ToggleGroup vg = new ToggleGroup();
@@ -229,6 +229,7 @@ public class AnalysisWindow {
                 int iterations = Integer.parseInt(iterationsTextField.getText());
                 System.out.println("Iterations set to: " + iterations);
                 for (int i=0; i<iterations; i++){
+                    System.out.println("remaining iterations: " +(iterations-i));
                     display.executeNextSequence();
                 }
 
@@ -241,7 +242,6 @@ public class AnalysisWindow {
     }
 
 
-    //@todo implement in Utility
     public Label drawAverage(){
         String averageLabelString ="";
         for(RunConfig stat :utility.getStatList()){
@@ -259,9 +259,6 @@ public class AnalysisWindow {
         averageLabel.setText(averageLabelString);
     }
 
-
-
-    //@todo Outsource to DisplayUtility
     public void updateAnalysisLabel(float timeUsed , int movesUsed, int timesFailed){
         analyisLabel.setText(analyisLabel.getText() + '\n'
                 + "Algorithm: " + utility.intToVicAlgo(ai.getSelectedVicAlgorithm()) + "\t"

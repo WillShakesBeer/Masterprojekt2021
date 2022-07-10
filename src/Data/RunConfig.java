@@ -37,8 +37,7 @@ public class RunConfig {
     public void addRunstat(RunStat stat){
         iterations = iterations+1;
         timesFailed = timesFailed+stat.getTimesFailed();
-        if(stat.getTimesFailed()!=1){
-            timeUsed = timeUsed+ stat.getTimeNeeded();
+        if(stat.getTimesFailed()==0){
             movesUsed = movesUsed+ stat.getMovesUsed();
         }
     }

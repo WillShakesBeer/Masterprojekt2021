@@ -24,7 +24,7 @@ public class Game {
         VictoryPoint newVic = createFirstVictoryPoint();
         //testPoint vor DLDF search(reachable within 5 moves)
         Board board = new Board(config.getLength(),config.getHeight(),config.getObstacleList(),config.getRobotList()
-        ,config.getVictorySpawns(),config.getStartVic());
+        ,config.getVictorySpawns(),newVic);
         state = new Gamestate(board,0);
 
     }

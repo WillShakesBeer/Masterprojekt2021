@@ -34,6 +34,8 @@ public class TreeSearch extends Thread{
     int depthLimit;
     int maxDegree;
 
+    boolean interrupt=false;
+
     //output
     MoveNode result=null;
     ArrayList<ArrayList<MoveCommand>> resultList;
@@ -84,7 +86,11 @@ public class TreeSearch extends Thread{
                 otherColors.add(currColor);
             }
         }
-        while (!this.setupExplore.isEmpty() && !Thread.currentThread().isInterrupted()){
+        while (!this.setupExplore.isEmpty() && !Thread.currentThread().isInterrupted() && !interrupt){
+            if(interrupt){
+                this.result=null;
+                return;
+            }
             if(selectedSetupHeuristic!=4) {
                 if (this.selectedVicHeuristic == 4) {
                     ArrayList<MoveNode> setupList = setupSearch.loadAllSetups();
@@ -119,6 +125,10 @@ public class TreeSearch extends Thread{
                 }
             }
             while (!toExplore.isEmpty()) {
+                if(interrupt){
+                    this.result=null;
+                    return;
+                }
                 float minHValue;
 
                 //selects the next expanded Node
@@ -216,6 +226,10 @@ public class TreeSearch extends Thread{
     }
 
 
+    public void stopSearch(){
+        this.interrupt=true;
+        this.setupSearch.interrupt=true;
+    }
 
     public MoveNode getResult() {
         return result;

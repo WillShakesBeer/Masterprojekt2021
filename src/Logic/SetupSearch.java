@@ -28,6 +28,8 @@ public class SetupSearch {
     int selectedSetupHeuristic;
     int setupLimit;
 
+    boolean interrupt;
+
     //Expandable SetupNodes
     ArrayList<MoveNode> setupExplore;
     //Setupnode that will be used as root of main tree
@@ -144,6 +146,9 @@ public class SetupSearch {
     public ArrayList<MoveNode> loadAllSetups(){
         ArrayList<MoveNode> setupList = new ArrayList<MoveNode>();
         while (!this.setupExplore.isEmpty()){
+            if(interrupt){
+                return new ArrayList<MoveNode>();
+            }
             MoveNode newSetup = createNewSetup();
             switch (selectedSetupHeuristic){
                 case 3: case 4:

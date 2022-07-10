@@ -445,11 +445,12 @@ public class DisplayFx {
         if (this.visSeq.isEmpty()){
             this.visSeq=new ArrayList<MoveCommand>();
             System.out.println("no result");
-            anaWindow.updateAnalysisLabel(0,0,1);
+            anaWindow.updateAnalysisLabel(10,0,1);
             game.forceNewVictoryPoint();
             this.moveListlist = new ArrayList<>();
             redrawMovelist();
             redrawRobots();
+            return;
         }
         else{
             redrawMovelist();

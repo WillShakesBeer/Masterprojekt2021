@@ -30,6 +30,7 @@ public class RunStat {
         this.setupHeuristic=config.getSetupAlgo();
         this.depthLimit=config.getDepthLimit();
         this.setupLimit=config.getSetupLimit();
+        this.timesFailed=timesFailed;
     }
 
     public VicAlgorithms getAlgorithm() {

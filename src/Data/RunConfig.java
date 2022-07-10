@@ -38,7 +38,9 @@ public class RunConfig {
         iterations = iterations+1;
         timeUsed = timeUsed+ stat.getTimeNeeded();
         timesFailed = timesFailed+stat.getTimesFailed();
-        movesUsed = movesUsed+ stat.getMovesUsed();
+        if(stat.getTimesFailed()==0){
+            movesUsed = movesUsed+ stat.getMovesUsed();
+        }
     }
 
     public String toString(){

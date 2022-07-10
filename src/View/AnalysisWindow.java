@@ -123,7 +123,7 @@ public class AnalysisWindow {
         RadioButton v2 = new RadioButton("Random First Search");
         RadioButton v3 = new RadioButton("Breadth First Search");
         RadioButton v4 = new RadioButton("Air First Search");
-        RadioButton v5 = new RadioButton("Bredth First Search preloaded Setups");
+        RadioButton v5 = new RadioButton("Breadth First Search preloaded Setups");
 
         // create a toggle group
         ToggleGroup vg = new ToggleGroup();
@@ -229,6 +229,7 @@ public class AnalysisWindow {
                 int iterations = Integer.parseInt(iterationsTextField.getText());
                 System.out.println("Iterations set to: " + iterations);
                 for (int i=0; i<iterations; i++){
+                    System.out.println("remaining iterations: " +(iterations-i));
                     display.executeNextSequence();
                 }
 
@@ -241,7 +242,6 @@ public class AnalysisWindow {
     }
 
 
-    //@todo implement in Utility
     public Label drawAverage(){
         String averageLabelString ="";
         for(RunConfig stat :utility.getStatList()){
@@ -259,69 +259,6 @@ public class AnalysisWindow {
         averageLabel.setText(averageLabelString);
     }
 
-
-    //@todo Replace with DisplayUtility.getAverageList()
-    /*public void updateAverage(){
-
-        long timeNeededDFS=0;
-        int movesUsedDFS=0;
-        int counterDFS=0;
-        long timeNeededRandFS=0;
-        int movesUsedRandFS=0;
-        int counterRandFS=0;
-        long timeNeededBFS=0;
-        int movesUsedBFS=0;
-        int counterBFS=0;
-
-        for (RunStat runStat:runStats){
-            switch (runStat.getAlgorithm()){
-                case DFS:
-                    timeNeededDFS= timeNeededDFS +runStat.getTimeNeeded();
-                    movesUsedDFS = movesUsedDFS + runStat.getMovesUsed();
-                    counterDFS++;
-                    break;
-                case RFS:
-                    timeNeededRandFS= timeNeededRandFS +runStat.getTimeNeeded();
-                    movesUsedRandFS = movesUsedRandFS + runStat.getMovesUsed();
-                    counterRandFS++;
-                    break;
-                case BFS:
-                    timeNeededBFS = timeNeededBFS +runStat.getTimeNeeded();
-                    movesUsedBFS = movesUsedBFS + runStat.getMovesUsed();
-                    counterBFS++;
-                    break;
-                default:
-                    break;
-            }
-        }
-        double avgTimeNeededDFS =0;
-        double avgMovesUsedDFS=0;
-        if (counterDFS != 0){
-            avgTimeNeededDFS = timeNeededDFS / counterDFS;
-            avgMovesUsedDFS = movesUsedDFS /counterDFS;
-        }
-        double avgTimeNeededRandFS=0;
-        double avgMovesUsedRandFS=0;
-        if (timeNeededRandFS != 0){
-            avgTimeNeededRandFS =timeNeededRandFS /counterRandFS;
-            avgMovesUsedRandFS = movesUsedRandFS /counterRandFS;;
-        }
-        double avgTimeNeededBFS=0;
-        double avgMovesUsedBFS=0;
-        if (counterBFS != 0){
-            avgTimeNeededBFS = timeNeededBFS /counterBFS;
-            avgMovesUsedBFS = movesUsedBFS /counterBFS;
-        }
-
-        averageLabel.setText(
-                "Depth limited DFS: " + "\t" +"\t" + "Time needed:" + "\t" + avgTimeNeededDFS + "\t" + "Moves used:" + "\t" + avgMovesUsedDFS +  "\t" + "Runs " + counterDFS + '\n' +
-                        "Depth limited RandFS" + "\t"+ "Time needed:" + "\t" +  avgTimeNeededRandFS + "\t" + "Moves used:" + "\t" + avgMovesUsedRandFS +  "\t" + "Runs " + counterRandFS +  '\n' +
-                        "Depth limited BFS" + "\t" +"\t"+ "Time needed:" + "\t" +  avgTimeNeededBFS + "\t" + "Moves used:" + "\t" + avgMovesUsedBFS +  "\t" + "Runs " + counterBFS +  '\n'
-        );
-    }*/
-
-
-    //@todo Outsource to DisplayUtility
     public void updateAnalysisLabel(float timeUsed , int movesUsed, int timesFailed){
         analyisLabel.setText(analyisLabel.getText() + '\n'
                 + "Algorithm: " + utility.intToVicAlgo(ai.getSelectedVicAlgorithm()) + "\t"

@@ -39,21 +39,25 @@ public class AI {
         Thread t = new Thread(treeSearch);
         Timer timer = new Timer();
         System.out.println("Start Treesearch");
-        long startTime = System.nanoTime();
+        long startTime = System.currentTimeMillis();
         //timer.schedule(new TimeOutTask(t, timer,this.game), 5*1000);
         t.start();
         MoveNode result;
         try {
+            while (System.currentTimeMillis()< (startTime+20000) && t.isAlive()){
+            }
+            treeSearch.stopSearch();
             t.join();
-        } catch (InterruptedException e) {
+            System.out.println("Timeout");
+        } catch (Exception e) {
             e.printStackTrace();
         }
         result=treeSearch.getResult();
         if (result == null) {
             return new MoveNode();
         } else {
-            long stopTime = System.nanoTime();
-            long timeUsed=(stopTime-startTime)/(long)(1000000000);
+            long stopTime = System.currentTimeMillis();
+            long timeUsed=(stopTime-startTime)/(long)(1000);
             System.out.println("Time used "+(timeUsed)+" seconds");
             //result.setMoveCommands(clearCycles(result.getMoveCommands()));
             return result;

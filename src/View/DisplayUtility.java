@@ -49,6 +49,10 @@ public class DisplayUtility {
                 break;
             case 4:  algoString = "Breadth First Search preloaded Setups" + "\t";
                 break;
+            case 5:  algoString = "Generic Breadth" + "\t";
+                break;
+            case 6:  algoString = "Generic Depth" + "\t";
+                break;
             default: algoString = "undefined";
         }
         return algoString;
@@ -82,6 +86,10 @@ public class DisplayUtility {
             case AIR_FS:  algoString = "Air First Search" + "\t";
                 break;
             case BFS_PRELOAD:  algoString = "Breadth First Search preloaded Setups" + "\t";
+                break;
+            case BGENERIC:  algoString = "Generic Breadth" + "\t";
+                break;
+            case DGENERIC:  algoString = "Generic Depth" + "\t";
                 break;
             default: algoString = "undefined";
         }

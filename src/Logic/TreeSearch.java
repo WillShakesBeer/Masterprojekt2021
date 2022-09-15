@@ -77,7 +77,11 @@ public class TreeSearch extends Thread{
     public void run() {
 
         if (this.selectedVicHeuristic == 5){
-            this.genericSearch();
+            this.genericBreadthSearch();
+            return;
+        }
+        if (this.selectedVicHeuristic == 6){
+            this.genericDepthSearch();
             return;
         }
         if(this.selectedSetupHeuristic==4){
@@ -230,7 +234,7 @@ public class TreeSearch extends Thread{
     }
 
 
-    public void genericSearch(){
+    public void genericBreadthSearch(){
         MoveNode curr;
         MoveNode root = new MoveNode();
         toExplore=new ArrayList<MoveNode>();
@@ -241,6 +245,44 @@ public class TreeSearch extends Thread{
                 return;
             }
             curr = toExplore.get(toExplore.size()-1);
+            if(curr.getMoveCommands().size() > depthLimit){
+                toExplore.remove(curr);
+            }else{
+                for(Direction direction : Direction.values()){
+                    for(Colors color : Colors.values()){
+                        ArrayList<MoveCommand> childCommands= (ArrayList<MoveCommand>) curr.getMoveCommands().clone();
+                        childCommands.add(new MoveCommand(color,direction));
+                        MoveNode recentC=new MoveNode(childCommands);
+                        int seqSmart = utility.isSeqSmart(recentC.getMoveCommands());
+                        if(seqSmart ==0){
+                            this.result=recentC;
+                            return;
+                        }
+                        if(seqSmart == 1){
+                            toExplore.add(0,recentC);
+                        }
+                    }
+                }
+            }
+            toExplore.remove(curr);
+
+        }
+        this.result=null;
+
+    }
+
+    //todo: Solutions are either Maxlength or 1 fix
+    public void genericDepthSearch(){
+        MoveNode curr;
+        MoveNode root = new MoveNode();
+        toExplore=new ArrayList<MoveNode>();
+        toExplore.add(root);
+        while (!toExplore.isEmpty()){
+            if(interrupt){
+                this.result=null;
+                return;
+            }
+            curr = toExplore.get(0);
             if(curr.getMoveCommands().size() > depthLimit){
                 toExplore.remove(curr);
             }else{

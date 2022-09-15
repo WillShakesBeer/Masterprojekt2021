@@ -124,7 +124,8 @@ public class AnalysisWindow {
         RadioButton v3 = new RadioButton("Breadth First Search");
         RadioButton v4 = new RadioButton("Air First Search");
         RadioButton v5 = new RadioButton("Breadth First Search preloaded Setups");
-        RadioButton v6 = new RadioButton("Generic Search");
+        RadioButton v6 = new RadioButton("Generic BSearch");
+        RadioButton v7 = new RadioButton("Generic DSearch");
 
         // create a toggle group
         ToggleGroup vg = new ToggleGroup();
@@ -134,6 +135,7 @@ public class AnalysisWindow {
         v4.setToggleGroup(vg);
         v5.setToggleGroup(vg);
         v6.setToggleGroup(vg);
+        v7.setToggleGroup(vg);
 
 
         v1.setOnAction(new EventHandler<ActionEvent>() {
@@ -178,8 +180,14 @@ public class AnalysisWindow {
                 ai.setSelectedVicAlgorithm(5);
             }
         });
+        v7.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent e) {
+                ai.setSelectedVicAlgorithm(6);
+            }
+        });
         v1.setSelected(true);
-        HBox vicAlgorithms = new HBox(v1,v2,v3,v4,v5,v6);
+        HBox vicAlgorithms = new HBox(v1,v2,v3,v4,v5,v6,v7);
         vicAlgorithms.setSpacing(10);
 
 
@@ -291,7 +299,9 @@ public class AnalysisWindow {
                 break;
             case 4:  algorithm = VicAlgorithms.BFS_PRELOAD;
                 break;
-            case 5:  algorithm = VicAlgorithms.GENERIC;
+            case 5:  algorithm = VicAlgorithms.BGENERIC;
+                break;
+            case 6:  algorithm = VicAlgorithms.DGENERIC;
                 break;
             default: algorithm= VicAlgorithms.UNDEFINED;
         }

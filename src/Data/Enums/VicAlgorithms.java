@@ -5,6 +5,6 @@ package Data.Enums;
  */
 //Added Undefined to avoid NullPointerExceptions in case of Testing undefined Algorithms
 public enum VicAlgorithms {
-        DFS,RFS,BFS,AIR_FS,BFS_PRELOAD,GENERIC,UNDEFINED
+        DFS,RFS,BFS,AIR_FS,BFS_PRELOAD, BGENERIC,DGENERIC,UNDEFINED
 
 }

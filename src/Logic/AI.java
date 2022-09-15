@@ -46,7 +46,7 @@ public class AI {
         t.start();
         MoveNode result;
         try {
-            while (System.currentTimeMillis()< (startTime+300000) && t.isAlive()){
+            while (System.currentTimeMillis()< (startTime+20000) && t.isAlive()){
             }
             if(t.isAlive()){
                 treeSearch.stopSearch();

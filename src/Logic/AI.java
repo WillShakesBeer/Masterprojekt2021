@@ -19,6 +19,7 @@ public class AI {
     private int depthLimit;
     private int setupLimit;
     private int maxDegree;
+    private boolean interrupted;
 
 
     public AI(Game game){
@@ -40,15 +41,23 @@ public class AI {
         Timer timer = new Timer();
         System.out.println("Start Treesearch");
         long startTime = System.currentTimeMillis();
+        interrupted=false;
         //timer.schedule(new TimeOutTask(t, timer,this.game), 5*1000);
         t.start();
         MoveNode result;
         try {
-            while (System.currentTimeMillis()< (startTime+20000) && t.isAlive()){
+            while (System.currentTimeMillis()< (startTime+300000) && t.isAlive()){
             }
-            treeSearch.stopSearch();
+            if(t.isAlive()){
+                treeSearch.stopSearch();
+            }
+            if(treeSearch.getInterrupt()){
+                interrupted=true;
+                System.out.println("Timeout");
+            }else{
+                interrupted=false;
+            }
             t.join();
-            System.out.println("Timeout");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -182,5 +191,13 @@ public class AI {
 
     public void setSetupLimit(int setupLimit) {
         this.setupLimit = setupLimit;
+    }
+
+    public boolean isInterrupted() {
+        return interrupted;
+    }
+
+    public void setInterrupted(boolean interrupted) {
+        this.interrupted = interrupted;
     }
 }

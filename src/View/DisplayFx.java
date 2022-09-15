@@ -445,7 +445,11 @@ public class DisplayFx {
         if (this.visSeq.isEmpty()){
             this.visSeq=new ArrayList<MoveCommand>();
             System.out.println("no result");
-            anaWindow.updateAnalysisLabel(10,0,1);
+            if(ai.isInterrupted()){
+                anaWindow.updateAnalysisLabel(10,0,0,1);
+            }else{
+                anaWindow.updateAnalysisLabel(10,0,1,0);
+            }
             game.forceNewVictoryPoint();
             this.moveListlist = new ArrayList<>();
             redrawMovelist();
@@ -463,7 +467,7 @@ public class DisplayFx {
         long timerEnd = System.currentTimeMillis();
         long timeDiff = timerEnd-timerBegin;
         float timeUsed = (float) timeDiff* (float) 0.001;
-        anaWindow.updateAnalysisLabel(timeUsed, movesUsed,0);
+        anaWindow.updateAnalysisLabel(timeUsed, movesUsed,0,0);
     }
 
     public void executeNextMove(){

@@ -76,6 +76,10 @@ public class TreeSearch extends Thread{
     @Override
     public void run() {
 
+        if (this.selectedVicHeuristic == 5){
+            this.genericSearch();
+            return;
+        }
         if(this.selectedSetupHeuristic==4){
             utility.loadCriticalPath(utility.getMaxDegree());
         }
@@ -226,6 +230,42 @@ public class TreeSearch extends Thread{
     }
 
 
+    public void genericSearch(){
+        MoveNode curr;
+        MoveNode root = new MoveNode();
+        toExplore=new ArrayList<MoveNode>();
+        toExplore.add(root);
+        while (!toExplore.isEmpty()){
+            if(interrupt){
+                this.result=null;
+                return;
+            }
+            curr = toExplore.get(toExplore.size()-1);
+            if(curr.getMoveCommands().size() > depthLimit){
+                toExplore.remove(curr);
+            }else{
+                for(Direction direction : Direction.values()){
+                    for(Colors color : Colors.values()){
+                        ArrayList<MoveCommand> childCommands= (ArrayList<MoveCommand>) curr.getMoveCommands().clone();
+                        childCommands.add(new MoveCommand(color,direction));
+                        MoveNode recentC=new MoveNode(childCommands);
+                        int seqSmart = utility.isSeqSmart(recentC.getMoveCommands());
+                        if(seqSmart ==0){
+                            this.result=recentC;
+                            return;
+                        }
+                        if(seqSmart == 1){
+                            toExplore.add(0,recentC);
+                        }
+                    }
+                }
+            }
+            toExplore.remove(curr);
+
+        }
+        this.result=null;
+
+    }
     public void stopSearch(){
         this.interrupt=true;
         this.setupSearch.interrupt=true;
@@ -239,4 +279,11 @@ public class TreeSearch extends Thread{
         this.result = result;
     }
 
+    public boolean getInterrupt() {
+        return interrupt;
+    }
+
+    public void setInterrupt(boolean interrupt) {
+        this.interrupt = interrupt;
+    }
 }

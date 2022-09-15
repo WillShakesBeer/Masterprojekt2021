@@ -21,8 +21,9 @@ public class RunStat {
     int movesUsed;
 
     int timesFailed;
+    int amntTimeout;
 
-    public RunStat(RunConfig config, float timeNeeded, int movesUsed, int timesFailed){
+    public RunStat(RunConfig config, float timeNeeded, int movesUsed, int timesFailed,int amntTimeout){
         this.config= config;
         this.timeNeeded=timeNeeded;
         this.movesUsed=movesUsed;
@@ -31,6 +32,7 @@ public class RunStat {
         this.depthLimit=config.getDepthLimit();
         this.setupLimit=config.getSetupLimit();
         this.timesFailed=timesFailed;
+        this.amntTimeout=amntTimeout;
     }
 
     public VicAlgorithms getAlgorithm() {
@@ -61,7 +63,7 @@ public class RunStat {
         return timeNeeded;
     }
 
-    public void setTimeNeeded(long timeNeeded) {
+    public void setTimeNeeded(float timeNeeded) {
         this.timeNeeded = timeNeeded;
     }
 
@@ -99,5 +101,13 @@ public class RunStat {
 
     public void setConfig(RunConfig config) {
         this.config = config;
+    }
+
+    public int getAmntTimeout() {
+        return amntTimeout;
+    }
+
+    public void setAmntTimeout(int amntTimeout) {
+        this.amntTimeout = amntTimeout;
     }
 }

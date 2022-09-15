@@ -49,6 +49,7 @@ public class Utility {
     //1 => no crash
     //-1 => crash
     //0 => Point Scored
+    //-2 => Last move reverted
     public int isSeqSmart(ArrayList<MoveCommand> moveCommands){
         for(int i =0;i<moveCommands.size();i++){
 

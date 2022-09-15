@@ -50,7 +50,7 @@ public class AnalysisWindow {
         vBoxColumns.setPadding(new Insets(10));
         vBoxColumns.setSpacing(10);
 
-        Scene secondScene = new Scene(vBoxColumns, 970,700);
+        Scene secondScene = new Scene(vBoxColumns, 1300,800);
         analysisWindow.setTitle("Analysis");
         analysisWindow.setScene(secondScene);
         analysisWindow.setX(0);
@@ -124,6 +124,7 @@ public class AnalysisWindow {
         RadioButton v3 = new RadioButton("Breadth First Search");
         RadioButton v4 = new RadioButton("Air First Search");
         RadioButton v5 = new RadioButton("Breadth First Search preloaded Setups");
+        RadioButton v6 = new RadioButton("Generic Search");
 
         // create a toggle group
         ToggleGroup vg = new ToggleGroup();
@@ -132,6 +133,7 @@ public class AnalysisWindow {
         v3.setToggleGroup(vg);
         v4.setToggleGroup(vg);
         v5.setToggleGroup(vg);
+        v6.setToggleGroup(vg);
 
 
         v1.setOnAction(new EventHandler<ActionEvent>() {
@@ -170,9 +172,14 @@ public class AnalysisWindow {
                 ai.setSelectedVicAlgorithm(4);
             }
         });
-
+        v6.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent e) {
+                ai.setSelectedVicAlgorithm(5);
+            }
+        });
         v1.setSelected(true);
-        HBox vicAlgorithms = new HBox(v1,v2,v3,v4,v5);
+        HBox vicAlgorithms = new HBox(v1,v2,v3,v4,v5,v6);
         vicAlgorithms.setSpacing(10);
 
 
@@ -259,7 +266,7 @@ public class AnalysisWindow {
         averageLabel.setText(averageLabelString);
     }
 
-    public void updateAnalysisLabel(float timeUsed , int movesUsed, int timesFailed){
+    public void updateAnalysisLabel(float timeUsed , int movesUsed, int timesFailed,int amntTimeout){
         analyisLabel.setText(analyisLabel.getText() + '\n'
                 + "Algorithm: " + utility.intToVicAlgo(ai.getSelectedVicAlgorithm()) + "\t"
                 + "SetupAlgorithm: "+ utility.intToSetupHeuristic(ai.getSelectedSetupHeuristic()) + "\t"
@@ -267,7 +274,8 @@ public class AnalysisWindow {
                 + "Setup Limit: " + ai.getSetupLimit() + "\t"
                 + "Time needed: " + timeUsed + "\t"
                 + "Moves used: " + movesUsed + "\t"
-                + "Times failed " + timesFailed);
+                + "Times failed " + timesFailed + "\t"
+                + "Timeouts " + amntTimeout);
 
 
         VicAlgorithms algorithm;
@@ -282,6 +290,8 @@ public class AnalysisWindow {
             case 3:  algorithm = VicAlgorithms.AIR_FS;
                 break;
             case 4:  algorithm = VicAlgorithms.BFS_PRELOAD;
+                break;
+            case 5:  algorithm = VicAlgorithms.GENERIC;
                 break;
             default: algorithm= VicAlgorithms.UNDEFINED;
         }
@@ -303,7 +313,7 @@ public class AnalysisWindow {
 
         RunConfig config = new RunConfig(algorithm,setup, ai.getDepthLimit(), ai.getSetupLimit());
 
-        RunStat runStat = new RunStat(config, timeUsed , movesUsed,timesFailed);
+        RunStat runStat = new RunStat(config, timeUsed , movesUsed,timesFailed, amntTimeout);
         runStats.add(runStat);
         utility.updateStats(runStat);
         updateAverage();

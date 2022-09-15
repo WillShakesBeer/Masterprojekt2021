@@ -15,6 +15,7 @@ public class RunConfig {
     int setupLimit;
     float timeUsed;
     int timesFailed;
+    int amntTimeout;
     int iterations;
     int movesUsed;
 
@@ -37,14 +38,16 @@ public class RunConfig {
     public void addRunstat(RunStat stat){
         iterations = iterations+1;
         timesFailed = timesFailed+stat.getTimesFailed();
-        if(stat.getTimesFailed()==0){
+        amntTimeout = amntTimeout + stat.getAmntTimeout();
+        if(stat.getTimesFailed()==0 && stat.getAmntTimeout() ==0){
             movesUsed = movesUsed+ stat.getMovesUsed();
+            timeUsed = timeUsed + stat.getTimeNeeded();
         }
     }
 
     public String toString(){
-        float avgTimeNeeded = (float) timeUsed / (float) (iterations-timesFailed);
-        float avgMovesNeeded = (float) movesUsed / (float) (iterations-timesFailed);
+        float avgTimeNeeded = (float) timeUsed / (float) (iterations-timesFailed-amntTimeout);
+        float avgMovesNeeded = (float) movesUsed / (float) (iterations-timesFailed-amntTimeout);
         String result = "";
         DisplayUtility utility = new DisplayUtility();
         result = result + utility.enumToVicAlgo(this.vicAlgo) +"\t";
@@ -52,6 +55,7 @@ public class RunConfig {
         result = result + "Time needed " + avgTimeNeeded+"\t";
         result = result + "Moves used " + avgMovesNeeded +"\t";
         result = result + "Times failed " +timesFailed + "\t";
+        result = result + "Timeouts " +amntTimeout + "\t";
         result = result + "Iterations " +iterations + "\n";
         return result;
     }

@@ -45,8 +45,10 @@ public class AI {
         //timer.schedule(new TimeOutTask(t, timer,this.game), 5*1000);
         t.start();
         MoveNode result;
+        int timeLimit=30000;
+        //20000
         try {
-            while (System.currentTimeMillis()< (startTime+20000) && t.isAlive()){
+            while (System.currentTimeMillis()< (startTime+timeLimit) && t.isAlive()){
             }
             if(t.isAlive()){
                 treeSearch.stopSearch();

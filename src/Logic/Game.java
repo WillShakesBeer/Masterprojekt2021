@@ -22,6 +22,8 @@ public class Game {
     public Game(Config config){
         this.config=config;
         VictoryPoint newVic = createFirstVictoryPoint();
+        //newVic = new VictoryPoint(new Coord(12,2), Colors.YELLOW);
+        newVic = config.getStartVic();
         //testPoint vor DLDF search(reachable within 5 moves)
         Board board = new Board(config.getLength(),config.getHeight(),config.getObstacleList(),config.getRobotList()
         ,config.getVictorySpawns(),newVic);

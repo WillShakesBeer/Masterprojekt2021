@@ -157,6 +157,9 @@ public class SetupSearch {
                         utility.insertInOrder(newSetup,setupList);
                     }
                 break;
+                case 0:
+                    setupList.add(newSetup);
+                break;
                 default:
                     utility.insertInOrder(newSetup,setupList);
                 break;

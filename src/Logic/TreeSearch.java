@@ -273,10 +273,19 @@ public class TreeSearch extends Thread{
 
     //todo: Solutions are either Maxlength or 1 fix
     public void genericDepthSearch(){
+        int precomputedSetups = 1;
         MoveNode curr;
         MoveNode root = new MoveNode();
         toExplore=new ArrayList<MoveNode>();
         toExplore.add(root);
+        if(precomputedSetups==1){
+            ArrayList<MoveNode> setupList = setupSearch.loadAllSetups();
+            toExplore = new ArrayList<MoveNode>();
+            for (MoveNode currSetup : setupList) {
+                MoveNode currSetupCopy = new MoveNode((ArrayList<MoveCommand>) currSetup.getMoveCommands().clone(), currSetup.getHValue());
+                toExplore.add(currSetupCopy);
+            }
+        }
         while (!toExplore.isEmpty()){
             if(interrupt){
                 this.result=null;
@@ -287,18 +296,36 @@ public class TreeSearch extends Thread{
                 toExplore.remove(curr);
             }else{
                 for(Direction direction : Direction.values()){
-                    for(Colors color : Colors.values()){
-                        ArrayList<MoveCommand> childCommands= (ArrayList<MoveCommand>) curr.getMoveCommands().clone();
-                        childCommands.add(new MoveCommand(color,direction));
-                        MoveNode recentC=new MoveNode(childCommands);
-                        int seqSmart = utility.isSeqSmart(recentC.getMoveCommands());
-                        if(seqSmart ==0){
-                            this.result=recentC;
-                            return;
-                        }
-                        if(seqSmart == 1){
-                            toExplore.add(0,recentC);
-                        }
+                    switch (precomputedSetups){
+                        case 1:
+                            Colors vicColor = this.game.getState().getBoard().getVictoryPoint().getColor();
+                            ArrayList<MoveCommand> childCommands1= (ArrayList<MoveCommand>) curr.getMoveCommands().clone();
+                            childCommands1.add(new MoveCommand(vicColor,direction));
+                            MoveNode recentC1=new MoveNode(childCommands1);
+                            int seqSmart1 = utility.isSeqSmart(recentC1.getMoveCommands());
+                            if(seqSmart1 ==0){
+                                this.result=recentC1;
+                                return;
+                            }
+                            if(seqSmart1 == 1){
+                                toExplore.add(0,recentC1);
+                            }
+                            break;
+                        case 0:
+                            for(Colors color : Colors.values()){
+                                ArrayList<MoveCommand> childCommands= (ArrayList<MoveCommand>) curr.getMoveCommands().clone();
+                                childCommands.add(new MoveCommand(color,direction));
+                                MoveNode recentC=new MoveNode(childCommands);
+                                int seqSmart = utility.isSeqSmart(recentC.getMoveCommands());
+                                if(seqSmart ==0){
+                                    this.result=recentC;
+                                    return;
+                                }
+                                if(seqSmart == 1){
+                                    toExplore.add(0,recentC);
+                                }
+                            }
+                            break;
                     }
                 }
             }

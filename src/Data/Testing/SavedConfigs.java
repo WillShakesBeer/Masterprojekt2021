@@ -27,10 +27,10 @@ public class SavedConfigs {
         int length = 15;
         int height = 15;
         ArrayList<Robot> robotList = new ArrayList<Robot>();
-        robotList.add(new Data.Robot(new Coord(0,0), Colors.RED));
-        robotList.add(new Data.Robot(new Coord(0,15), Colors.BLUE));
+        robotList.add(new Data.Robot(new Coord(0,8), Colors.RED));
+        robotList.add(new Data.Robot(new Coord(5,15), Colors.BLUE));
         robotList.add(new Data.Robot(new Coord(15,0), Colors.YELLOW));
-        robotList.add(new Data.Robot(new Coord(15,15), Colors.GREEN));
+        robotList.add(new Data.Robot(new Coord(8,15), Colors.GREEN));
 
         ArrayList<Obstacle> obstacleList = new ArrayList<Obstacle>();
         obstacleList.add(new Obstacle(new Coord(3,0),new Coord(4,0), ObsType.HORIZONTAL));
@@ -99,7 +99,7 @@ public class SavedConfigs {
         victorySpawns.add(new VictorySpawn(new Coord(5,6), Colors.GREEN));
         victorySpawns.add(new VictorySpawn(new Coord(11,5), Colors.GREEN));
 
-        VictoryPoint testVic = new VictoryPoint(new Coord(11, 5),Colors.GREEN);
+        VictoryPoint testVic = new VictoryPoint(new Coord(3, 9),Colors.BLUE);
         //VictoryPoint testVic1 = new VictoryPoint(new Coord(12, 9),Colors.YELLOW);
         //VictoryPoint testVic2 = new VictoryPoint(new Coord(11, 5),Colors.GREEN);
         //VictoryPoint testVic3 = new VictoryPoint(new Coord(1, 12),Colors.RED);
